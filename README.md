@@ -98,6 +98,33 @@ Desktop controls:
 - `Esc` or `q`: close the application.
 - `--no-audio`: run without CoreAudio output.
 
+### Three-knob desktop simulation
+
+The first three-knob implementation slice can be exercised through the same
+normalized event and controller path that physical encoders will use:
+
+```bash
+UI/.venv/bin/python UI/kiwi_gl_display.py --desktop --desktop-knobs
+```
+
+| Knob | Counterclockwise | Clockwise | Press / hold |
+| --- | --- | --- | --- |
+| Large `TUNE` | `A` | `D` | `S` cycles the tuning step; hold `S` for direct frequency entry |
+| Small `VIEW` | Left arrow | Right arrow | Space switches Zoom/Volume; hold Space for Home/Back |
+| Small `NAV` | Up arrow | Down arrow | Enter activates focus; hold Enter to cancel editing or go Back |
+
+Slow TUNE input moves exactly one selected step per logical click. Rapid input
+uses bounded acceleration, and a pause or direction reversal returns
+immediately to precision tuning. A bright outline shows knob focus while the
+on-screen labels show VIEW mode, tuning step, and acceleration. Mouse/touch
+input remains enabled and takes ownership immediately.
+
+The default [`config/ituner-knobs.json`](config/ituner-knobs.json) is disabled
+until physical mappings are supplied. GPIO/evdev readers, reconnect handling,
+installer dependencies, and the standalone 600-click hardware diagnostic are
+the next hardware phase; desktop simulation already validates the shared
+event, focus, edit, tuning, navigation, and feedback core.
+
 Because desktop windows are borderless, use `Esc` or `q` instead of a macOS close button.
 
 The receiver is a live public KiwiSDR or FM-DX Webserver connection. KiwiSDR

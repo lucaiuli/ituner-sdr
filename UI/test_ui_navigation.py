@@ -1572,5 +1572,103 @@ class ReceiverButtonContractTests(unittest.TestCase):
         self.assertTrue(ui.pending_connection_closes_picker("list", map_open=False))
 
 
+class KnobUiIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        ui.configure_output(True)
+        ui.configure_popup_layout()
+
+    def test_main_context_has_sidebar_actions_in_reading_order(self):
+        context = ui.active_knob_context(ui.KnobUiFlags())
+
+        self.assertEqual(context.screen_id, "main")
+        self.assertEqual(
+            tuple(control.control_id for control in context.controls),
+            ("receivers", "audio", "modes", "settings"),
+        )
+
+    def test_settings_context_exposes_only_settings_destinations(self):
+        context = ui.active_knob_context(ui.KnobUiFlags(settings_menu_open=True))
+
+        self.assertEqual(context.screen_id, "settings")
+        self.assertEqual(
+            tuple(control.control_id for control in context.controls),
+            ("display", "location", "receivers", "cpu", "tests", "fan", "back"),
+        )
+
+    def test_receiver_picker_context_marks_rows_for_page_control(self):
+        context = ui.active_knob_context(
+            ui.KnobUiFlags(picker_open=True),
+            receiver_row_count=3,
+        )
+
+        self.assertTrue(context.receiver_list_active)
+        rows = [control for control in context.controls if control.category == "receiver"]
+        self.assertEqual(tuple(row.control_id for row in rows), (
+            "receiver_row:0", "receiver_row:1", "receiver_row:2",
+        ))
+
+    def test_search_does_not_focus_controls_covered_by_keyboard(self):
+        context = ui.active_knob_context(
+            ui.KnobUiFlags(picker_open=True, search_open=True),
+            receiver_row_count=5,
+        )
+
+        self.assertEqual(context.screen_id, "receiver_search")
+        self.assertEqual(tuple(control.control_id for control in context.controls), ("back",))
+
+    def test_unmapped_nested_drawer_never_falls_through_to_hidden_home_controls(self):
+        context = ui.active_knob_context(
+            ui.KnobUiFlags(receiver_home_panel_open=True),
+        )
+
+        self.assertEqual(context.screen_id, "receiver_home")
+        self.assertEqual(tuple(control.control_id for control in context.controls), ("back",))
+
+    def test_tune_command_quantizes_and_clamps_with_active_protocol(self):
+        state = ui.SharedState(
+            "http://kiwi.test:8073", 1000.0, 4, -95.0,
+            -110, -10, 1, "am", True, receiver_type="kiwi",
+        )
+
+        frequency = ui.apply_knob_tune(
+            state, clicks=3, multiplier=1, step_hz=100,
+        )
+
+        self.assertAlmostEqual(frequency, 1000.3)
+        self.assertAlmostEqual(state.snapshot()[1], 1000.3)
+
+    def test_tune_command_clamps_fmdx_to_receiver_bounds(self):
+        server = "https://knob-fmdx.test"
+        ui.fmdx.register_receivers(({
+            "server": server,
+            "min_freq_khz": 87500.0,
+            "max_freq_khz": 108000.0,
+        },))
+        state = ui.SharedState(
+            server, 107999.9, 0, -95.0,
+            -110, -10, 1, "am", True, receiver_type="fmdx",
+        )
+
+        frequency = ui.apply_knob_tune(
+            state, clicks=10, multiplier=12, step_hz=100,
+        )
+
+        self.assertEqual(frequency, 108000.0)
+
+    def test_focus_box_maps_main_actions_and_rejects_hidden_rows(self):
+        flags = ui.KnobUiFlags()
+        self.assertEqual(ui.knob_focus_box("receivers", flags), ui.lcd_nav_box(0, 4))
+        self.assertIsNone(ui.knob_focus_box("receiver_row:9", flags, receiver_row_count=4))
+
+    def test_overlay_reports_view_mode_step_and_acceleration(self):
+        snapshot = ui.KnobController().snapshot()
+        lines = ui.knob_overlay_lines(snapshot, tune_step_hz=100)
+
+        self.assertEqual(lines[0], "VIEW ZOOM")
+        self.assertEqual(lines[1], "TUNE STEP 100 Hz")
+        self.assertEqual(lines[2], "TUNE x1")
+
+
 if __name__ == "__main__":
     unittest.main()
