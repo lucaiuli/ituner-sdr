@@ -219,6 +219,21 @@ class FmdxDirectoryTests(unittest.TestCase):
         self.assertEqual(merged[0]["server"], "http://kiwi.test:8073/")
         self.assertEqual(merged[1]["server"], "https://fmdx.test/radio")
 
+    def test_cached_directory_load_never_requires_network(self):
+        payload = {"dataset": [{
+            "name": "Cached FM",
+            "url": "https://cached.test/radio/",
+            "coords": [44.4, 26.1],
+            "status": 1,
+        }]}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "directory.json"
+            path.write_text(json.dumps(payload))
+            receivers = fmdx.load_cached_directory(path)
+
+        self.assertEqual(receivers[0]["server"], "https://cached.test/radio")
+        self.assertTrue(fmdx.is_fmdx_server("https://cached.test/radio"))
+
     def test_health_dispatches_fmdx_without_a_waterfall_probe(self):
         health = {"stations": {}}
         station = ("FM", "Somewhere", "https://fmdx.test", 0, 0, 1, 2, "fmdx")

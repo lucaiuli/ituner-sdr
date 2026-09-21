@@ -546,6 +546,16 @@ def merge_receivers(*groups):
     return merged
 
 
+def load_cached_directory(cache_path):
+    """Load and register a saved directory without performing network I/O."""
+    try:
+        receivers = normalize_directory(json.loads(Path(cache_path).read_text()))
+    except (OSError, ValueError, TypeError):
+        receivers = []
+    register_receivers(receivers)
+    return receivers
+
+
 def load_directory(cache_path, timeout=15, minimum_entries=20):
     """Load a cached directory, refresh it, and atomically retain good data."""
     cache_path = Path(cache_path)

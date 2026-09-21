@@ -206,6 +206,7 @@ import pygame
 from OpenGL import GL
 
 import kiwi_live_display_fb as kiwi
+import fmdx
 from knob_controller import KnobCommandKind, KnobController
 from knob_input import DesktopKnobAdapter
 from knob_ui_adapter import (
@@ -2428,6 +2429,8 @@ PUBLIC_DIRECTORY_CACHE = Path.home() / ".local/state/kiwi-gl-public-directory.js
 STATION_HEALTH_CACHE = Path.home() / ".local/state/kiwi-gl-station-health.json"
 GLOBE_DIRECTORY_URL = "http://rx.linkfanel.net/kiwisdr_com.js"
 GLOBE_DIRECTORY_CACHE = Path.home() / ".local/state/kiwi-gl-globe-receivers.json"
+FMDX_DIRECTORY_CACHE = Path.home() / ".local/state/ituner-fmdx-directory.json"
+FMDX_STATION_CACHE = Path.home() / ".local/state/ituner-fmdx-stations.json"
 RECEIVER_HOME_PROFILE = Path.home() / ".local/state/kiwi-gl-receiver-home.json"
 FAVORITES_CACHE = Path.home() / ".local/state/kiwi-gl-favorites.json"
 FAN_CURVE_CONFIG = Path.home() / ".local/state/ituner-fan-curve.json"
@@ -2565,8 +2568,12 @@ def receiver_limit_label(entry):
     return "LIMIT SET" if entry.get("time_limit_advertised") else ""
 
 
-def receiver_route_label(server):
+def receiver_route_label(server, receiver_type=None):
     """Classify the directory route without hiding its actual receiver host."""
+    if str(receiver_type or "").casefold() == "fmdx" or fmdx.is_fmdx_server(server):
+        return "FMDX"
+    if str(receiver_type or "").casefold() == "kiwi":
+        return "KIWI"
     parsed = urlparse(server if "://" in server else "http://" + server)
     host = (parsed.hostname or "").casefold()
     # Kiwi's public relay endpoints identify themselves with a proxy host
@@ -3208,7 +3215,8 @@ def load_public_stations():
     return prioritize_local_station(cached if cached else kiwi.STATIONS)
 
 
-STATIONS = load_public_stations()
+FMDX_RECEIVERS = fmdx.load_cached_directory(FMDX_DIRECTORY_CACHE)
+STATIONS = tuple(load_public_stations()) + tuple(fmdx.stations_from_receivers(FMDX_RECEIVERS))
 
 
 def parse_globe_directory(script):
@@ -3242,7 +3250,11 @@ def parse_globe_directory(script):
             total = int(field("users_max", "0"))
         except ValueError:
             used = total = 0
-        receivers.append({"name": name, "location": location, "server": server, "lat": lat, "lon": lon, "used": used, "total": total})
+        receivers.append({
+            "name": name, "location": location, "server": server,
+            "lat": lat, "lon": lon, "used": used, "total": total,
+            "receiver_type": "kiwi",
+        })
     return receivers
 
 
@@ -3251,13 +3263,14 @@ def load_globe_receivers():
     try:
         cached = json.loads(GLOBE_DIRECTORY_CACHE.read_text())
         if isinstance(cached, list):
-            return cached
+            return fmdx.merge_receivers(cached, FMDX_RECEIVERS)
     except (OSError, ValueError, TypeError):
-        return []
-    return []
+        return list(FMDX_RECEIVERS)
+    return list(FMDX_RECEIVERS)
 
 
 def refresh_globe_receivers(result):
+    fmdx_receivers = fmdx.load_directory(FMDX_DIRECTORY_CACHE)
     try:
         request = Request(GLOBE_DIRECTORY_URL, headers={"User-Agent": "KiwiTouch/1.0"})
         with urlopen(request, timeout=15) as response:
@@ -3267,12 +3280,18 @@ def refresh_globe_receivers(result):
             temporary = GLOBE_DIRECTORY_CACHE.with_suffix(".tmp")
             temporary.write_text(json.dumps(receivers, separators=(",", ":")))
             os.replace(temporary, GLOBE_DIRECTORY_CACHE)
-            result.put(("ready", receivers))
+            result.put(("ready", fmdx.merge_receivers(receivers, fmdx_receivers)))
             return
     except OSError as exc:
+        if fmdx_receivers:
+            result.put(("ready", fmdx_receivers))
+            return
         result.put(("error", str(exc)))
         return
-    result.put(("error", "public map returned no usable GPS receivers"))
+    if fmdx_receivers:
+        result.put(("ready", fmdx_receivers))
+    else:
+        result.put(("error", "public maps returned no usable GPS receivers"))
 
 
 def stations_from_globe_receivers(receivers):
@@ -3297,7 +3316,8 @@ def stations_from_globe_receivers(receivers):
             lat, lon = float(receiver["lat"]), float(receiver["lon"])
         except (KeyError, TypeError, ValueError):
             lat = lon = None
-        stations.append((name, location, server, used, total, lat, lon))
+        receiver_type = str(receiver.get("receiver_type") or "kiwi").casefold()
+        stations.append((name, location, server, used, total, lat, lon, receiver_type))
     return prioritize_local_station(stations)
 
 
@@ -3315,7 +3335,11 @@ def choose_constellation(center, receivers, health):
     stay nearby so their heat field describes local reception alternatives, not
     an arbitrary pentagon or other artificial shape.
     """
-    if not center:
+    receivers = [
+        receiver for receiver in receivers
+        if str(receiver.get("receiver_type") or "kiwi").casefold() == "kiwi"
+    ]
+    if not center or str(center.get("receiver_type") or "kiwi").casefold() != "kiwi":
         return [], []
 
     def readiness(receiver):
@@ -3459,7 +3483,7 @@ def filtered_stations(stations, query, sort_mode, route_filter="all", favorites=
         route_matches = (
             route_filter == "all"
             or (route_filter == "favorites" and server in favorites)
-            or receiver_route_label(server).casefold() == route_filter
+            or receiver_route_label(server, station_receiver_type(station)).casefold() == route_filter
         )
         return all(term in haystack for term in terms) and route_matches
     filtered = [station for station in stations if matches(station)]
@@ -4015,8 +4039,12 @@ def load_remembered_view(path):
         parsed = urlparse(server)
         if parsed.scheme in ("http", "https") and parsed.hostname:
             view = {"server": server}
+            receiver_type = str(saved.get("receiver_type") or "").casefold()
+            if receiver_type in ("kiwi", "fmdx"):
+                view["receiver_type"] = receiver_type
             freq_khz = saved.get("freq_khz")
-            if isinstance(freq_khz, (int, float)) and 0.0 <= freq_khz <= TUNING_MAX_KHZ:
+            maximum_khz = fmdx.DEFAULT_MAX_KHZ if receiver_type == "fmdx" else TUNING_MAX_KHZ
+            if isinstance(freq_khz, (int, float)) and 0.0 <= freq_khz <= maximum_khz:
                 view["freq_khz"] = float(freq_khz)
             zoom = saved.get("zoom")
             if isinstance(zoom, int) and 0 <= zoom <= kiwi.DISPLAY_MAX_ZOOM:
@@ -4033,7 +4061,10 @@ def load_remembered_view(path):
     return None
 
 
-def save_remembered_view(path, server, freq_khz, zoom, radio_mode=None, manual_radio_mode=False, preferences=None):
+def save_remembered_view(
+    path, server, freq_khz, zoom, radio_mode=None, manual_radio_mode=False,
+    preferences=None, receiver_type=None,
+):
     parsed = urlparse(server)
     if parsed.scheme not in ("http", "https") or not parsed.hostname:
         return
@@ -4041,11 +4072,13 @@ def save_remembered_view(path, server, freq_khz, zoom, radio_mode=None, manual_r
         path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_name(path.name + ".tmp")
         saved = {
-            "version": 2,
+            "version": 3,
             "freq_khz": round(float(freq_khz), 3),
             "server": server,
             "zoom": clamp(int(zoom), 0, kiwi.DISPLAY_MAX_ZOOM),
         }
+        if str(receiver_type or "").casefold() in ("kiwi", "fmdx"):
+            saved["receiver_type"] = str(receiver_type).casefold()
         if manual_radio_mode and isinstance(radio_mode, str) and radio_mode.upper() in KIWI_RADIO_MODES:
             saved["radio_mode"] = radio_mode.upper()
         if preferences:
@@ -4091,7 +4124,11 @@ class SharedState:
     ):
         self.lock = threading.Lock()
         self.server = server
-        self.freq_khz = freq_khz
+        self.receiver_type = "fmdx" if fmdx.is_fmdx_server(server) else "kiwi"
+        self.freq_khz = (
+            fmdx.receiver_frequency(server, freq_khz)
+            if self.receiver_type == "fmdx" else freq_khz
+        )
         self.zoom = clamp(int(zoom), 0, kiwi.DISPLAY_MAX_ZOOM)
         self.smeter_dbm = smeter_dbm
         self.smeter_peak_dbm = smeter_dbm
@@ -4203,6 +4240,12 @@ class SharedState:
         with self.lock:
             return self.server, self.freq_khz, self.zoom, self.smeter_dbm, self.view_generation, self.server_generation
 
+    def receiver_type_snapshot(self, generation=None):
+        with self.lock:
+            if generation is not None and generation != self.server_generation:
+                return None
+            return self.receiver_type
+
     def kiwi_session_timestamp_snapshot(self, generation):
         with self.lock:
             if generation != self.server_generation:
@@ -4212,7 +4255,10 @@ class SharedState:
     def set_view(self, freq_khz=None, zoom=None):
         with self.lock:
             if freq_khz is not None:
-                self.freq_khz = freq_khz
+                self.freq_khz = (
+                    fmdx.clamp_receiver_frequency(self.server, freq_khz)
+                    if self.receiver_type == "fmdx" else freq_khz
+                )
             if zoom is not None:
                 self.zoom = clamp(int(zoom), 0, kiwi.DISPLAY_MAX_ZOOM)
             self.spectrum_peak_values = ()
@@ -4229,7 +4275,7 @@ class SharedState:
             self.live_tune_rate_hz = int(clamp(int(rate_hz), 1, 100))
             return self.live_tune_rate_hz
 
-    def set_server(self, server, zoom=None):
+    def set_server(self, server, zoom=None, receiver_type=None):
         """Switch receiver without inheriting that receiver's demodulator default.
 
         A Kiwi starts a fresh SND socket in its own default state (commonly
@@ -4239,7 +4285,15 @@ class SharedState:
         still connecting.
         """
         with self.lock:
+            selected_type = str(receiver_type or "").casefold()
+            if selected_type not in ("kiwi", "fmdx"):
+                selected_type = "fmdx" if fmdx.is_fmdx_server(server) else "kiwi"
+            if selected_type == "fmdx":
+                fmdx.ensure_receiver(server, "fmdx")
             self.server = server
+            self.receiver_type = selected_type
+            if self.receiver_type == "fmdx":
+                self.freq_khz = fmdx.receiver_frequency(server, self.freq_khz)
             # Selecting another receiver is an intentional request to listen
             # to it, even if the previous one had been paused.
             self.stream_paused = False
@@ -14409,6 +14463,34 @@ def station_fields(station):
     return name, location, server, listener_used, listener_total
 
 
+def station_receiver_type(station):
+    """Return explicit directory protocol, falling back to the FM-DX registry."""
+    if isinstance(station, (list, tuple)) and len(station) > 7:
+        receiver_type = str(station[7] or "").casefold()
+        if receiver_type in ("kiwi", "fmdx"):
+            return receiver_type
+    server = station[2] if isinstance(station, (list, tuple)) and len(station) > 2 else ""
+    return "fmdx" if fmdx.is_fmdx_server(server) else "kiwi"
+
+
+def effective_receiver_mode(receiver_type, kiwi_mode):
+    return fmdx.MODE_LABEL if str(receiver_type).casefold() == "fmdx" else str(kiwi_mode).upper()
+
+
+def receiver_tuning_bounds(server, receiver_type):
+    if str(receiver_type).casefold() == "fmdx":
+        return fmdx.receiver_bounds(server) or (fmdx.DEFAULT_MIN_KHZ, fmdx.DEFAULT_MAX_KHZ)
+    return 0.0, TUNING_MAX_KHZ
+
+
+def receiver_display_span(zoom, receiver_type):
+    return (
+        fmdx.audio_waterfall_span_khz(zoom)
+        if str(receiver_type).casefold() == "fmdx"
+        else kiwi.zoom_to_span_khz(zoom)
+    )
+
+
 def knob_tuned_frequency(frequency_khz, clicks, multiplier, step_hz, low_khz, high_khz):
     """Apply a knob movement in Hz while respecting the active receiver bounds."""
     delta_khz = int(clicks) * max(1, int(multiplier)) * max(1, int(step_hz)) / 1000.0
@@ -14472,8 +14554,8 @@ def draw_station_picker(
     )
     if LCD_800_MODE:
         draw_picker_button(text_cache, PICKER_ROUTE_ALL_BOX, "ALL", 19, route_filter == "all")
-        draw_picker_button(text_cache, PICKER_ROUTE_DIRECT_BOX, "DIRECT", 17, route_filter == "direct")
-        draw_picker_button(text_cache, PICKER_ROUTE_PROXY_BOX, "PROXY", 18, route_filter == "proxy")
+        draw_picker_button(text_cache, PICKER_ROUTE_DIRECT_BOX, "KIWI", 18, route_filter == "kiwi")
+        draw_picker_button(text_cache, PICKER_ROUTE_PROXY_BOX, "FMDX", 18, route_filter == "fmdx")
         draw_picker_button(text_cache, PICKER_ROUTE_FAVORITES_BOX, "FAVORITES", 15, route_filter == "favorites")
     draw_picker_button(text_cache, PICKER_EXIT_BOX, "EXIT", 19 if LCD_800_MODE else 20)
 
@@ -18826,6 +18908,7 @@ def main():
     desktop_knob_adapter = DesktopKnobAdapter() if args.desktop and args.desktop_knobs else None
     knob_controller = KnobController() if desktop_knob_adapter is not None else None
     remembered_radio_mode = None
+    remembered_receiver_type = None
     remembered_preferences = {}
     if args.remember_receiver:
         remembered_view = load_remembered_view(args.receiver_state_file)
@@ -18833,6 +18916,10 @@ def main():
             args.server = remembered_view["server"]
             args.freq_khz = remembered_view.get("freq_khz", args.freq_khz)
             args.zoom = remembered_view.get("zoom", args.zoom)
+            remembered_receiver_type = remembered_view.get("receiver_type")
+            if remembered_receiver_type == "fmdx":
+                fmdx.ensure_receiver(args.server, "fmdx")
+                args.freq_khz = fmdx.receiver_frequency(args.server, args.freq_khz)
             remembered_radio_mode = remembered_view.get("radio_mode")
             remembered_preferences = remembered_view.get("preferences", {})
             print(
@@ -19828,6 +19915,7 @@ def main():
             radio_mode,
             manual_radio_mode,
             preferences,
+            state.receiver_type_snapshot(),
         )
         saved_preferences_signature = signature
         preferences_dirty = False
@@ -20045,7 +20133,11 @@ def main():
     def active_tuning_bounds():
         if state.external_waterfall_snapshot() or rtl_lab.is_running():
             return rtl_lab.tuning_bounds()
-        return 0.0, TUNING_MAX_KHZ
+        server, _freq, _zoom, _smeter, _generation, server_generation = state.snapshot()
+        return receiver_tuning_bounds(
+            server,
+            state.receiver_type_snapshot(server_generation) or "kiwi",
+        )
 
     def clamp_active_frequency(value):
         low, high = active_tuning_bounds()
@@ -20279,11 +20371,14 @@ def main():
         """Use one path for normal list taps and the Home local-receiver key."""
         nonlocal station_pending_server, station_pending_started_at, station_connected_at, zoom_osd_until
         name, _location, target_server, _used, _total = station_fields(station)
-        _server, frequency, zoom, _generation, _server_generation = state.set_server(target_server)
+        _server, frequency, zoom, _generation, _server_generation = state.set_server(
+            target_server,
+            receiver_type=station_receiver_type(station),
+        )
         write_remembered_view(save_current_frequency=True, force=True)
         drain_queue(line_queue)
         wf_texture.clear()
-        animate_to(frequency, kiwi.zoom_to_span_khz(zoom), 0.20)
+        animate_to(frequency, receiver_display_span(zoom, station_receiver_type(station)), 0.20)
         station_pending_server = target_server
         station_pending_started_at = time.monotonic()
         station_connected_at = 0.0
@@ -21675,9 +21770,9 @@ def main():
                             elif picker_open and LCD_800_MODE and contains(PICKER_ROUTE_ALL_BOX, x, y):
                                 gesture = "picker_route_all"
                             elif picker_open and LCD_800_MODE and contains(PICKER_ROUTE_DIRECT_BOX, x, y):
-                                gesture = "picker_route_direct"
+                                gesture = "picker_route_kiwi"
                             elif picker_open and LCD_800_MODE and contains(PICKER_ROUTE_PROXY_BOX, x, y):
-                                gesture = "picker_route_proxy"
+                                gesture = "picker_route_fmdx"
                             elif picker_open and LCD_800_MODE and contains(PICKER_ROUTE_FAVORITES_BOX, x, y):
                                 gesture = "picker_route_favorites"
                             elif picker_open and contains(PICKER_EXIT_BOX, x, y):
@@ -23673,7 +23768,7 @@ def main():
                                 station_sort = "name" if station_sort == "location" else "location"
                                 stations = filtered_stations(all_stations, station_query, station_sort, station_route_filter, favorite_servers)
                                 station_scroll = 0
-                        elif touch_started and gesture in ("picker_route_all", "picker_route_direct", "picker_route_proxy", "picker_route_favorites"):
+                        elif touch_started and gesture in ("picker_route_all", "picker_route_kiwi", "picker_route_fmdx", "picker_route_favorites"):
                             moved = max(abs(x - start_x), abs(y - start_y))
                             if moved <= args.tap_px:
                                 station_route_filter = gesture.removeprefix("picker_route_")
