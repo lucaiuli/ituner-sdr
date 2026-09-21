@@ -24,7 +24,7 @@ echo 'Installing display driver, GT911 touch support, OpenGL SDR UI, and boot se
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   build-essential raspberrypi-kernel-headers device-tree-compiler \
-  python3-pygame python3-opengl python3-pil pipewire-audio wireplumber
+  ffmpeg python3-pygame python3-opengl python3-pil pipewire-audio wireplumber
 
 install -d -m 0755 /usr/local/src/ituner-sdr-display /opt/ituner-sdr/UI /usr/local/lib/ituner-sdr "${state_dir}"
 install -m 0644 "${repo_dir}/display-driver/driver/Makefile" "${repo_dir}/display-driver/driver/panel-sitronix-st7701.c" /usr/local/src/ituner-sdr-display/
@@ -50,7 +50,7 @@ awk '/^# BEGIN ITUNER SDR$/ {skip=1; next} /^# END ITUNER SDR$/ {skip=0; next} !
   printf '# END ITUNER SDR\n'
 } >"${config_txt}"
 
-install -m 0644 "${repo_dir}/UI/kiwi_gl_display.py" "${repo_dir}/UI/kiwi_live_display_fb.py" "${repo_dir}/UI/kiwi_station_health.py" "${repo_dir}/UI/render_sdr_frontend_mockup.py" /opt/ituner-sdr/UI/
+install -m 0644 "${repo_dir}/UI/fmdx.py" "${repo_dir}/UI/kiwi_gl_display.py" "${repo_dir}/UI/kiwi_live_display_fb.py" "${repo_dir}/UI/kiwi_station_health.py" "${repo_dir}/UI/render_sdr_frontend_mockup.py" /opt/ituner-sdr/UI/
 install -d -m 0755 /opt/ituner-sdr/UI/assets
 install -m 0644 "${repo_dir}/UI/assets/waterfall-texture.png" /opt/ituner-sdr/UI/assets/
 install -m 0755 "${repo_dir}/scripts/start-opengl.sh" /usr/local/lib/ituner-sdr/start-opengl.sh

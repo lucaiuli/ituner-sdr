@@ -2582,6 +2582,11 @@ def receiver_route_label(server, receiver_type=None):
     return "PROXY" if any("proxy" in label for label in host.split(".")) else "DIRECT"
 
 
+def receiver_worker_protocol(receiver_type):
+    """Select the transport without inferring protocol from a URL shape."""
+    return "fmdx" if str(receiver_type or "").casefold() == "fmdx" else "kiwi"
+
+
 def load_favorite_servers():
     try:
         payload = json.loads(FAVORITES_CACHE.read_text())
@@ -3216,7 +3221,22 @@ def load_public_stations():
 
 
 FMDX_RECEIVERS = fmdx.load_cached_directory(FMDX_DIRECTORY_CACHE)
+FMDX_LEARNED_STATIONS = fmdx.load_station_cache(FMDX_STATION_CACHE)
+FMDX_STATION_CACHE_LOCK = threading.Lock()
 STATIONS = tuple(load_public_stations()) + tuple(fmdx.stations_from_receivers(FMDX_RECEIVERS))
+
+
+def remember_fmdx_station(server, station):
+    """Atomically retain one learned RDS identity per FM-DX receiver."""
+    canonical = fmdx.normalize_server_url(server)
+    if not canonical or not station:
+        return
+    with FMDX_STATION_CACHE_LOCK:
+        previous = FMDX_LEARNED_STATIONS.get(canonical, ())
+        merged = fmdx.merge_station_presets(previous, (station,))
+        if merged != previous:
+            FMDX_LEARNED_STATIONS[canonical] = merged
+            fmdx.save_station_cache(FMDX_STATION_CACHE, FMDX_LEARNED_STATIONS)
 
 
 def parse_globe_directory(script):
@@ -4094,7 +4114,10 @@ def abort_kiwi_transport(ws):
     if ws is None:
         return
     try:
-        ws.send_close()
+        if hasattr(ws, "send_close"):
+            ws.send_close()
+        else:
+            ws.close()
     except (AttributeError, OSError):
         pass
     raw_socket = getattr(ws, "sock", None)
@@ -4125,6 +4148,14 @@ class SharedState:
         self.lock = threading.Lock()
         self.server = server
         self.receiver_type = "fmdx" if fmdx.is_fmdx_server(server) else "kiwi"
+        canonical_fmdx_server = fmdx.normalize_server_url(server)
+        self.fmdx_status = {}
+        self.fmdx_stations = tuple(
+            FMDX_LEARNED_STATIONS.get(canonical_fmdx_server, ())
+            if self.receiver_type == "fmdx" and canonical_fmdx_server else ()
+        )
+        self.fmdx_scan_requested = False
+        self.fmdx_scan_request_generation = 0
         self.freq_khz = (
             fmdx.receiver_frequency(server, freq_khz)
             if self.receiver_type == "fmdx" else freq_khz
@@ -4246,6 +4277,47 @@ class SharedState:
                 return None
             return self.receiver_type
 
+    def update_fmdx_status(self, payload, generation):
+        """Publish current FM-DX metadata and retain any valid RDS identity."""
+        with self.lock:
+            if generation != self.server_generation or self.receiver_type != "fmdx":
+                return None
+            self.fmdx_status = dict(payload or {})
+            station = fmdx.station_from_status(self.fmdx_status, self.freq_khz)
+            if station:
+                self.fmdx_stations = fmdx.merge_station_presets(self.fmdx_stations, (station,))
+            return station
+
+    def fmdx_status_snapshot(self):
+        with self.lock:
+            return dict(self.fmdx_status)
+
+    def update_fmdx_stations(self, stations, generation):
+        with self.lock:
+            if generation != self.server_generation or self.receiver_type != "fmdx":
+                return ()
+            self.fmdx_stations = fmdx.merge_station_presets(self.fmdx_stations, stations)
+            return self.fmdx_stations
+
+    def fmdx_stations_snapshot(self):
+        with self.lock:
+            return tuple(self.fmdx_stations)
+
+    def request_fmdx_scan(self, active, generation=None):
+        with self.lock:
+            if (
+                self.receiver_type != "fmdx"
+                or (generation is not None and generation != self.server_generation)
+            ):
+                return None
+            self.fmdx_scan_requested = bool(active)
+            self.fmdx_scan_request_generation += 1
+            return self.fmdx_scan_requested, self.fmdx_scan_request_generation
+
+    def fmdx_scan_request_snapshot(self):
+        with self.lock:
+            return self.fmdx_scan_requested, self.fmdx_scan_request_generation
+
     def kiwi_session_timestamp_snapshot(self, generation):
         with self.lock:
             if generation != self.server_generation:
@@ -4292,6 +4364,14 @@ class SharedState:
                 fmdx.ensure_receiver(server, "fmdx")
             self.server = server
             self.receiver_type = selected_type
+            canonical_fmdx_server = fmdx.normalize_server_url(server)
+            self.fmdx_status = {}
+            self.fmdx_stations = tuple(
+                FMDX_LEARNED_STATIONS.get(canonical_fmdx_server, ())
+                if selected_type == "fmdx" and canonical_fmdx_server else ()
+            )
+            self.fmdx_scan_requested = False
+            self.fmdx_scan_request_generation += 1
             if self.receiver_type == "fmdx":
                 self.freq_khz = fmdx.receiver_frequency(server, self.freq_khz)
             # Selecting another receiver is an intentional request to listen
@@ -4916,7 +4996,7 @@ class SharedState:
             now = time.monotonic()
             if source == "wf" and now - self.last_snd_smeter_t < 2.0:
                 return
-            if source == "snd":
+            if source in ("snd", "fmdx"):
                 self.last_snd_smeter_t = now
             elapsed = min(0.25, max(0.0, now - self.last_smeter_update_t))
             time_constant = SMETER_ATTACK_SECONDS if smeter_dbm >= self.smeter_dbm else SMETER_RELEASE_SECONDS
@@ -7511,14 +7591,33 @@ def radio_variant_layout(modes):
         yield mode, (x0, y0, x0 + button_w, y0 + RADIO_VARIANT_BUTTON_H)
 
 
-def radio_option_at(x, y, family_open=None):
+def fmdx_control_layout(stations, scan_active=False):
+    """Reuse the first drawer cells for explicit FM-DX station actions."""
+    boxes = [box for _family, _modes, box in radio_mode_layout()]
+    actions = []
+    if stations:
+        actions.extend(("preset_previous", "preset_next"))
+    actions.append("scan_stop" if scan_active else "scan_start")
+    for action, box in zip(actions, boxes):
+        yield action, box
+
+
+def radio_option_at(
+    x, y, family_open=None, receiver_type="kiwi", fmdx_stations=(),
+    fmdx_scan_active=False,
+):
     if LCD_800_MODE and y > lcd_radio_drawer_reveal_y():
         return None
     if LCD_800_MODE and contains(lcd_radio_drawer_close_box(), x, y):
         return "close", None
-    for _family, modes, box in radio_mode_layout():
-        if contains(box, x, y):
-            return "mode_cycle", modes
+    if receiver_worker_protocol(receiver_type) == "kiwi":
+        for _family, modes, box in radio_mode_layout():
+            if contains(box, x, y):
+                return "mode_cycle", modes
+    else:
+        for action, box in fmdx_control_layout(fmdx_stations, fmdx_scan_active):
+            if contains(box, x, y):
+                return "fmdx_action", action
     for step_hz, box in radio_step_options():
         if contains(box, x, y):
             return "step", step_hz
@@ -7637,7 +7736,10 @@ def draw_radio_variant_option(text_cache, box, mode, active):
     )
 
 
-def draw_radio_setup_panel(text_cache, mode, digital, step_hz, family_open=None):
+def draw_radio_setup_panel(
+    text_cache, mode, digital, step_hz, family_open=None,
+    receiver_type="kiwi", fmdx_status=None, fmdx_stations=(), fmdx_scan_active=False,
+):
     x0, y0, x1, y1 = radio_panel_box()
     # On the 800×1280 target this is a compact drawer in the permanent right
     # rail. Do not veil or occupy the waterfall: it remains the radio's live
@@ -7653,10 +7755,21 @@ def draw_radio_setup_panel(text_cache, mode, digital, step_hz, family_open=None)
         close_x0, close_y0, close_x1, close_y1 = lcd_radio_drawer_close_box()
         if reveal_y >= close_y1:
             draw_radio_close_button(text_cache, (close_x0, close_y0, close_x1, close_y1))
-        active_mode = mode.upper()
-        for family, modes, box in radio_mode_layout():
-            if reveal_y >= box[3]:
-                draw_radio_family_option(text_cache, box, family, modes, active_mode)
+        active_mode = effective_receiver_mode(receiver_type, mode)
+        if receiver_worker_protocol(receiver_type) == "fmdx":
+            ps = str((fmdx_status or {}).get("ps") or "Waiting for RDS").strip()
+            draw_text(text_cache, x0 + 12, y0 + 86, "FM-FMDX", (244, 178, 91), 20, True, False, "lm", family="Liberation Sans")
+            draw_text(text_cache, x0 + 12, y0 + 108, "MODE IS SERVER CONTROLLED", (145, 183, 190), 11, True, False, "lm", family="Liberation Sans")
+            draw_text(text_cache, x0 + 12, y0 + 137, ps[:24], (229, 243, 246), 15, True, False, "lm", family="Liberation Sans")
+            draw_text(text_cache, x0 + 12, y0 + 158, f"{len(fmdx_stations)} station presets", (145, 183, 190), 11, False, False, "lm", family="Liberation Sans")
+            labels = {"preset_previous": "PREV", "preset_next": "NEXT", "scan_start": "SCAN", "scan_stop": "STOP"}
+            for action, box in fmdx_control_layout(fmdx_stations, fmdx_scan_active):
+                if reveal_y >= box[3]:
+                    draw_radio_option(text_cache, box, labels[action], action == "scan_stop")
+        else:
+            for family, modes, box in radio_mode_layout():
+                if reveal_y >= box[3]:
+                    draw_radio_family_option(text_cache, box, family, modes, active_mode)
         step_y0 = lcd_radio_step_y0()
         if reveal_y >= step_y0:
             draw_text(text_cache, x0 + 12, step_y0 - 15, "TUNING STEP", (145, 183, 190), 11, True, False, "lm", family="Liberation Sans")
@@ -7670,12 +7783,21 @@ def draw_radio_setup_panel(text_cache, mode, digital, step_hz, family_open=None)
     draw_logical_rect(x0, y0, x1, y1, (7, 14, 20, 242))
     draw_logical_line(x0, y0, x1, y0, (163, 190, 196, 112), 1)
     draw_logical_line(x0, y1, x1, y1, (163, 190, 196, 112), 1)
-    draw_text(text_cache, radio_popup_x(30), radio_popup_y(84), "MODE", (229, 243, 246), 20, True, False, "lm", family="Liberation Sans")
-    draw_text(text_cache, radio_popup_x(30), radio_popup_y(101), "Tap a mode to cycle its variants", (145, 183, 190), 13, False, False, "lm", family="Liberation Sans")
+    server_controlled = receiver_worker_protocol(receiver_type) == "fmdx"
+    draw_text(text_cache, radio_popup_x(30), radio_popup_y(84), "FM-FMDX" if server_controlled else "MODE", (229, 243, 246), 20, True, False, "lm", family="Liberation Sans")
+    draw_text(text_cache, radio_popup_x(30), radio_popup_y(101), "Mode is controlled by the FM-DX server" if server_controlled else "Tap a mode to cycle its variants", (145, 183, 190), 13, False, False, "lm", family="Liberation Sans")
     draw_text(text_cache, radio_popup_x(532), radio_popup_y(87), "STEP", (145, 183, 190), 13, True, False, "lm", family="Liberation Sans")
-    active_mode = mode.upper()
-    for family, modes, box in radio_mode_layout():
-        draw_radio_family_option(text_cache, box, family, modes, active_mode)
+    active_mode = effective_receiver_mode(receiver_type, mode)
+    if not server_controlled:
+        for family, modes, box in radio_mode_layout():
+            draw_radio_family_option(text_cache, box, family, modes, active_mode)
+    else:
+        ps = str((fmdx_status or {}).get("ps") or "Waiting for RDS").strip()
+        draw_text(text_cache, radio_popup_x(30), radio_popup_y(176), ps[:32], (244, 178, 91), 24, True, False, "lm", family="Liberation Sans")
+        draw_text(text_cache, radio_popup_x(30), radio_popup_y(210), f"{len(fmdx_stations)} station presets available", (176, 221, 214), 14, True, False, "lm", family="Liberation Sans")
+        labels = {"preset_previous": "PREVIOUS", "preset_next": "NEXT", "scan_start": "SCAN", "scan_stop": "STOP SCAN"}
+        for action, box in fmdx_control_layout(fmdx_stations, fmdx_scan_active):
+            draw_radio_option(text_cache, box, labels[action], action == "scan_stop")
     if not LCD_800_MODE:
         draw_text(text_cache, radio_popup_x(30), radio_popup_y(300), f"ACTIVE  {KIWI_MODE_CONTEXT.get(active_mode, active_mode)}", (176, 221, 214), 14, True, False, "lm", family="Liberation Sans")
     for option, box in radio_step_options():
@@ -12116,9 +12238,12 @@ def draw_receiver_map(
         is_pending = receiver["server"] == pending_server
         is_failed = is_pending and connection_status == "failed"
         is_hovered = receiver["server"] == hover_server
+        is_fmdx = receiver_worker_protocol(receiver.get("receiver_type")) == "fmdx"
         color = (
             (255, 81, 96, 255) if is_failed else
-            ((94, 236, 183, 255) if is_pending else ((83, 229, 176, 232) if ready else (132, 189, 198, 165)))
+            ((94, 236, 183, 255) if is_pending else
+             (fmdx.FMDX_MARKER_COLOR if is_fmdx else
+              ((83, 229, 176, 232) if ready else (132, 189, 198, 165))))
         )
         # The panel is viewed at arm's length. Make both the luminous station
         # core and its halo substantially easier to acquire with a finger.
@@ -14568,9 +14693,15 @@ def draw_station_picker(
         selected = server == selected_server
         pending = server == pending_server
         entry_health = station_health.get(server, {})
+        receiver_type = station_receiver_type(station)
+        displayed_health = dict(entry_health)
+        if receiver_type == "fmdx":
+            # FM-DX derives its local waterfall from the verified audio feed;
+            # it has no separate remote waterfall endpoint to probe.
+            displayed_health["waterfall"] = displayed_health.get("audio")
         checked = entry_health.get("checked", 0)
         health_fresh = time.time() - checked <= 86400
-        active = health_fresh and entry_health.get("audio") is True and entry_health.get("waterfall") is True
+        active = health_fresh and displayed_health.get("audio") is True and displayed_health.get("waterfall") is True
         if pending:
             # Retain the selected tile while the two Kiwi streams establish.
             # The inset/bright outline reads as a real pressed touch state.
@@ -14599,7 +14730,7 @@ def draw_station_picker(
         if pending:
             draw_logical_rect(box[0] + 3, box[1] + 3, box[2] - 3, box[1] + 8, (112, 255, 188, 230))
         marker_y = (box[1] + box[3]) / 2
-        draw_station_health_icons(text_cache, box[0] + 17, marker_y, entry_health, health_fresh)
+        draw_station_health_icons(text_cache, box[0] + 17, marker_y, displayed_health, health_fresh)
         generic_name = "0-30" in name.lower() and "sdr" in name.lower()
         if generic_name:
             # Keep the useful suffix for otherwise generic directory labels;
@@ -14631,7 +14762,7 @@ def draw_station_picker(
             draw_logical_rect(badge_x0, badge_y0, badge_x1, badge_y1, (28, 112, 91, 228))
             draw_text(text_cache, (badge_x0 + badge_x1) / 2, (badge_y0 + badge_y1) / 2, "LOCAL", (222, 255, 237), 13 if single_column_lcd else 10, True, False, "cm", family="Liberation Sans")
         limit_label = receiver_limit_label(entry_health)
-        route_label = receiver_route_label(server)
+        route_label = receiver_route_label(server, station_receiver_type(station))
         distance_label = format_station_distance(station, home_profile)
         connection_label = {
             "connecting": "CONNECTING",
@@ -14641,10 +14772,10 @@ def draw_station_picker(
             "failed": "UNAVAILABLE",
         }.get(connection_status, "CONNECTING") if pending else ""
         pill_y = marker_y + (3 if single_column_lcd else 1)
-        audio_pill_w = station_stream_pill(text_cache, title_x, pill_y, "audio", entry_health, health_fresh, pending)
+        audio_pill_w = station_stream_pill(text_cache, title_x, pill_y, "audio", displayed_health, health_fresh, pending)
         waterfall_pill_x = title_x + audio_pill_w + 8
         waterfall_pill_w = station_stream_pill(
-            text_cache, waterfall_pill_x, pill_y, "waterfall", entry_health, health_fresh, pending
+            text_cache, waterfall_pill_x, pill_y, "waterfall", displayed_health, health_fresh, pending
         )
         status_x = waterfall_pill_x + waterfall_pill_w + 14
         status_label = " · ".join(
@@ -15640,6 +15771,132 @@ def stereo_s16le_to_mono(data):
     samples = struct.unpack(f"<{frame_count * 2}h", data[:frame_count * 4])
     mono = tuple((samples[index] + samples[index + 1]) // 2 for index in range(0, len(samples), 2))
     return struct.pack(f"<{frame_count}h", *mono)
+
+
+def fmdx_decoder_command():
+    """Return the low-latency MP3-to-PCM pipeline used by FM-DX audio."""
+    return [
+        "ffmpeg", "-loglevel", "error", "-fflags", "nobuffer",
+        "-flags", "low_delay", "-probesize", "32", "-analyzeduration", "0",
+        "-f", "mp3", "-i", "pipe:0", "-f", "s16le", "-acodec", "pcm_s16le",
+        "-ar", str(fmdx.AUDIO_SAMPLE_RATE), "-ac", "2", "pipe:1",
+    ]
+
+
+class FmdxMp3Decoder:
+    """Decode the FM-DX MP3 fallback stream into 48 kHz stereo PCM."""
+
+    def __init__(self, on_pcm, process_factory=subprocess.Popen):
+        self.on_pcm = on_pcm
+        self.process = process_factory(
+            fmdx_decoder_command(),
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            bufsize=0,
+        )
+        self.closed = False
+        self.reader = threading.Thread(target=self._read, name="fmdx-mp3-decode", daemon=True)
+        self.reader.start()
+
+    def feed(self, data):
+        if self.closed or not data or not self.process.stdin:
+            return
+        try:
+            self.process.stdin.write(data)
+        except (BrokenPipeError, OSError, ValueError):
+            pass
+
+    def _read(self):
+        while not self.closed and self.process.stdout:
+            try:
+                pcm = self.process.stdout.read(8192)
+            except (OSError, ValueError):
+                break
+            if not pcm:
+                break
+            self.on_pcm(pcm)
+
+    def close(self):
+        if self.closed:
+            return
+        try:
+            if self.process.stdin:
+                self.process.stdin.close()
+        except (OSError, ValueError):
+            pass
+        self.reader.join(timeout=0.5)
+        self.closed = True
+        try:
+            self.process.terminate()
+            self.process.wait(timeout=1.0)
+        except (OSError, subprocess.TimeoutExpired):
+            try:
+                self.process.kill()
+            except OSError:
+                pass
+        self.reader.join(timeout=0.5)
+
+
+def put_latest(target_queue, item):
+    """Publish to a bounded real-time lane without ever blocking audio."""
+    if target_queue is None:
+        return
+    try:
+        target_queue.put_nowait(item)
+        return
+    except queue.Full:
+        pass
+    try:
+        target_queue.get_nowait()
+    except queue.Empty:
+        pass
+    try:
+        target_queue.put_nowait(item)
+    except queue.Full:
+        pass
+
+
+def publish_fmdx_pcm(
+    pcm, args, state, server_generation, player, analyzer, line_queue,
+    transcript_queue=None, callsign_queue=None,
+):
+    """Fan decoded FM-DX PCM into the existing live presentation lanes."""
+    if (
+        not pcm
+        or state.receiver_type_snapshot(server_generation) != "fmdx"
+        or state.stream_paused_snapshot()
+    ):
+        return False
+    audio_controls, _audio_generation = state.audio_controls_snapshot()
+    scan_active = state.fmdx_scan_request_snapshot()[0]
+    muted = bool(audio_controls.get("mute", False) or scan_active)
+    if player is not None:
+        player.submit(bytes(len(pcm)) if muted else pcm, silence=muted)
+    mono = stereo_s16le_to_mono(pcm)
+    analysis_pcm = fmdx.resample_mono_s16le(
+        mono, fmdx.AUDIO_SAMPLE_RATE, getattr(args, "audio_rate", 12_000),
+    )
+    transcription_enabled, _engine, _lines, _partial, _status, _generation = state.transcription_snapshot()
+    if transcription_enabled:
+        put_latest(transcript_queue, analysis_pcm)
+    callsign_enabled, _value, _message, _status, _updated_at = state.callsign_snapshot()
+    if callsign_enabled:
+        put_latest(callsign_queue, analysis_pcm)
+    _floor, _ceiling, _speed, _auto, palette, _wf_generation = state.waterfall_snapshot()
+    mapper = waterfall_mapper(palette)
+    _server, center_khz, _zoom, _smeter, _view_generation, current_generation = state.snapshot()
+    if current_generation != server_generation:
+        return False
+    for samples in analyzer.feed(mono):
+        line = kiwi.waterfall_line(samples, mapper, 0.0, 255.0, width=WF_TEX_W)
+        state.update_spectrum(samples, 0.0, 255.0)
+        row_item = (line, center_khz, fmdx.AUDIO_WATERFALL_SPAN_HZ / 1000.0)
+        for _ in range(max(1, int(getattr(args, "wf_row_pixels", 1)))):
+            put_latest(line_queue, row_item)
+    state.connection_ready(server_generation, "audio")
+    state.connection_ready(server_generation, "waterfall")
+    return True
 
 
 def default_sideband_mode(freq_khz):
@@ -18012,10 +18269,172 @@ def set_audio_output_volume(args, volume):
     return set_pipewire_default_volume(volume)
 
 
+def fmdx_audio_session(
+    args, stop_event, state, server, server_generation, line_queue=None,
+    transcript_queue=None, callsign_queue=None,
+):
+    """Run one typed FM-DX control/audio session until the receiver changes."""
+    control = audio = decoder = player = None
+    preset_queue = queue.Queue(maxsize=1)
+    analyzer = fmdx.AudioWaterfallAnalyzer(bins=SPECTRUM_BINS)
+    ready = threading.Event()
+    audio_args = argparse.Namespace(**vars(args))
+    audio_args.audio_rate = fmdx.AUDIO_SAMPLE_RATE
+
+    def load_presets():
+        try:
+            presets = fmdx.fetch_station_presets(server)
+        except (OSError, ValueError, TypeError):
+            presets = ()
+        put_latest(preset_queue, presets)
+
+    def on_pcm(pcm):
+        if publish_fmdx_pcm(
+            pcm, args, state, server_generation, player, analyzer, line_queue,
+            transcript_queue=transcript_queue, callsign_queue=callsign_queue,
+        ) and not ready.is_set():
+            ready.set()
+            persist_live_station_health(server, "audio", True)
+
+    try:
+        state.connection_attempt(server_generation, "audio")
+        control = fmdx.WebSocket.connect(fmdx.websocket_url(server, "text"))
+        if not state.register_transport_socket(server_generation, "fmdx-text", control):
+            control = None
+            return
+        audio = fmdx.WebSocket.connect(fmdx.websocket_url(server, "audio"))
+        if not state.register_transport_socket(server_generation, "audio", audio):
+            audio = None
+            return
+        player = BufferedAudioPlayer(audio_args, 2, state)
+        decoder = FmdxMp3Decoder(on_pcm)
+        audio.send_text(json.dumps({"type": "fallback", "data": "mp3"}, separators=(",", ":")))
+        threading.Thread(target=load_presets, name="fmdx-presets", daemon=True).start()
+        _server, freq_khz, _zoom, _smeter, view_generation, generation = state.snapshot()
+        if generation != server_generation:
+            return
+        control.send_text(fmdx.tune_command(freq_khz))
+        seen_view_generation = view_generation
+        next_tune_at = time.monotonic() + fmdx.TUNE_INTERVAL_SECONDS
+        scan_frequencies = ()
+        scan_index = 0
+        scan_origin_khz = freq_khz
+        scan_deadline = 0.0
+        scan_tuned_at = 0.0
+        seen_scan_request_generation = -1
+
+        def finish_scan(restore=True):
+            nonlocal scan_frequencies, scan_index, scan_deadline, scan_tuned_at
+            scan_frequencies = ()
+            scan_index = 0
+            scan_deadline = 0.0
+            scan_tuned_at = 0.0
+            state.request_fmdx_scan(False, server_generation)
+            if restore:
+                state.set_view(freq_khz=scan_origin_khz)
+
+        while not stop_event.is_set():
+            if state.stream_paused_snapshot() or state.external_audio_snapshot():
+                break
+            current_server, freq_khz, _zoom, _smeter, view_generation, generation = state.snapshot()
+            if generation != server_generation or current_server != server:
+                break
+            try:
+                presets = preset_queue.get_nowait()
+            except queue.Empty:
+                presets = None
+            if presets is not None:
+                state.update_fmdx_stations(presets, server_generation)
+            now = time.monotonic()
+            scan_requested, scan_request_generation = state.fmdx_scan_request_snapshot()
+            if scan_request_generation != seen_scan_request_generation:
+                seen_scan_request_generation = scan_request_generation
+                if scan_requested and not scan_frequencies:
+                    scan_origin_khz = freq_khz
+                    known = state.fmdx_stations_snapshot()
+                    candidates = fmdx.rds_discovery_frequencies(known, freq_khz)
+                    if not candidates:
+                        bounds = fmdx.receiver_bounds(server) or (
+                            fmdx.DEFAULT_MIN_KHZ, fmdx.DEFAULT_MAX_KHZ,
+                        )
+                        candidates = tuple(sorted(
+                            fmdx.band_scan_frequencies(*bounds),
+                            key=lambda candidate: abs(candidate - freq_khz),
+                        )[:fmdx.RDS_DISCOVERY_MAX_PRESETS])
+                    scan_frequencies = candidates
+                    scan_index = 0
+                    if scan_frequencies:
+                        state.set_view(freq_khz=scan_frequencies[0])
+                        scan_index = 1
+                        scan_tuned_at = now
+                        scan_deadline = now + fmdx.RDS_DISCOVERY_DWELL_SECONDS
+                    else:
+                        finish_scan(restore=False)
+                elif not scan_requested and scan_frequencies:
+                    finish_scan(restore=True)
+            if scan_frequencies and now >= scan_deadline:
+                if scan_index >= len(scan_frequencies):
+                    finish_scan(restore=True)
+                else:
+                    state.set_view(freq_khz=scan_frequencies[scan_index])
+                    scan_index += 1
+                    scan_tuned_at = now
+                    scan_deadline = now + fmdx.RDS_DISCOVERY_DWELL_SECONDS
+                current_server, freq_khz, _zoom, _smeter, view_generation, generation = state.snapshot()
+            if view_generation != seen_view_generation and now >= next_tune_at:
+                control.send_text(fmdx.tune_command(freq_khz))
+                analyzer.reset()
+                seen_view_generation = view_generation
+                next_tune_at = now + fmdx.TUNE_INTERVAL_SECONDS
+            readable, _writable, _errors = select.select(
+                [control.sock, audio.sock], [], [], KIWI_IO_POLL_SECONDS,
+            )
+            for source in readable:
+                if state.receiver_type_snapshot(server_generation) != "fmdx":
+                    return
+                if source is control.sock:
+                    payload = fmdx.parse_text_message(control.recv())
+                    if payload is None:
+                        continue
+                    scan_status_is_current = (
+                        not scan_frequencies
+                        or (
+                            fmdx.status_matches_frequency(payload, freq_khz)
+                            and time.monotonic() - scan_tuned_at
+                            >= fmdx.RDS_DISCOVERY_MIN_LOCK_SECONDS
+                        )
+                    )
+                    learned_station = (
+                        state.update_fmdx_status(payload, server_generation)
+                        if scan_status_is_current else None
+                    )
+                    if learned_station:
+                        remember_fmdx_station(server, learned_station)
+                    signal_dbm = fmdx.signal_dbm(payload)
+                    if signal_dbm is not None:
+                        state.set_smeter(signal_dbm, source="fmdx")
+                else:
+                    packet = audio.recv()
+                    if packet and not packet.startswith(b"{"):
+                        decoder.feed(packet)
+    finally:
+        if state.fmdx_scan_request_snapshot()[0]:
+            state.request_fmdx_scan(False, server_generation)
+        if decoder:
+            decoder.close()
+        stop_audio_player(player)
+        if control:
+            state.unregister_transport_socket("fmdx-text", control)
+            control.close()
+        if audio:
+            state.unregister_transport_socket("audio", audio)
+            audio.close()
+
+
 def snd_meter_worker(
     args, stop_event, state, transcript_queue=None, callsign_queue=None,
     dual_mixer=None, dual_source=None, dual_matcher=None, enable_listener_dsp=True,
-    listener_name=None,
+    listener_name=None, line_queue=None,
 ):
     # SND ingress is part of the audio path: a late WebSocket read leaves the
     # PCM reserve empty even when the playback clock itself is perfectly on
@@ -18066,6 +18485,18 @@ def snd_meter_worker(
                 stop_event.wait(0.10)
                 continue
             server, freq_khz, _zoom, _smeter, view_generation, server_generation = state.snapshot()
+            if receiver_worker_protocol(state.receiver_type_snapshot(server_generation)) == "fmdx":
+                stop_audio_player(player)
+                player = None
+                player_channels = None
+                player_server_generation = None
+                fmdx_audio_session(
+                    args, stop_event, state, server, server_generation,
+                    line_queue=line_queue,
+                    transcript_queue=transcript_queue,
+                    callsign_queue=callsign_queue,
+                )
+                continue
             if server_generation != retry_server_generation:
                 retry_server_generation = server_generation
                 retry_failures = 0
@@ -18678,6 +19109,12 @@ def waterfall_worker(args, line_queue, stop_event, state, listener_name=None):
                     break
                 continue
             server, freq_khz, zoom, _smeter_dbm, seen_generation, seen_server_generation = state.snapshot()
+            if receiver_worker_protocol(state.receiver_type_snapshot(seen_server_generation)) == "fmdx":
+                # FM-DX has no RF waterfall endpoint. Its decoded-audio
+                # session publishes compatible rows into this same queue.
+                if stop_event.wait(0.10):
+                    break
+                continue
             if seen_server_generation != retry_server_generation:
                 retry_server_generation = seen_server_generation
                 retry_failures = 0
@@ -19097,6 +19534,7 @@ def main():
             "dual_mixer": dual_audio_mixer,
             "dual_source": "A",
             "dual_matcher": dual_program_matcher,
+            "line_queue": line_queue,
         },
         daemon=True,
     )
@@ -19138,7 +19576,7 @@ def main():
     start = time.monotonic()
     frames = 0
     display_freq = args.freq_khz
-    display_span = kiwi.zoom_to_span_khz(args.zoom)
+    display_span = receiver_display_span(args.zoom, state.receiver_type_snapshot())
     # Scope sizing is an experimental live layout control. It begins at the
     # established wide-layout height and changes only while its grab rail is
     # visible, so ordinary waterfall gestures remain untouched.
@@ -20071,6 +20509,8 @@ def main():
     def apply_band_default(freq_khz):
         """Follow the conventional 10 MHz split until the operator takes over."""
         nonlocal radio_mode, auto_sideband_mode
+        if state.receiver_type_snapshot() == "fmdx":
+            return
         # The retune test is observational. It must not unexpectedly change
         # the current demodulator while it crosses a nearby band threshold.
         if retune_sweep is not None:
@@ -20151,7 +20591,7 @@ def main():
     def active_source_span_khz(zoom_level):
         if state.external_waterfall_snapshot() or rtl_lab.is_running():
             return rtl_lab.source_span_khz()
-        return kiwi.zoom_source_span_khz(zoom_level)
+        return receiver_display_span(zoom_level, state.receiver_type_snapshot())
 
     def change_zoom(delta, animation_duration=0.22):
         nonlocal zoom_osd_until, auto_zoom_levels_used
@@ -20165,7 +20605,7 @@ def main():
         freq_khz, new_zoom, _gen = state.set_view(zoom=new_zoom)
         remember_current_view()
         auto_zoom_levels_used = 0
-        animate_to(freq_khz, kiwi.zoom_to_span_khz(new_zoom), animation_duration)
+        animate_to(freq_khz, receiver_display_span(new_zoom, state.receiver_type_snapshot()), animation_duration)
         zoom_osd_until = time.monotonic() + args.zoom_osd_seconds
         print(f"gl zoom {new_zoom} span {kiwi.zoom_to_span_khz(new_zoom):.1f} kHz", flush=True)
         return True
@@ -21054,14 +21494,16 @@ def main():
             RADIOGARDEN_ZOOM_MAX,
         )
         picker_map_inertia_yaw = picker_map_inertia_pitch = 0.0
-        _server, freq_khz, zoom, _gen, _server_gen = state.set_server(selected["server"])
+        _server, freq_khz, zoom, _gen, _server_gen = state.set_server(
+            selected["server"], receiver_type=selected.get("receiver_type", "kiwi"),
+        )
         # A receiver selection is an explicit operator decision. Persist it
         # immediately so a reboot during its connection attempt never falls
         # back to the bundled/default public endpoint.
         write_remembered_view(save_current_frequency=True, force=True)
         drain_queue(line_queue)
         wf_texture.clear()
-        animate_to(freq_khz, kiwi.zoom_to_span_khz(zoom), 0.20)
+        animate_to(freq_khz, receiver_display_span(zoom, selected.get("receiver_type", "kiwi")), 0.20)
         station_pending_server = selected["server"]
         station_pending_started_at = time.monotonic()
         station_connected_at = 0.0
@@ -23114,7 +23556,12 @@ def main():
                         elif touch_started and gesture == "radio_setup":
                             moved = max(abs(x - start_x), abs(y - start_y))
                             if moved <= args.tap_px:
-                                choice = radio_option_at(x, y, radio_family_open)
+                                choice = radio_option_at(
+                                    x, y, radio_family_open,
+                                    state.receiver_type_snapshot(),
+                                    state.fmdx_stations_snapshot(),
+                                    state.fmdx_scan_request_snapshot()[0],
+                                )
                                 if choice is None:
                                     # The drawer is intentionally modal only
                                     # inside its own rail: a blank tap is the
@@ -23127,6 +23574,27 @@ def main():
                                     if kind == "close":
                                         radio_setup_open = False
                                         radio_family_open = None
+                                    elif kind == "fmdx_action":
+                                        _server, current_frequency, current_zoom, _smeter, _view_gen, server_generation = state.snapshot()
+                                        if value in ("scan_start", "scan_stop"):
+                                            state.request_fmdx_scan(value == "scan_start", server_generation)
+                                        else:
+                                            presets = state.fmdx_stations_snapshot()
+                                            if presets:
+                                                frequencies = [float(item["frequency_khz"]) for item in presets]
+                                                nearest_index = min(
+                                                    range(len(frequencies)),
+                                                    key=lambda index: abs(frequencies[index] - current_frequency),
+                                                )
+                                                direction = -1 if value == "preset_previous" else 1
+                                                target_frequency = frequencies[(nearest_index + direction) % len(frequencies)]
+                                                state.set_view(freq_khz=target_frequency)
+                                                animate_to(
+                                                    target_frequency,
+                                                    receiver_display_span(current_zoom, "fmdx"),
+                                                    0.20,
+                                                )
+                                                remember_current_view()
                                     elif kind == "mode_cycle":
                                         radio_mode = next_radio_mode_variant(radio_mode, value)
                                         radio_family_open = None
@@ -24287,7 +24755,7 @@ def main():
             apply_band_default(freq_khz)
             if not touch_started and not inertia_active and time.monotonic() - anim_start > anim_duration:
                 display_freq = freq_khz
-                display_span = kiwi.zoom_to_span_khz(zoom)
+                display_span = receiver_display_span(zoom, state.receiver_type_snapshot())
 
             if now >= next_system_sample:
                 # The compact status remains inexpensive at a two-second
@@ -24467,7 +24935,7 @@ def main():
                 smeter_dbm,
                 smeter_peak_dbm,
                 smeter_readout_dbm,
-                radio_mode,
+                effective_receiver_mode(state.receiver_type_snapshot(), radio_mode),
                 digital_mode,
                 finger_tune_step_hz(zoom, tune_step_hz),
                 controls_alpha=control_alpha,
@@ -24629,7 +25097,11 @@ def main():
                         station_route_filter, receiver_home_profile,
                     )
             if radio_setup_open or radio_drawer_visible:
-                draw_radio_setup_panel(text_cache, radio_mode, digital_mode, tune_step_hz, radio_family_open)
+                draw_radio_setup_panel(
+                    text_cache, radio_mode, digital_mode, tune_step_hz, radio_family_open,
+                    state.receiver_type_snapshot(), state.fmdx_status_snapshot(),
+                    state.fmdx_stations_snapshot(), state.fmdx_scan_request_snapshot()[0],
+                )
             if display_setup_open:
                 wf_floor, wf_ceil, wf_speed, wf_auto, wf_palette, _wf_generation = state.waterfall_snapshot()
                 spectrum_enabled, _spectrum_values, _spectrum_peak_values = state.spectrum_snapshot()

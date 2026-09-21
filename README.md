@@ -112,6 +112,22 @@ Because desktop windows are borderless, use `Esc` or `q` instead of a macOS clos
 
 The receiver is a live public KiwiSDR connection. If the remembered receiver does not provide a waterfall, choose another from `Home -> RX`. Desktop mode is a development/runtime option only; it leaves the Pi's rotated framebuffer output untouched.
 
+### FM-DX receivers
+
+The receiver picker also includes available public FM-DX Webservers. Select
+the **FMDX** route to see only those receivers. FM-DX tuning stays within the
+band limits published by each server and is shown as the server-controlled
+`FM-FMDX` mode; the saved Kiwi demodulator is retained for the next Kiwi
+receiver.
+
+FM-DX programme audio arrives as MP3 and is decoded locally with `ffmpeg` into
+the existing audio, captions/callsign, scope, and audio-waterfall paths. The
+Pi installer now installs `ffmpeg` automatically. For macOS development,
+install it separately (for example with `brew install ffmpeg`) before opening
+an FM-DX receiver. Live RDS programme-service names and server presets are
+kept in the local receiver-state cache; they are not committed to the
+repository.
+
 ## Boot services and status
 
 After reboot, the following services are enabled:
