@@ -1,0 +1,53 @@
+{
+  "enabled": false,
+  "timing": {
+    "hold_seconds": 0.65,
+    "rotation_debounce_seconds": 0.001,
+    "button_debounce_seconds": 0.025
+  },
+  "acceleration": {
+    "window_seconds": 0.18,
+    "medium_clicks_per_second": 18.0,
+    "fast_clicks_per_second": 48.0,
+    "medium_multiplier": 4,
+    "fast_multiplier": 12
+  },
+  "knobs": [
+    {
+      "role": "TUNE",
+      "source": "gpio",
+      "chip": "/dev/gpiochip0",
+      "line_a": 17,
+      "line_b": 18,
+      "button_line": 27,
+      "transitions_per_click": 4,
+      "expected_clicks_per_revolution": 600,
+      "invert": false
+    },
+    {
+      "role": "VIEW",
+      "source": "gpio",
+      "chip": "/dev/gpiochip0",
+      "line_a": 22,
+      "line_b": 23,
+      "button_line": 24,
+      "transitions_per_click": 4,
+      "expected_clicks_per_revolution": 20,
+      "invert": false
+    },
+    {
+      "role": "NAV",
+      "source": "evdev",
+      "match": {
+        "name": "replace-with-device-name",
+        "vendor_id": 0,
+        "product_id": 0
+      },
+      "rotation": {"type": "EV_REL", "code": "REL_DIAL"},
+      "button": {"type": "EV_KEY", "code": "BTN_0"},
+      "transitions_per_click": 1,
+      "expected_clicks_per_revolution": 20,
+      "invert": false
+    }
+  ]
+}
