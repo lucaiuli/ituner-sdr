@@ -140,8 +140,13 @@ def knob_overlay_lines(
     snapshot: KnobControllerSnapshot,
     tune_step_hz: int,
 ) -> tuple[str, ...]:
+    view_line = (
+        f"MAP {snapshot.map_view_mode.value}"
+        if snapshot.screen_id in ("receiver_map", "constellation")
+        else f"VIEW {snapshot.view_mode.value}"
+    )
     return (
-        f"VIEW {snapshot.view_mode.value}",
+        view_line,
         f"STEP {max(1, int(tune_step_hz))} Hz",
         f"TUNE x{snapshot.tune_multiplier}",
     )

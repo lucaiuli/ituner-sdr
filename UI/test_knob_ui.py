@@ -68,6 +68,30 @@ class KnobUiIntegrationTests(unittest.TestCase):
             ui.PICKER_EXIT_BOX,
         )
 
+    def test_receiver_map_focus_uses_reticle_and_existing_actions(self):
+        self.assertEqual(
+            ui.knob_focus_box("map_target", "receiver_map", (), 0),
+            ui.map_center_focus_box(ui.PICKER_MAP_BOX),
+        )
+        self.assertEqual(
+            ui.knob_focus_box("map_view", "receiver_map", (), 0),
+            ui.RADIOGARDEN_VIEW_BOX,
+        )
+
+    def test_constellation_focus_uses_stable_listener_server(self):
+        listeners = (
+            {"server": "http://one"},
+            {"server": "http://two"},
+        )
+        control_id = ui.knob_context(
+            "constellation", constellation_servers=("http://two",)
+        ).controls[1].control_id
+
+        self.assertEqual(
+            ui.knob_focus_box(control_id, "constellation", (), 0, listeners),
+            ui.GLOBE_STATION_BOXES[1],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
