@@ -21,7 +21,7 @@ from knob_ui_adapter import (  # noqa: E402
     receiver_control_id,
     receiver_station_key,
 )
-from knob_controller import KnobController  # noqa: E402
+from knob_controller import KnobContext, KnobController  # noqa: E402
 
 
 class KnobUiAdapterTests(unittest.TestCase):
@@ -104,6 +104,15 @@ class KnobUiAdapterTests(unittest.TestCase):
         self.assertEqual(
             knob_overlay_lines(snapshot, 100),
             ("VIEW ZOOM", "STEP 100 Hz", "TUNE x1"),
+        )
+
+    def test_overlay_reports_map_view_mode_on_geographic_screen(self):
+        controller = KnobController()
+        controller.update_context(KnobContext("receiver_map", map_active=True))
+
+        self.assertEqual(
+            knob_overlay_lines(controller.snapshot(), 100)[0],
+            "MAP PAN Y",
         )
 
 

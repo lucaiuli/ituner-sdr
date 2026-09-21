@@ -210,9 +210,13 @@ from knob_controller import KnobCommandKind, KnobController
 from knob_input import DesktopKnobAdapter
 from knob_ui_adapter import (
     HOME_CONTROL_IDS,
+    MAP_TARGET_CONTROL_ID,
     SETTINGS_CONTROL_IDS,
     ReceiverTarget,
     advance_receiver_scroll,
+    apply_map_pan,
+    apply_map_zoom,
+    constellation_server,
     knob_context,
     knob_overlay_lines,
     receiver_control_id,
@@ -14425,7 +14429,18 @@ def receiver_targets(stations, scroll, page_size=PICKER_ROWS):
     )
 
 
-def knob_focus_box(control_id, screen_id, receiver_rows, receiver_scroll):
+def map_center_focus_box(box, size=92):
+    """Return a focus target centered on the map's existing reticle."""
+    center_x = (box[0] + box[2]) / 2
+    center_y = (box[1] + box[3]) / 2
+    half = max(1.0, float(size)) / 2
+    return (center_x - half, center_y - half, center_x + half, center_y + half)
+
+
+def knob_focus_box(
+    control_id, screen_id, receiver_rows, receiver_scroll,
+    constellation_listeners=(),
+):
     """Resolve a semantic knob target to the UI geometry already in use."""
     if control_id is None:
         return None
@@ -14439,6 +14454,23 @@ def knob_focus_box(control_id, screen_id, receiver_rows, receiver_scroll):
         for index, target in enumerate(receiver_rows):
             if target.control_id == control_id:
                 return station_tile(int(receiver_scroll) + index, receiver_scroll)
+    if screen_id == "receiver_map":
+        if control_id == MAP_TARGET_CONTROL_ID:
+            return map_center_focus_box(PICKER_MAP_BOX)
+        return {
+            "map_list": RADIOGARDEN_LIST_BOX,
+            "map_view": RADIOGARDEN_VIEW_BOX,
+            "back": RADIOGARDEN_EXIT_BOX,
+        }.get(control_id)
+    if screen_id == "constellation":
+        if control_id == MAP_TARGET_CONTROL_ID:
+            return map_center_focus_box(GLOBE_MAP_BOX)
+        if control_id == "back":
+            return GLOBE_BACK_BOX
+        server = constellation_server(control_id)
+        for index, receiver in enumerate(constellation_listeners):
+            if receiver.get("server") == server and index < len(GLOBE_STATION_BOXES):
+                return GLOBE_STATION_BOXES[index]
     return None
 
 
@@ -20502,6 +20534,10 @@ def main():
 
     def current_knob_screen():
         """Return the smallest stable focus context for the visible workspace."""
+        if picker_open and picker_map_open:
+            return "receiver_map"
+        if globe_open:
+            return "constellation"
         if picker_open and not picker_map_open and not search_open:
             return "receivers"
         if settings_menu_open:
@@ -20527,7 +20563,15 @@ def main():
             return
         screen_id = current_knob_screen()
         targets = receiver_targets(prioritized_receiver_rows(), station_scroll) if screen_id == "receivers" else ()
-        knob_controller.update_context(knob_context(screen_id, targets))
+        listener_servers = (
+            tuple(receiver["server"] for receiver in globe_listeners)
+            if screen_id == "constellation" else ()
+        )
+        knob_controller.update_context(knob_context(
+            screen_id,
+            targets,
+            constellation_servers=listener_servers,
+        ))
 
     def close_knob_context():
         """Return knob navigation to Home without disturbing the live receiver."""
@@ -20562,9 +20606,15 @@ def main():
         nonlocal display_freq, candidate_freq, anim_start, inertia_velocity_khz_s
         nonlocal tune_step_hz, frequency_entry_open, frequency_entry_value
         nonlocal frequency_entry_invalid, frequency_entry_replace_on_digit
-        nonlocal station_scroll, picker_open, knob_feedback_until
+        nonlocal station_scroll, picker_open, picker_map_open, knob_feedback_until
+        nonlocal picker_map_yaw, picker_map_pitch, picker_map_scale, picker_map_view
+        nonlocal picker_map_lock_target, picker_map_zoom_target
+        nonlocal picker_map_inertia_yaw, picker_map_inertia_pitch
+        nonlocal picker_map_notice, picker_map_notice_until
+        nonlocal globe_yaw, globe_pitch, globe_scale, globe_open, tests_panel_open
         for command in commands:
             handled = True
+            screen_id = current_knob_screen()
             if command.kind is KnobCommandKind.TUNE:
                 _server, frequency, _zoom, _smeter, _generation, _server_generation = state.snapshot()
                 low_khz, high_khz = active_tuning_bounds()
@@ -20591,9 +20641,85 @@ def main():
                 change_zoom(1 if command.delta > 0 else -1)
             elif command.kind is KnobCommandKind.SET_VOLUME:
                 apply_main_volume(clamp(audio_volume + command.delta * 0.025, 0.0, 1.0))
+            elif command.kind in (KnobCommandKind.MAP_PAN_X, KnobCommandKind.MAP_PAN_Y):
+                horizontal = command.delta if command.kind is KnobCommandKind.MAP_PAN_X else 0
+                vertical = command.delta if command.kind is KnobCommandKind.MAP_PAN_Y else 0
+                if screen_id == "receiver_map":
+                    picker_map_lock_target = None
+                    picker_map_zoom_target = None
+                    picker_map_inertia_yaw = picker_map_inertia_pitch = 0.0
+                    picker_map_yaw, picker_map_pitch = apply_map_pan(
+                        picker_map_yaw,
+                        picker_map_pitch,
+                        horizontal_clicks=horizontal,
+                        vertical_clicks=vertical,
+                        latitude_limit_degrees=82.0,
+                    )
+                elif screen_id == "constellation":
+                    globe_yaw, globe_pitch = apply_map_pan(
+                        globe_yaw,
+                        globe_pitch,
+                        horizontal_clicks=horizontal,
+                        vertical_clicks=vertical,
+                        latitude_limit_degrees=80.0,
+                    )
+                else:
+                    handled = False
+            elif command.kind is KnobCommandKind.MAP_ZOOM:
+                if screen_id == "receiver_map":
+                    picker_map_lock_target = None
+                    picker_map_zoom_target = None
+                    picker_map_inertia_yaw = picker_map_inertia_pitch = 0.0
+                    picker_map_scale = apply_map_zoom(
+                        picker_map_scale,
+                        command.delta,
+                        RADIOGARDEN_ZOOM_MIN,
+                        RADIOGARDEN_ZOOM_MAX,
+                    )
+                    picker_map_notice = f"GLOBE {picker_map_scale:.1f}x"
+                    picker_map_notice_until = time.monotonic() + 1.2
+                elif screen_id == "constellation":
+                    globe_scale = apply_map_zoom(globe_scale, command.delta, 0.55, 10.0)
+                else:
+                    handled = False
             elif command.kind is KnobCommandKind.ACTIVATE:
                 control_id = command.control_id or ""
-                if control_id in HOME_CONTROL_IDS:
+                if screen_id == "receiver_map" and control_id == MAP_TARGET_CONTROL_ID:
+                    center_x = (PICKER_MAP_BOX[0] + PICKER_MAP_BOX[2]) / 2
+                    center_y = (PICKER_MAP_BOX[1] + PICKER_MAP_BOX[3]) / 2
+                    select_receiver_from_map(center_x, center_y)
+                elif screen_id == "receiver_map" and control_id == "map_list":
+                    picker_map_open = False
+                elif screen_id == "receiver_map" and control_id == "map_view":
+                    current_view_index = MAP_VIEWS.index(picker_map_view)
+                    picker_map_view = MAP_VIEWS[(current_view_index + 1) % len(MAP_VIEWS)]
+                    picker_map_notice = f"MAP VIEW  {MAP_VIEW_LABELS[picker_map_view]}"
+                    picker_map_notice_until = time.monotonic() + 1.75
+                elif screen_id == "receiver_map" and control_id == "back":
+                    picker_open = picker_map_open = False
+                elif screen_id == "constellation" and control_id == MAP_TARGET_CONTROL_ID:
+                    anchor = receiver_map_center_candidate(
+                        globe_receivers,
+                        math.degrees(globe_yaw),
+                        math.degrees(globe_pitch),
+                    )
+                    activate_constellation_anchor(anchor)
+                elif screen_id == "constellation" and control_id == "back":
+                    globe_open = False
+                    tests_panel_open = True
+                    globe_mixer.stop()
+                    scout_probe.stop()
+                elif screen_id == "constellation" and constellation_server(control_id) is not None:
+                    server = constellation_server(control_id)
+                    selected = next(
+                        (receiver for receiver in globe_listeners if receiver["server"] == server),
+                        None,
+                    )
+                    if selected is not None:
+                        select_constellation_listener(selected)
+                    else:
+                        handled = False
+                elif control_id in HOME_CONTROL_IDS:
                     activate_navigation_item(HOME_CONTROL_IDS.index(control_id))
                 elif control_id in SETTINGS_CONTROL_IDS:
                     activate_navigation_item(SETTINGS_CONTROL_IDS.index(control_id), SETTINGS_MENU_ITEMS)
@@ -20996,6 +21122,88 @@ def main():
         picker_map_notice = f"FLYING TO  {bottom_station_title(receiver['name'], receiver['location'])}"
         picker_map_notice_until = picker_map_motion_at + 2.8
         return True
+
+    def select_constellation_listener(selected):
+        """Switch the warmed listener through the same path for touch and knobs."""
+        nonlocal globe_active_server, globe_status
+        globe_active_server = selected["server"]
+        globe_mixer.select(selected["server"])
+        globe_status = "Switching live waterfall and audio"
+        _server, freq_khz, zoom, _gen, _server_gen = state.set_server(selected["server"])
+        remember_current_view()
+        drain_queue(line_queue)
+        wf_texture.clear()
+        animate_to(freq_khz, kiwi.zoom_to_span_khz(zoom), 0.20)
+        print(f"gl globe select {selected['name']}: {selected['server']}", flush=True)
+
+    def activate_constellation_anchor(anchor):
+        """Warm listeners and scouts around one selected geographic anchor."""
+        nonlocal globe_heat_frequency_khz, globe_heat_radio_mode, globe_anchor
+        nonlocal globe_listeners, globe_scouts, globe_replacement_slots
+        nonlocal globe_scout_history, globe_scout_measurements
+        nonlocal globe_scout_search_radius_km, globe_scout_local_rounds
+        nonlocal globe_next_scout_rotation, globe_next_scout_promotion, globe_next_scout_review
+        nonlocal globe_active_server, globe_status
+        if anchor is None:
+            globe_status = "No receiver is available near the map center"
+            return False
+        _map_server, map_freq_khz, _map_zoom, _map_smeter, _map_view_gen, _map_server_gen = state.snapshot()
+        map_radio_mode, _map_low_cut, _map_high_cut, _map_radio_gen = state.radio_snapshot()
+        retain_heat = (
+            globe_heat_frequency_khz is not None
+            and abs(map_freq_khz - globe_heat_frequency_khz) < 0.001
+            and map_radio_mode == globe_heat_radio_mode
+        )
+        if not retain_heat:
+            globe_scout_history = []
+            globe_scout_scanned_servers.clear()
+        globe_heat_frequency_khz = map_freq_khz
+        globe_heat_radio_mode = map_radio_mode
+        globe_anchor = anchor
+        globe_listeners, globe_scouts = choose_constellation(anchor, globe_receivers, station_health)
+        remaining_scout_budget = max(0, SCOUT_MAX_TOTAL - len(globe_scout_scanned_servers))
+        globe_scouts = [
+            scout for scout in globe_scouts
+            if scout["server"] not in globe_scout_scanned_servers
+        ][:remaining_scout_budget]
+        globe_replacement_slots = [
+            {
+                "current_server": receiver["server"],
+                "original_server": receiver["server"],
+                "previous_name": bottom_station_title(receiver["name"], receiver["location"]),
+                "reason": None,
+                "gain_db": 0.0,
+                "snr": None,
+            }
+            for receiver in globe_listeners
+        ]
+        globe_scout_measurements = {}
+        globe_scout_search_radius_km = max(
+            SCOUT_SEARCH_START_KM,
+            max((globe_haversine_km(anchor, scout) for scout in globe_scouts), default=0.0),
+        )
+        globe_scout_scanned_servers.update(scout["server"] for scout in globe_scouts)
+        globe_scout_local_rounds = 0
+        globe_next_scout_rotation = time.monotonic() + SCOUT_ROTATION_SECONDS
+        globe_next_scout_promotion = time.monotonic() + 10.0
+        globe_next_scout_review = time.monotonic() + 10.0
+        globe_failed_servers.clear()
+        globe_active_server = globe_listeners[0]["server"] if globe_listeners else None
+        if globe_active_server:
+            _server, freq_khz, zoom, _gen, _server_gen = state.set_server(globe_active_server)
+            remember_current_view()
+            drain_queue(line_queue)
+            wf_texture.clear()
+            animate_to(freq_khz, kiwi.zoom_to_span_khz(zoom), 0.20)
+            globe_mixer.start(globe_listeners, globe_active_server)
+            heat_label = "retaining prior heat cloud; " if retain_heat else "new heat cloud; "
+            if globe_scouts:
+                scout_probe.scan(globe_scouts)
+                globe_status = f"{heat_label}{len(globe_listeners)}/3 listeners warming"
+            else:
+                scout_probe.stop()
+                globe_status = f"Scout cap ({SCOUT_MAX_TOTAL}) reached; heat cloud retained"
+        return bool(globe_active_server)
 
 
     try:
@@ -22404,16 +22612,7 @@ def main():
                             if moved <= args.tap_px:
                                 selected_index = next((index for index, box in enumerate(GLOBE_STATION_BOXES) if contains(box, x, y)), None)
                                 if selected_index is not None and selected_index < len(globe_listeners):
-                                    selected = globe_listeners[selected_index]
-                                    globe_active_server = selected["server"]
-                                    globe_mixer.select(selected["server"])
-                                    globe_status = "Switching live waterfall and audio"
-                                    _server, freq_khz, zoom, _gen, _server_gen = state.set_server(selected["server"])
-                                    remember_current_view()
-                                    drain_queue(line_queue)
-                                    wf_texture.clear()
-                                    animate_to(freq_khz, kiwi.zoom_to_span_khz(zoom), 0.20)
-                                    print(f"gl globe select {selected['name']}: {selected['server']}", flush=True)
+                                    select_constellation_listener(globe_listeners[selected_index])
                             wake_controls()
                         elif touch_started and gesture == "globe":
                             moved = max(abs(x - start_x), abs(y - start_y))
@@ -22443,62 +22642,7 @@ def main():
                                     if candidates:
                                         _distance, anchor = min(candidates, key=lambda item: item[0])
                                 if anchor is not None:
-                                    _map_server, map_freq_khz, _map_zoom, _map_smeter, _map_view_gen, _map_server_gen = state.snapshot()
-                                    map_radio_mode, _map_low_cut, _map_high_cut, _map_radio_gen = state.radio_snapshot()
-                                    retain_heat = (
-                                        globe_heat_frequency_khz is not None
-                                        and abs(map_freq_khz - globe_heat_frequency_khz) < 0.001
-                                        and map_radio_mode == globe_heat_radio_mode
-                                    )
-                                    if not retain_heat:
-                                        globe_scout_history = []
-                                        globe_scout_scanned_servers = set()
-                                    globe_heat_frequency_khz = map_freq_khz
-                                    globe_heat_radio_mode = map_radio_mode
-                                    globe_anchor = anchor
-                                    globe_listeners, globe_scouts = choose_constellation(anchor, globe_receivers, station_health)
-                                    remaining_scout_budget = max(0, SCOUT_MAX_TOTAL - len(globe_scout_scanned_servers))
-                                    globe_scouts = [
-                                        scout for scout in globe_scouts
-                                        if scout["server"] not in globe_scout_scanned_servers
-                                    ][:remaining_scout_budget]
-                                    globe_replacement_slots = [
-                                        {
-                                            "current_server": receiver["server"],
-                                            "original_server": receiver["server"],
-                                            "previous_name": bottom_station_title(receiver["name"], receiver["location"]),
-                                            "reason": None,
-                                            "gain_db": 0.0,
-                                            "snr": None,
-                                        }
-                                        for receiver in globe_listeners
-                                    ]
-                                    globe_scout_measurements = {}
-                                    globe_scout_search_radius_km = max(
-                                        SCOUT_SEARCH_START_KM,
-                                        max((globe_haversine_km(anchor, scout) for scout in globe_scouts), default=0.0),
-                                    )
-                                    globe_scout_scanned_servers.update(scout["server"] for scout in globe_scouts)
-                                    globe_scout_local_rounds = 0
-                                    globe_next_scout_rotation = time.monotonic() + SCOUT_ROTATION_SECONDS
-                                    globe_next_scout_promotion = time.monotonic() + 10.0
-                                    globe_next_scout_review = time.monotonic() + 10.0
-                                    globe_failed_servers.clear()
-                                    globe_active_server = globe_listeners[0]["server"] if globe_listeners else None
-                                    if globe_active_server:
-                                        _server, freq_khz, zoom, _gen, _server_gen = state.set_server(globe_active_server)
-                                        remember_current_view()
-                                        drain_queue(line_queue)
-                                        wf_texture.clear()
-                                        animate_to(freq_khz, kiwi.zoom_to_span_khz(zoom), 0.20)
-                                        globe_mixer.start(globe_listeners, globe_active_server)
-                                        heat_label = "retaining prior heat cloud; " if retain_heat else "new heat cloud; "
-                                        if globe_scouts:
-                                            scout_probe.scan(globe_scouts)
-                                            globe_status = f"{heat_label}{len(globe_listeners)}/3 listeners warming"
-                                        else:
-                                            scout_probe.stop()
-                                            globe_status = f"Scout cap ({SCOUT_MAX_TOTAL}) reached; heat cloud retained"
+                                    activate_constellation_anchor(anchor)
                             wake_controls()
                         elif touch_started and gesture == "globe_outside":
                             wake_controls()
@@ -24795,6 +24939,7 @@ def main():
                         knob_snapshot.screen_id,
                         knob_receiver_rows,
                         station_scroll,
+                        globe_listeners,
                     )
                     draw_knob_focus_outline(
                         focus_box,
