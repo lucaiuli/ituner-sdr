@@ -11,8 +11,10 @@ from urllib.request import Request, urlopen
 
 sys.path.insert(0, str(Path(__file__).parent))
 import kiwi_live_display_fb as kiwi
+import fmdx
 
 CACHE = Path.home() / ".local/state/kiwi-gl-public-directory.json"
+FMDX_CACHE = Path.home() / ".local/state/ituner-fmdx-directory.json"
 HEALTH = Path.home() / ".local/state/kiwi-gl-station-health.json"
 # Start one directory entry at a time across this whole period. The scan is
 # deliberately paced, not batched; a slow probe only makes the pass longer.
@@ -91,6 +93,28 @@ def probe_waterfall(server):
             ws.send_close()
 
 
+def probe_fmdx_audio(server):
+    """Confirm that an FM-DX receiver is supplying its MP3 fallback feed."""
+    ws = None
+    try:
+        ws = fmdx.WebSocket.connect(fmdx.websocket_url(server, "audio"), timeout=4)
+        ws.send_text(json.dumps({"type": "fallback", "data": "mp3"}, separators=(",", ":")))
+        deadline = time.monotonic() + AUDIO_PROBE_SECONDS
+        while time.monotonic() < deadline:
+            try:
+                message = ws.recv()
+            except TimeoutError:
+                continue
+            if message and not message.startswith(b"{"):
+                return True
+        return False
+    except Exception:
+        return False
+    finally:
+        if ws is not None:
+            ws.close()
+
+
 def probe_time_limit(server):
     """Return whether the receiver advertises any admin-configured limits.
 
@@ -129,7 +153,10 @@ def station_is_at_capacity(station):
     return total > 0 and used >= total
 
 
-def refresh_station_health(health, station, audio_probe=probe_audio, waterfall_probe=probe_waterfall, limit_probe=probe_time_limit):
+def refresh_station_health(
+    health, station, audio_probe=probe_audio, waterfall_probe=probe_waterfall,
+    limit_probe=probe_time_limit, fmdx_audio_probe=probe_fmdx_audio,
+):
     """Probe a station unless the directory reports every listener slot full.
 
     A capacity skip intentionally makes no edit to the station record, so its
@@ -138,6 +165,17 @@ def refresh_station_health(health, station, audio_probe=probe_audio, waterfall_p
     if station_is_at_capacity(station):
         return False
     server = station[2]
+    receiver_type = station[7] if len(station) > 7 else "kiwi"
+    if receiver_type == "fmdx":
+        audio = fmdx_audio_probe(server)
+        health.setdefault("stations", {})[server] = {
+            "status": "ok" if audio else "failed",
+            "waterfall": False,
+            "audio": audio,
+            "receiver_type": "fmdx",
+            "checked": int(time.time()),
+        }
+        return True
     waterfall = waterfall_probe(server) == "ok"
     audio = audio_probe(server)
     previous = health.setdefault("stations", {}).get(server, {})
@@ -163,6 +201,12 @@ def main():
     while True:
         started = time.monotonic()
         stations = load_json(CACHE, [])
+        try:
+            stations += fmdx.stations_from_receivers(
+                fmdx.normalize_directory(load_json(FMDX_CACHE, {}))
+            )
+        except (TypeError, ValueError):
+            pass
         health = load_json(HEALTH, {"cursor": 0, "stations": {}})
         interval = scan_interval_seconds(len(stations))
         if stations:
