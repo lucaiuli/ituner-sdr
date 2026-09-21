@@ -138,6 +138,22 @@ class KnobControllerTests(unittest.TestCase):
         self.assertEqual(command.kind, KnobCommandKind.TOGGLE_VIEW_MODE)
         self.assertEqual(controller.snapshot().view_mode, ViewMode.VOLUME)
 
+    def test_view_pages_receiver_list_even_when_back_is_focused(self):
+        controller = KnobController()
+        controller.update_context(KnobContext(
+            "receivers",
+            (FocusableControl("back"),),
+            receiver_list_active=True,
+        ))
+
+        commands = controller.handle(KnobEvent.turn(
+            KnobRole.VIEW, 1, timestamp=1.0, source="test"
+        ))
+
+        self.assertEqual(len(commands), 1)
+        self.assertEqual(commands[0].kind, KnobCommandKind.PAGE)
+        self.assertEqual(commands[0].delta, 1)
+
     def test_view_hold_is_home_on_main_and_back_in_nested_screen(self):
         controller = KnobController()
         main = controller.handle(button_event(KnobEventKind.HOLD, KnobRole.VIEW, 1.0))[0]

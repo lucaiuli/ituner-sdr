@@ -192,6 +192,8 @@ class KnobController:
         return ()
 
     def _view_turn(self, event: KnobEvent) -> tuple[KnobCommand, ...]:
+        if self.context.receiver_list_active:
+            return (KnobCommand(KnobCommandKind.PAGE, delta=event.delta),)
         if self._editing_control is not None:
             return (KnobCommand(
                 KnobCommandKind.ADJUST_COARSE,
@@ -205,9 +207,6 @@ class KnobController:
                 else KnobCommandKind.MAP_PAN_Y
             )
             return (KnobCommand(kind, delta=event.delta),)
-        focused = self._focused_control()
-        if self.context.receiver_list_active and focused and focused.category == "receiver":
-            return (KnobCommand(KnobCommandKind.PAGE, delta=event.delta),)
         kind = (
             KnobCommandKind.SET_ZOOM
             if self._view_mode is ViewMode.ZOOM
