@@ -11,6 +11,7 @@ from knob_controller import (  # noqa: E402
     KnobCommandKind,
     KnobContext,
     KnobController,
+    MapViewMode,
     ViewMode,
 )
 from knob_input import KnobEvent, KnobEventKind, KnobRole  # noqa: E402
@@ -153,6 +154,48 @@ class KnobControllerTests(unittest.TestCase):
         self.assertEqual(len(commands), 1)
         self.assertEqual(commands[0].kind, KnobCommandKind.PAGE)
         self.assertEqual(commands[0].delta, 1)
+
+    def test_map_turns_route_to_pan_then_zoom_after_view_toggle(self):
+        controller = KnobController()
+        controller.update_context(KnobContext(
+            "receiver_map",
+            (FocusableControl("map_target"), FocusableControl("back")),
+            map_active=True,
+        ))
+
+        horizontal = controller.handle(KnobEvent.turn(
+            KnobRole.TUNE, 2, timestamp=1.0, source="test"
+        ))[0]
+        vertical = controller.handle(KnobEvent.turn(
+            KnobRole.VIEW, -3, timestamp=1.1, source="test"
+        ))[0]
+        toggle = controller.handle(button_event(
+            KnobEventKind.RELEASE, KnobRole.VIEW, 1.2
+        ))[0]
+        zoom = controller.handle(KnobEvent.turn(
+            KnobRole.VIEW, 1, timestamp=1.3, source="test"
+        ))[0]
+
+        self.assertEqual((horizontal.kind, horizontal.delta), (KnobCommandKind.MAP_PAN_X, 2))
+        self.assertEqual((vertical.kind, vertical.delta), (KnobCommandKind.MAP_PAN_Y, -3))
+        self.assertEqual(toggle.kind, KnobCommandKind.TOGGLE_VIEW_MODE)
+        self.assertEqual(controller.snapshot().map_view_mode, MapViewMode.ZOOM)
+        self.assertEqual((zoom.kind, zoom.delta), (KnobCommandKind.MAP_ZOOM, 1))
+
+    def test_nav_activates_focused_map_target(self):
+        controller = KnobController()
+        controller.update_context(KnobContext(
+            "constellation",
+            (FocusableControl("map_target"), FocusableControl("back")),
+            map_active=True,
+        ))
+
+        command = controller.handle(button_event(
+            KnobEventKind.RELEASE, KnobRole.NAV, 1.0
+        ))[0]
+
+        self.assertEqual(command.kind, KnobCommandKind.ACTIVATE)
+        self.assertEqual(command.control_id, "map_target")
 
     def test_view_hold_is_home_on_main_and_back_in_nested_screen(self):
         controller = KnobController()
