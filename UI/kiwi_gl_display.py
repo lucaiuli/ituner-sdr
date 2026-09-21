@@ -208,6 +208,18 @@ from OpenGL import GL
 
 import kiwi_live_display_fb as kiwi
 import openwebrx_client as owrx
+from knob_controller import KnobCommandKind, KnobController
+from knob_input import DesktopKnobAdapter
+from knob_ui_adapter import (
+    HOME_CONTROL_IDS,
+    SETTINGS_CONTROL_IDS,
+    ReceiverTarget,
+    advance_receiver_scroll,
+    knob_context,
+    knob_overlay_lines,
+    receiver_control_id,
+    receiver_station_key,
+)
 import render_sdr_frontend_mockup as sdr_ui
 
 
@@ -14433,6 +14445,22 @@ def station_fields(station):
     return name, location, server, listener_used, listener_total
 
 
+def knob_tuned_frequency(frequency_khz, clicks, multiplier, step_hz, low_khz, high_khz):
+    """Apply a knob movement in Hz while respecting the active receiver bounds."""
+    delta_khz = int(clicks) * max(1, int(multiplier)) * max(1, int(step_hz)) / 1000.0
+    return clamp(float(frequency_khz) + delta_khz, float(low_khz), float(high_khz))
+
+
+def receiver_targets(stations, scroll, page_size=PICKER_ROWS):
+    """Expose the currently visible receiver rows as stable knob targets."""
+    start = max(0, int(scroll))
+    rows = stations[start:start + max(1, int(page_size))]
+    return tuple(
+        ReceiverTarget(receiver_control_id(station_fields(station)[2]), station_fields(station)[2])
+        for station in rows
+    )
+
+
 def draw_station_picker(
     text_cache, stations, scroll, selected_server, query, sort_mode, station_health,
     pending_server=None, connection_status=None, route_filter="all", home_profile=None,
@@ -19456,6 +19484,7 @@ def main():
     parser.add_argument("--fps", type=float, default=24.0, help="render target; 24 fps is the balanced Raspberry Pi LCD default")
     parser.add_argument("--duration", type=float, default=0.0, help="optional run limit in seconds")
     parser.add_argument("--desktop", action="store_true", help="run the LCD 1280x800 landscape UI locally with mouse input")
+    parser.add_argument("--desktop-knobs", action="store_true", help="simulate TUNE, VIEW, and NAV knobs with the desktop keyboard")
     parser.add_argument("--frequency-keypad-preview", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--wspr-preview", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--dual-vfo-preview", action="store_true", help=argparse.SUPPRESS)
@@ -19506,6 +19535,8 @@ def main():
     parser.add_argument("--audio-backend", choices=AUDIO_BACKENDS, default="pipewire", help=argparse.SUPPRESS)
     parser.add_argument("--audio-rate", type=int, default=12000, help="Kiwi raw PCM rate for the local output stream")
     args = parser.parse_args()
+    desktop_knob_adapter = DesktopKnobAdapter() if args.desktop and args.desktop_knobs else None
+    knob_controller = KnobController() if desktop_knob_adapter is not None else None
     remembered_radio_mode = None
     remembered_preferences = {}
     if args.remember_receiver:
@@ -19771,6 +19802,7 @@ def main():
     cpu_core_history = deque(maxlen=122)
     temp_c = None
     controls_active_until = time.monotonic() + CONTROL_QUIET_SECONDS
+    knob_feedback_until = 0.0
     all_stations = STATIONS
     main_receiver_capacity = MainReceiverCapacityMonitor()
     station_query = ""
@@ -21229,6 +21261,133 @@ def main():
         else:
             print(f"gl navigation {label} pending", flush=True)
 
+    def current_knob_screen():
+        """Return the smallest stable focus context for the visible workspace."""
+        if picker_open and not picker_map_open and not search_open:
+            return "receivers"
+        if settings_menu_open:
+            return "settings"
+        nested_open = any((
+            menu_open, picker_open, radio_setup_open, band_navigation_open,
+            display_setup_open, filter_drawer_open, digital_menu_open,
+            receiver_home_panel_open, fan_curve_panel_open, network_panel_open,
+            network_password_open, audio_panel_open, asr_panel_open,
+            deepgram_setup_open, tests_panel_open, font_lab_open,
+            compact_font_review_open, rtl_lab_open, wspr_panel_open,
+            wspr_identity_open, wspr_add_open, wspr_decoder_settings_open,
+            globe_open, dj_tune_open, filter_panel_open, frequency_entry_open,
+            dual_vfo_open,
+        ))
+        return "nested" if nested_open else "main"
+
+    def prioritized_receiver_rows():
+        return health_prioritized_stations(stations, station_health, station_sort)
+
+    def update_knob_context():
+        if knob_controller is None:
+            return
+        screen_id = current_knob_screen()
+        targets = receiver_targets(prioritized_receiver_rows(), station_scroll) if screen_id == "receivers" else ()
+        knob_controller.update_context(knob_context(screen_id, targets))
+
+    def close_knob_context():
+        """Return knob navigation to Home without disturbing the live receiver."""
+        nonlocal menu_open, picker_open, picker_map_open, search_open
+        nonlocal settings_menu_open, digital_menu_open, frequency_entry_open
+        nonlocal audio_panel_open, asr_panel_open, deepgram_setup_open
+        nonlocal display_setup_open, radio_setup_open, radio_family_open, band_navigation_open
+        nonlocal filter_drawer_open, filter_panel_open, receiver_home_panel_open, fan_curve_panel_open
+        nonlocal network_panel_open, network_password_open, tests_panel_open
+        nonlocal font_lab_open, compact_font_review_open, rtl_lab_open, globe_open, dj_tune_open
+        nonlocal wspr_panel_open, wspr_identity_open, wspr_add_open, wspr_decoder_settings_open
+        nonlocal dual_vfo_open, dual_vfo_picker_open, dual_vfo_mode_open
+        if rtl_lab_open:
+            rtl_lab.stop()
+        if dual_vfo_open:
+            stop_dual_vfo_clients()
+        menu_open = picker_open = picker_map_open = search_open = False
+        settings_menu_open = digital_menu_open = frequency_entry_open = False
+        audio_panel_open = asr_panel_open = deepgram_setup_open = False
+        display_setup_open = radio_setup_open = band_navigation_open = False
+        radio_family_open = None
+        filter_drawer_open = filter_panel_open = False
+        receiver_home_panel_open = fan_curve_panel_open = False
+        network_panel_open = network_password_open = tests_panel_open = False
+        font_lab_open = compact_font_review_open = rtl_lab_open = False
+        globe_open = dj_tune_open = False
+        wspr_panel_open = wspr_identity_open = wspr_add_open = wspr_decoder_settings_open = False
+        dual_vfo_open = dual_vfo_picker_open = dual_vfo_mode_open = False
+
+    def execute_knob_commands(commands):
+        """Translate semantic knob commands through the UI's existing actions."""
+        nonlocal display_freq, candidate_freq, anim_start, inertia_velocity_khz_s
+        nonlocal tune_step_hz, frequency_entry_open, frequency_entry_value
+        nonlocal frequency_entry_invalid, frequency_entry_replace_on_digit
+        nonlocal station_scroll, picker_open, knob_feedback_until
+        for command in commands:
+            handled = True
+            if command.kind is KnobCommandKind.TUNE:
+                _server, frequency, _zoom, _smeter, _generation, _server_generation = state.snapshot()
+                low_khz, high_khz = active_tuning_bounds()
+                frequency = knob_tuned_frequency(
+                    frequency, command.delta, command.multiplier,
+                    tune_step_hz, low_khz, high_khz,
+                )
+                state.set_view(freq_khz=frequency)
+                display_freq = candidate_freq = frequency
+                anim_start = 0.0
+                inertia_velocity_khz_s = 0.0
+                remember_current_view()
+            elif command.kind is KnobCommandKind.CYCLE_TUNE_STEP:
+                steps = tuple(step for step, _box in RADIO_STEP_OPTIONS)
+                tune_step_hz = steps[(steps.index(tune_step_hz) + 1) % len(steps)] if tune_step_hz in steps else steps[0]
+                write_remembered_view(force=True)
+            elif command.kind is KnobCommandKind.OPEN_FREQUENCY_ENTRY:
+                _server, frequency, _zoom, _smeter, _generation, _server_generation = state.snapshot()
+                frequency_entry_value = f"{frequency / 1000.0:.6f}"
+                frequency_entry_invalid = False
+                frequency_entry_replace_on_digit = True
+                frequency_entry_open = True
+            elif command.kind is KnobCommandKind.SET_ZOOM:
+                change_zoom(1 if command.delta > 0 else -1)
+            elif command.kind is KnobCommandKind.SET_VOLUME:
+                apply_main_volume(clamp(audio_volume + command.delta * 0.025, 0.0, 1.0))
+            elif command.kind is KnobCommandKind.ACTIVATE:
+                control_id = command.control_id or ""
+                if control_id in HOME_CONTROL_IDS:
+                    activate_navigation_item(HOME_CONTROL_IDS.index(control_id))
+                elif control_id in SETTINGS_CONTROL_IDS:
+                    activate_navigation_item(SETTINGS_CONTROL_IDS.index(control_id), SETTINGS_MENU_ITEMS)
+                elif control_id == "back":
+                    picker_open = False
+                else:
+                    station_key = receiver_station_key(control_id)
+                    visible_stations = prioritized_receiver_rows()
+                    station = next(
+                        (row for row in visible_stations if station_fields(row)[2] == station_key),
+                        None,
+                    )
+                    if station is not None:
+                        connect_to_station(station)
+                        picker_open = False
+                    else:
+                        handled = False
+            elif command.kind is KnobCommandKind.PAGE:
+                visible_stations = prioritized_receiver_rows()
+                station_scroll = advance_receiver_scroll(
+                    station_scroll, command.delta,
+                    station_page_max(visible_stations), PICKER_ROWS,
+                )
+            elif command.kind in (KnobCommandKind.BACK, KnobCommandKind.HOME):
+                close_knob_context()
+            elif command.kind is KnobCommandKind.TOGGLE_VIEW_MODE:
+                pass
+            else:
+                handled = False
+            if handled:
+                wake_controls()
+                knob_feedback_until = time.monotonic() + 2.0
+
     def set_lcd_filter_edge(edge, x):
         """Apply one live passband-edge slider position from the rail drawer."""
         nonlocal filter_custom_width
@@ -21604,7 +21763,23 @@ def main():
         if dual_vfo_open:
             start_dual_vfo_clients()
         while not stop_event.is_set():
+            update_knob_context()
             for event in pygame.event.get():
+                if desktop_knob_adapter is not None and event.type in (pygame.KEYDOWN, pygame.KEYUP):
+                    key_name = pygame.key.name(event.key)
+                    if key_name == "return":
+                        key_name = "enter"
+                    knob_events = desktop_knob_adapter.handle_key(
+                        key_name, event.type == pygame.KEYDOWN, time.monotonic()
+                    )
+                    for knob_event in knob_events:
+                        execute_knob_commands(knob_controller.handle(knob_event))
+                if (
+                    knob_controller is not None
+                    and event.type == pygame.MOUSEBUTTONDOWN
+                    and getattr(event, "button", None) == 1
+                ):
+                    execute_knob_commands(knob_controller.touch_takeover())
                 if event.type == pygame.QUIT:
                     # KMS/SDL can emit a synthetic QUIT while the DSI panel
                     # finishes probing after boot (Cocoa can do the same for
@@ -21722,6 +21897,11 @@ def main():
                     else:
                         change_zoom(1 if event.y > 0 else -1)
 
+            if desktop_knob_adapter is not None:
+                for knob_event in desktop_knob_adapter.poll(time.monotonic()):
+                    execute_knob_commands(knob_controller.handle(knob_event))
+                execute_knob_commands(knob_controller.flush_frame())
+
             while True:
                 try:
                     data = os.read(ev.fileno(), kiwi.EVENT_STRUCT.size)
@@ -21779,6 +21959,8 @@ def main():
 
                     if is_active:
                         if not touch_started:
+                            if knob_controller is not None:
+                                execute_knob_commands(knob_controller.touch_takeover())
                             # Any new operator gesture takes ownership from a
                             # running test. The run button itself is exempt so
                             # it remains an immediate, obvious Stop control.
