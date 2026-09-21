@@ -5119,6 +5119,32 @@ def draw_logical_line(x0, y0, x1, y1, color, width=1):
     GL.glEnable(GL.GL_TEXTURE_2D)
 
 
+def draw_knob_focus_outline(box, editing=False):
+    """Draw knob focus above the existing control without replacing it."""
+    if box is None:
+        return
+    x0, y0, x1, y1 = box
+    color = (251, 186, 79, 245) if editing else (83, 220, 238, 245)
+    inset = 2
+    draw_logical_line(x0 + inset, y0 + inset, x1 - inset, y0 + inset, color, 3)
+    draw_logical_line(x1 - inset, y0 + inset, x1 - inset, y1 - inset, color, 3)
+    draw_logical_line(x1 - inset, y1 - inset, x0 + inset, y1 - inset, color, 3)
+    draw_logical_line(x0 + inset, y1 - inset, x0 + inset, y0 + inset, color, 3)
+
+
+def draw_knob_overlay(text_cache, lines, alpha=235):
+    """Show the active desktop knob modes without suppressing other OSDs."""
+    x0, y0, x1, y1 = 16, 112, 228, 194
+    draw_logical_rect(x0, y0, x1, y1, (5, 12, 18, int(alpha * 0.9)))
+    draw_logical_line(x0, y0, x1, y0, (83, 220, 238, alpha), 2)
+    for index, line in enumerate(lines):
+        draw_text(
+            text_cache, x0 + 12, y0 + 20 + index * 23, line,
+            (220, 244, 247, alpha), 15, True, False, "lm",
+            family="Liberation Sans",
+        )
+
+
 def draw_logical_polyline(points, color, width=1):
     if len(points) < 2:
         return
@@ -14459,6 +14485,23 @@ def receiver_targets(stations, scroll, page_size=PICKER_ROWS):
         ReceiverTarget(receiver_control_id(station_fields(station)[2]), station_fields(station)[2])
         for station in rows
     )
+
+
+def knob_focus_box(control_id, screen_id, receiver_rows, receiver_scroll):
+    """Resolve a semantic knob target to the UI geometry already in use."""
+    if control_id is None:
+        return None
+    if screen_id == "main" and control_id in HOME_CONTROL_IDS:
+        return lcd_nav_box(HOME_CONTROL_IDS.index(control_id), len(MENU_ITEMS))
+    if screen_id == "settings" and control_id in SETTINGS_CONTROL_IDS:
+        return lcd_nav_box(SETTINGS_CONTROL_IDS.index(control_id), len(SETTINGS_MENU_ITEMS))
+    if screen_id == "receivers":
+        if control_id == "back":
+            return PICKER_EXIT_BOX
+        for index, target in enumerate(receiver_rows):
+            if target.control_id == control_id:
+                return station_tile(int(receiver_scroll) + index, receiver_scroll)
+    return None
 
 
 def draw_station_picker(
@@ -25593,6 +25636,33 @@ def main():
                 or filter_panel_open or frequency_entry_open or dual_vfo_open
             ):
                 draw_utc_clock(text_cache)
+            if knob_controller is not None:
+                knob_snapshot = knob_controller.snapshot()
+                knob_receiver_rows = (
+                    receiver_targets(prioritized_receiver_rows(), station_scroll)
+                    if knob_snapshot.screen_id == "receivers" else ()
+                )
+                if knob_snapshot.focus_visible:
+                    focus_box = knob_focus_box(
+                        knob_snapshot.focused_control_id,
+                        knob_snapshot.screen_id,
+                        knob_receiver_rows,
+                        station_scroll,
+                    )
+                    draw_knob_focus_outline(
+                        focus_box,
+                        knob_snapshot.editing_control_id is not None,
+                    )
+                knob_feedback_remaining = knob_feedback_until - now
+                if knob_feedback_remaining > 0:
+                    knob_alpha = 235
+                    if knob_feedback_remaining < 0.35:
+                        knob_alpha = int(235 * knob_feedback_remaining / 0.35)
+                    draw_knob_overlay(
+                        text_cache,
+                        knob_overlay_lines(knob_snapshot, tune_step_hz),
+                        knob_alpha,
+                    )
             if screenshot_requested.is_set():
                 pixels = GL.glReadPixels(0, 0, NATIVE_W, NATIVE_H, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE)
                 screenshot = pygame.image.fromstring(pixels, (NATIVE_W, NATIVE_H), "RGBA", True)

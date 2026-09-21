@@ -119,6 +119,26 @@ Desktop controls:
 - `Esc` or `q`: close the application.
 - `--no-audio`: run without CoreAudio output.
 
+### Three-knob desktop simulation
+
+The optional keyboard profile simulates the proposed TUNE, VIEW, and NAV
+controls while reusing the live UI actions:
+
+```bash
+UI/.venv/bin/python UI/kiwi_gl_display.py --desktop --desktop-knobs
+```
+
+| Knob | Counterclockwise | Clockwise | Press |
+| --- | --- | --- | --- |
+| TUNE | `A` | `D` | `S` |
+| VIEW | Left arrow | Right arrow | `Space` |
+| NAV | Up arrow | Down arrow | `Enter` |
+
+Hold a press for 0.65 seconds to trigger its hold action. The existing RC-28
+support remains active. This pull request does not include GPIO or evdev
+hardware readers; the desktop profile is opt-in and disabled unless
+`--desktop-knobs` is supplied with `--desktop`.
+
 Because desktop windows are borderless, use `Esc` or `q` instead of a macOS close button.
 
 The receiver is a live public KiwiSDR connection. If the remembered receiver does not provide a waterfall, choose another from `Home -> RX`. Desktop mode is a development/runtime option only; it leaves the Pi's rotated framebuffer output untouched.

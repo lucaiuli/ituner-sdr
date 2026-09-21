@@ -46,6 +46,28 @@ class KnobUiIntegrationTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertIn("--desktop-knobs", completed.stdout)
 
+    def test_home_focus_box_uses_current_navigation_geometry(self):
+        self.assertEqual(
+            ui.knob_focus_box("settings", "main", (), 0),
+            ui.lcd_nav_box(5, len(ui.MENU_ITEMS)),
+        )
+
+    def test_receiver_focus_box_tracks_visible_station_tile(self):
+        targets = ui.receiver_targets([
+            ("One", "A", "http://one", 1, 4),
+            ("Two", "B", "http://two", 2, 4),
+        ], 0, page_size=5)
+        self.assertEqual(
+            ui.knob_focus_box(targets[1].control_id, "receivers", targets, 0),
+            ui.station_tile(1, 0),
+        )
+
+    def test_receiver_back_focus_uses_picker_exit_box(self):
+        self.assertEqual(
+            ui.knob_focus_box("back", "receivers", (), 0),
+            ui.PICKER_EXIT_BOX,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
