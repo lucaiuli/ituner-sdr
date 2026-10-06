@@ -1,0 +1,1206 @@
+{
+  "filters": {
+    "ALL": [
+      "local:local://rtlsdr",
+      "kiwi:http://kiwisdr.local:8073",
+      "local:usb://airspy",
+      "local:local://airspy",
+      "k",
+      "kiwi:https://kiwi-bad-segment",
+      "kiwi:https://kiwi-empty-label",
+      "kiwi:https://kiwi-null-id",
+      "kiwi:Owrxs://Mixed.Case",
+      "kiwi:https://kiwi-favorite",
+      "openwebrx:owrx://receiver.local",
+      "openwebrx:owrxs://rx.oh6ah.fi",
+      "fmdx:https://fm.test",
+      "fmdx:https://fm.test2",
+      "fmdx:https://fm.test3"
+    ],
+    "all": [
+      "local:local://rtlsdr",
+      "kiwi:http://kiwisdr.local:8073",
+      "local:usb://airspy",
+      "local:local://airspy",
+      "k",
+      "kiwi:https://kiwi-bad-segment",
+      "kiwi:https://kiwi-empty-label",
+      "kiwi:https://kiwi-null-id",
+      "kiwi:Owrxs://Mixed.Case",
+      "kiwi:https://kiwi-favorite",
+      "openwebrx:owrx://receiver.local",
+      "openwebrx:owrxs://rx.oh6ah.fi",
+      "fmdx:https://fm.test",
+      "fmdx:https://fm.test2",
+      "fmdx:https://fm.test3"
+    ],
+    "bogus": [
+      "local:local://rtlsdr",
+      "kiwi:http://kiwisdr.local:8073",
+      "local:usb://airspy",
+      "local:local://airspy",
+      "k",
+      "kiwi:https://kiwi-bad-segment",
+      "kiwi:https://kiwi-empty-label",
+      "kiwi:https://kiwi-null-id",
+      "kiwi:Owrxs://Mixed.Case",
+      "kiwi:https://kiwi-favorite",
+      "openwebrx:owrx://receiver.local",
+      "openwebrx:owrxs://rx.oh6ah.fi",
+      "fmdx:https://fm.test",
+      "fmdx:https://fm.test2",
+      "fmdx:https://fm.test3"
+    ],
+    "fmdx": [
+      "fmdx:https://fm.test",
+      "fmdx:https://fm.test2",
+      "fmdx:https://fm.test3"
+    ],
+    "kiwi": [
+      "k",
+      "kiwi:https://kiwi-bad-segment",
+      "kiwi:https://kiwi-empty-label",
+      "kiwi:https://kiwi-null-id",
+      "kiwi:Owrxs://Mixed.Case",
+      "kiwi:https://kiwi-favorite"
+    ],
+    "local": [
+      "local:local://rtlsdr",
+      "kiwi:http://kiwisdr.local:8073",
+      "local:usb://airspy",
+      "local:local://airspy"
+    ],
+    "openwebrx": [
+      "openwebrx:owrx://receiver.local",
+      "openwebrx:owrxs://rx.oh6ah.fi"
+    ]
+  },
+  "fmdx_directory": [
+    "fmdx:https://fm.test",
+    "fmdx:https://fm.band"
+  ],
+  "kiwi_directory": [
+    "kiwi:http://kiwi.test:8073",
+    "openwebrx:owrxs://rx.oh6ah.fi",
+    "kiwi:http://kiwi-short.test:8073",
+    "kiwi:http://kiwi-null.test:8073"
+  ],
+  "merged": [
+    "local:local://rtlsdr",
+    "kiwi:http://kiwisdr.local:8073",
+    "local:usb://airspy",
+    "local:local://airspy",
+    "kiwi:http://kiwi.test:8073",
+    "kiwi:http://kiwi-short.test:8073",
+    "kiwi:http://kiwi-null.test:8073",
+    "k",
+    "kiwi:https://kiwi-bad-segment",
+    "kiwi:https://kiwi-empty-label",
+    "kiwi:https://kiwi-null-id",
+    "kiwi:Owrxs://Mixed.Case",
+    "kiwi:https://kiwi-favorite",
+    "openwebrx:owrxs://rx.oh6ah.fi",
+    "openwebrx:owrx://receiver.local",
+    "fmdx:https://fm.test",
+    "fmdx:https://fm.band",
+    "fmdx:https://fm.test2",
+    "fmdx:https://fm.test3"
+  ],
+  "migrated": [
+    {
+      "endpoint": "https://fm.test",
+      "frequency_khz": 101700.0,
+      "protocol": "fmdx",
+      "receiver_id": "fmdx:https://fm.test",
+      "shared_control": false,
+      "source": "fmdx",
+      "view": "map"
+    },
+    {
+      "endpoint": "http://kiwi.test:8073/",
+      "frequency_khz": 7075.0,
+      "mode": "LSB",
+      "protocol": "kiwi",
+      "receiver_id": "kiwi:http://kiwi.test:8073",
+      "shared_control": false,
+      "source": "kiwi",
+      "view": "list",
+      "zoom": 8
+    },
+    {
+      "endpoint": "http://kiwi.test:8073",
+      "protocol": "kiwi",
+      "receiver_id": "kiwi:http://kiwi.test:8073",
+      "shared_control": false,
+      "source": "kiwi",
+      "view": "list"
+    },
+    {
+      "endpoint": "local://rtlsdr",
+      "protocol": "local",
+      "receiver_id": "local:rtlsdr",
+      "shared_control": false,
+      "source": "kiwi",
+      "view": "list"
+    }
+  ],
+  "records": [
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "agc",
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "frequency",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "mode",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "passband",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "agc",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "squelch",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "volume",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "waterfall_pan",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "waterfall_zoom",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "spectrum_tilt",
+          "message": "Spectrum Tilt is unavailable on this receiver",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "https://kiwi",
+      "favorite": false,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [],
+      "id": "k",
+      "label": "KIWI",
+      "latitude": 1.5,
+      "legacy_row": [
+        "Kiwi A",
+        "Somewhere",
+        "https://kiwi",
+        2,
+        4,
+        1.5,
+        -2.5,
+        "kiwi"
+      ],
+      "listeners_total": 4,
+      "listeners_used": 2,
+      "location": "Somewhere",
+      "longitude": -2.5,
+      "modes": [
+        "AM",
+        "SAM",
+        "LSB",
+        "USB",
+        "CW",
+        "NBFM",
+        "NFM",
+        "WFM",
+        "IQ"
+      ],
+      "name": "Kiwi A",
+      "protocol": "kiwi",
+      "source_group": "kiwi",
+      "source_span_khz": 0.0,
+      "supports_frequency": [
+        {
+          "khz": 7075.0,
+          "supported": true
+        },
+        {
+          "khz": 145500.0,
+          "supported": true
+        }
+      ],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "frequency",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "passband",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "agc",
+          "message": "Agc is unavailable on this receiver",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "owrx://receiver.local/",
+      "favorite": false,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [],
+      "id": "openwebrx:owrx://receiver.local",
+      "label": "OPENWEBRX",
+      "latitude": null,
+      "legacy_row": [
+        "Inferred",
+        "",
+        "owrx://receiver.local/",
+        null,
+        null,
+        null,
+        null,
+        "openwebrx"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "SAM",
+        "LSB",
+        "USB",
+        "CW",
+        "NBFM",
+        "NFM",
+        "WFM"
+      ],
+      "name": "Inferred",
+      "protocol": "openwebrx",
+      "source_group": "openwebrx",
+      "source_span_khz": 0.0,
+      "supports_frequency": [
+        {
+          "khz": 10.0,
+          "supported": true
+        }
+      ],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "frequency",
+        "mode",
+        "squelch",
+        "volume",
+        "waterfall_zoom"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "frequency",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "passband",
+          "message": "Passband is set by RTL-SDR",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "agc",
+          "message": "AGC is set by RTL-SDR",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "waterfall_pan",
+          "message": "Waterfall Pan is unavailable on this receiver",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "volume",
+          "message": "",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "local://rtlsdr",
+      "favorite": false,
+      "fixed_controls": {
+        "agc": "AGC is set by RTL-SDR",
+        "passband": "Passband is set by RTL-SDR"
+      },
+      "frequency_ranges_khz": [],
+      "id": "local:local://rtlsdr",
+      "label": "RTL-SDR",
+      "latitude": null,
+      "legacy_row": [
+        "Local RTL-SDR",
+        "",
+        "local://rtlsdr",
+        null,
+        null,
+        null,
+        null,
+        "local"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "NFM",
+        "WFM",
+        "USB",
+        "LSB"
+      ],
+      "name": "Local RTL-SDR",
+      "protocol": "local",
+      "source_group": "local",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "agc",
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "frequency",
+          "message": "",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "http://kiwisdr.local:8073",
+      "favorite": false,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [],
+      "id": "kiwi:http://kiwisdr.local:8073",
+      "label": "KIWI",
+      "latitude": null,
+      "legacy_row": [
+        "Local KiwiSDR",
+        "",
+        "http://kiwisdr.local:8073",
+        null,
+        null,
+        null,
+        null,
+        "kiwi"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "SAM",
+        "LSB",
+        "USB",
+        "CW",
+        "NBFM",
+        "NFM",
+        "WFM",
+        "IQ"
+      ],
+      "name": "Local KiwiSDR",
+      "protocol": "kiwi",
+      "source_group": "local",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "agc",
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [],
+      "endpoint": "https://kiwi-bad-segment",
+      "favorite": false,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [],
+      "id": "kiwi:https://kiwi-bad-segment",
+      "label": "KIWI",
+      "latitude": null,
+      "legacy_row": [
+        "Bad segment",
+        "",
+        "https://kiwi-bad-segment",
+        null,
+        null,
+        null,
+        null,
+        "kiwi"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "SAM",
+        "LSB",
+        "USB",
+        "CW",
+        "NBFM",
+        "NFM",
+        "WFM",
+        "IQ"
+      ],
+      "name": "Bad segment",
+      "protocol": "kiwi",
+      "source_group": "kiwi",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "shared_server",
+      "controls": [
+        "volume"
+      ],
+      "decisions": [
+        {
+          "allowed": false,
+          "control": "frequency",
+          "message": "Shared tuner: changing frequency affects every listener",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": true,
+          "control": "frequency",
+          "message": "",
+          "shared_acknowledged": true
+        },
+        {
+          "allowed": true,
+          "control": "volume",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "mode",
+          "message": "FM mode is controlled by the shared receiver",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "waterfall_pan",
+          "message": "Audio spectrum is fixed to 20 kHz",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "waterfall_zoom",
+          "message": "Audio spectrum is fixed to 20 kHz",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "passband",
+          "message": "Fixed passband on this receiver",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "agc",
+          "message": "Gain is controlled at the shared receiver",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "squelch",
+          "message": "Squelch is controlled at the shared receiver",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "https://fm.test",
+      "favorite": false,
+      "fixed_controls": {
+        "agc": "Gain is controlled at the shared receiver",
+        "frequency": "Shared tuner: changing frequency affects every listener",
+        "mode": "FM mode is controlled by the shared receiver",
+        "passband": "Fixed passband on this receiver",
+        "squelch": "Squelch is controlled at the shared receiver",
+        "waterfall_pan": "Audio spectrum is fixed to 20 kHz",
+        "waterfall_zoom": "Audio spectrum is fixed to 20 kHz"
+      },
+      "frequency_ranges_khz": [],
+      "id": "fmdx:https://fm.test",
+      "label": "FM-DX",
+      "latitude": null,
+      "legacy_row": [
+        "FM A",
+        "",
+        "https://fm.test",
+        null,
+        null,
+        null,
+        null,
+        "fmdx"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "FM"
+      ],
+      "name": "FM A",
+      "protocol": "fmdx",
+      "source_group": "fmdx",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "audio_spectrum"
+    },
+    {
+      "control_scope": "shared_server",
+      "controls": [
+        "volume"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "volume",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "mode",
+          "message": "FM mode is controlled by the shared receiver",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "https://fm.test2",
+      "favorite": false,
+      "fixed_controls": {
+        "agc": "Gain is controlled at the shared receiver",
+        "frequency": "Shared tuner: changing frequency affects every listener",
+        "mode": "FM mode is controlled by the shared receiver",
+        "passband": "Fixed passband on this receiver",
+        "squelch": "Squelch is controlled at the shared receiver",
+        "waterfall_pan": "Audio spectrum is fixed to 20 kHz",
+        "waterfall_zoom": "Audio spectrum is fixed to 20 kHz"
+      },
+      "frequency_ranges_khz": [],
+      "id": "fmdx:https://fm.test2",
+      "label": "FM-DX",
+      "latitude": null,
+      "legacy_row": [
+        "Receiver",
+        "",
+        "https://fm.test2",
+        null,
+        null,
+        null,
+        null,
+        "fmdx"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "FM"
+      ],
+      "name": "Receiver",
+      "protocol": "fmdx",
+      "source_group": "fmdx",
+      "source_span_khz": 0.0,
+      "supports_frequency": [
+        {
+          "khz": 100000.0,
+          "supported": true
+        }
+      ],
+      "tuning_bounds": null,
+      "waterfall_kind": "audio_spectrum"
+    },
+    {
+      "control_scope": "shared_server",
+      "controls": [],
+      "decisions": [
+        {
+          "allowed": false,
+          "control": "volume",
+          "message": "Volume is unavailable on this receiver",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "frequency",
+          "message": "Shared tuner: changing frequency affects every listener",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "https://fm.test3",
+      "favorite": false,
+      "fixed_controls": {
+        "agc": "Gain is controlled at the shared receiver",
+        "frequency": "Shared tuner: changing frequency affects every listener",
+        "mode": "FM mode is controlled by the shared receiver",
+        "passband": "Fixed passband on this receiver",
+        "squelch": "Squelch is controlled at the shared receiver",
+        "waterfall_pan": "Audio spectrum is fixed to 20 kHz",
+        "waterfall_zoom": "Audio spectrum is fixed to 20 kHz"
+      },
+      "frequency_ranges_khz": [],
+      "id": "fmdx:https://fm.test3",
+      "label": "FM-DX",
+      "latitude": null,
+      "legacy_row": [
+        "Receiver",
+        "",
+        "https://fm.test3",
+        null,
+        null,
+        null,
+        null,
+        "fmdx"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "FM"
+      ],
+      "name": "Receiver",
+      "protocol": "fmdx",
+      "source_group": "fmdx",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "audio_spectrum"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "passband",
+          "message": "",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "agc",
+          "message": "Agc is unavailable on this receiver",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "owrxs://rx.oh6ah.fi/",
+      "favorite": false,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [
+        [
+          0.0,
+          2000.0
+        ]
+      ],
+      "id": "openwebrx:owrxs://rx.oh6ah.fi",
+      "label": "OH6AH",
+      "latitude": null,
+      "legacy_row": [
+        "OH6AH",
+        "",
+        "owrxs://rx.oh6ah.fi/",
+        null,
+        null,
+        null,
+        null,
+        "openwebrx"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "lsb",
+        "usb"
+      ],
+      "name": "OH6AH",
+      "protocol": "openwebrx",
+      "source_group": "openwebrx",
+      "source_span_khz": 1000.0,
+      "supports_frequency": [
+        {
+          "khz": 500.0,
+          "supported": true
+        },
+        {
+          "khz": 2000.0,
+          "supported": true
+        },
+        {
+          "khz": 3000.0,
+          "supported": false
+        }
+      ],
+      "tuning_bounds": [
+        0.0,
+        2000.0
+      ],
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "frequency",
+        "volume"
+      ],
+      "decisions": [
+        {
+          "allowed": false,
+          "control": "mode",
+          "message": "Mode is unavailable on this receiver",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "passband",
+          "message": "Passband is set by AIRSPY",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "agc",
+          "message": "AGC is set by AIRSPY",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "usb://airspy",
+      "favorite": false,
+      "fixed_controls": {
+        "agc": "AGC is set by AIRSPY",
+        "passband": "Passband is set by AIRSPY"
+      },
+      "frequency_ranges_khz": [
+        [
+          0.5,
+          31000.0
+        ]
+      ],
+      "id": "local:usb://airspy",
+      "label": "AIRSPY",
+      "latitude": null,
+      "legacy_row": [
+        "Airspy HF",
+        "",
+        "usb://airspy",
+        null,
+        null,
+        null,
+        null,
+        "local"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "CW"
+      ],
+      "name": "Airspy HF",
+      "protocol": "local",
+      "source_group": "local",
+      "source_span_khz": 768.0,
+      "supports_frequency": [
+        {
+          "khz": 1000.0,
+          "supported": true
+        },
+        {
+          "khz": 40000.0,
+          "supported": false
+        }
+      ],
+      "tuning_bounds": [
+        0.5,
+        31000.0
+      ],
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "agc",
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "frequency",
+          "message": "",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "https://kiwi-empty-label",
+      "favorite": false,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [],
+      "id": "kiwi:https://kiwi-empty-label",
+      "label": "",
+      "latitude": null,
+      "legacy_row": [
+        "Receiver",
+        "",
+        "https://kiwi-empty-label",
+        null,
+        null,
+        null,
+        null,
+        "kiwi"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "SAM",
+        "LSB",
+        "USB",
+        "CW",
+        "NBFM",
+        "NFM",
+        "WFM",
+        "IQ"
+      ],
+      "name": "Receiver",
+      "protocol": "kiwi",
+      "source_group": "kiwi",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "agc",
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [],
+      "endpoint": "https://kiwi-null-id",
+      "favorite": false,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [],
+      "id": "kiwi:https://kiwi-null-id",
+      "label": "KIWI",
+      "latitude": null,
+      "legacy_row": [
+        "Receiver",
+        "",
+        "https://kiwi-null-id",
+        null,
+        null,
+        null,
+        null,
+        "kiwi"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "SAM",
+        "LSB",
+        "USB",
+        "CW",
+        "NBFM",
+        "NFM",
+        "WFM",
+        "IQ"
+      ],
+      "name": "Receiver",
+      "protocol": "kiwi",
+      "source_group": "kiwi",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "agc",
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "frequency",
+          "message": "",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "Owrxs://Mixed.Case/",
+      "favorite": false,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [],
+      "id": "kiwi:Owrxs://Mixed.Case",
+      "label": "KIWI",
+      "latitude": null,
+      "legacy_row": [
+        "Case",
+        "",
+        "Owrxs://Mixed.Case/",
+        null,
+        null,
+        null,
+        null,
+        "kiwi"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "SAM",
+        "LSB",
+        "USB",
+        "CW",
+        "NBFM",
+        "NFM",
+        "WFM",
+        "IQ"
+      ],
+      "name": "Case",
+      "protocol": "kiwi",
+      "source_group": "kiwi",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "frequency",
+        "mode"
+      ],
+      "decisions": [
+        {
+          "allowed": false,
+          "control": "squelch",
+          "message": "Squelch is unavailable on this receiver",
+          "shared_acknowledged": false
+        },
+        {
+          "allowed": false,
+          "control": "passband",
+          "message": "Passband is set by LOCAL",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "local://airspy",
+      "favorite": false,
+      "fixed_controls": {
+        "agc": "AGC is set by LOCAL",
+        "passband": "Passband is set by LOCAL"
+      },
+      "frequency_ranges_khz": [],
+      "id": "local:local://airspy",
+      "label": "LOCAL",
+      "latitude": null,
+      "legacy_row": [
+        "Airspy with fixed override",
+        "",
+        "local://airspy",
+        null,
+        null,
+        null,
+        null,
+        "local"
+      ],
+      "listeners_total": null,
+      "listeners_used": null,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "NFM",
+        "WFM",
+        "USB",
+        "LSB"
+      ],
+      "name": "Airspy with fixed override",
+      "protocol": "local",
+      "source_group": "local",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "audio_spectrum"
+    },
+    {
+      "control_scope": "per_session",
+      "controls": [
+        "agc",
+        "frequency",
+        "mode",
+        "passband",
+        "squelch",
+        "volume",
+        "waterfall_pan",
+        "waterfall_zoom"
+      ],
+      "decisions": [
+        {
+          "allowed": true,
+          "control": "frequency",
+          "message": "",
+          "shared_acknowledged": false
+        }
+      ],
+      "endpoint": "https://kiwi-favorite",
+      "favorite": true,
+      "fixed_controls": {},
+      "frequency_ranges_khz": [],
+      "id": "kiwi:https://kiwi-favorite",
+      "label": "KIWI",
+      "latitude": null,
+      "legacy_row": [
+        "Favorite",
+        "",
+        "https://kiwi-favorite",
+        0,
+        8,
+        null,
+        null,
+        "kiwi"
+      ],
+      "listeners_total": 8,
+      "listeners_used": 0,
+      "location": "",
+      "longitude": null,
+      "modes": [
+        "AM",
+        "SAM",
+        "LSB",
+        "USB",
+        "CW",
+        "NBFM",
+        "NFM",
+        "WFM",
+        "IQ"
+      ],
+      "name": "Favorite",
+      "protocol": "kiwi",
+      "source_group": "kiwi",
+      "source_span_khz": 0.0,
+      "supports_frequency": [],
+      "tuning_bounds": null,
+      "waterfall_kind": "rf"
+    }
+  ]
+}

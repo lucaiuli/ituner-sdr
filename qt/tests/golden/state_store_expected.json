@@ -1,0 +1,526 @@
+{
+  "empty_save_is_rejected": true,
+  "load": [
+    {
+      "name": "missing",
+      "result": null,
+      "saved": null
+    },
+    {
+      "name": "malformed",
+      "result": null,
+      "saved": "{not json"
+    },
+    {
+      "name": "empty_object",
+      "result": null,
+      "saved": {}
+    },
+    {
+      "name": "no_server",
+      "result": null,
+      "saved": {
+        "version": 4
+      }
+    },
+    {
+      "name": "server_no_scheme",
+      "result": null,
+      "saved": {
+        "server": "kiwi.test:8073"
+      }
+    },
+    {
+      "name": "server_no_host",
+      "result": null,
+      "saved": {
+        "server": "http://"
+      }
+    },
+    {
+      "name": "server_bad_scheme",
+      "result": null,
+      "saved": {
+        "server": "ftp://kiwi.test"
+      }
+    },
+    {
+      "name": "valid_minimal",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "server": "http://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "valid_https",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:https://kiwi.test:8073",
+        "server": "https://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "server": "https://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "full_view",
+      "result": {
+        "freq_khz": 7075.0,
+        "preferences": {
+          "audio_backend": "pipewire",
+          "wf_floor": 142
+        },
+        "protocol": "kiwi",
+        "radio_mode": "LSB",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false,
+        "zoom": 13
+      },
+      "saved": {
+        "freq_khz": 7075.0,
+        "preferences": {
+          "audio_backend": "pipewire",
+          "wf_floor": 142
+        },
+        "protocol": "kiwi",
+        "radio_mode": "lsb",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073",
+        "shared_control": true,
+        "version": 4,
+        "zoom": 13
+      }
+    },
+    {
+      "name": "fmdx_type",
+      "result": {
+        "freq_khz": 99500.0,
+        "preferences": {},
+        "protocol": "fmdx",
+        "receiver_id": "fmdx:http://fmdx.test:8080",
+        "receiver_type": "fmdx",
+        "server": "http://fmdx.test:8080",
+        "shared_control": false,
+        "zoom": 8
+      },
+      "saved": {
+        "freq_khz": 99500.0,
+        "preferences": {},
+        "receiver_type": "FMdx",
+        "server": "http://fmdx.test:8080",
+        "zoom": 8
+      }
+    },
+    {
+      "name": "freq_over_kiwi",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "freq_khz": 30000.0,
+        "server": "http://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "freq_negative",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "freq_khz": -1.0,
+        "server": "http://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "freq_bool",
+      "result": {
+        "freq_khz": 1.0,
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "freq_khz": true,
+        "server": "http://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "zoom_over",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "server": "http://kiwi.test:8073",
+        "zoom": 17
+      }
+    },
+    {
+      "name": "zoom_negative",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "server": "http://kiwi.test:8073",
+        "zoom": -1
+      }
+    },
+    {
+      "name": "zoom_fractional",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "server": "http://kiwi.test:8073",
+        "zoom": 13.5
+      }
+    },
+    {
+      "name": "mode_bad",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "radio_mode": "FM",
+        "server": "http://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "mode_lower",
+      "result": {
+        "protocol": "kiwi",
+        "radio_mode": "USB",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "radio_mode": "usb",
+        "server": "http://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "mode_non_string",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "radio_mode": 5,
+        "server": "http://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "prefs_non_object",
+      "result": {
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "server": "http://kiwi.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "preferences": [
+          1,
+          2
+        ],
+        "server": "http://kiwi.test:8073"
+      }
+    },
+    {
+      "name": "legacy_no_type",
+      "result": null,
+      "saved": {
+        "freq_khz": 7075.0,
+        "server": "kiwi.test"
+      }
+    },
+    {
+      "name": "openwebrx",
+      "result": {
+        "freq_khz": 144.0,
+        "protocol": "openwebrx",
+        "receiver_id": "openwebrx:http://openwebrx.test:8073",
+        "server": "http://openwebrx.test:8073",
+        "shared_control": false
+      },
+      "saved": {
+        "freq_khz": 144.0,
+        "receiver_type": "openwebrx",
+        "server": "http://openwebrx.test:8073"
+      }
+    }
+  ],
+  "rounding": [
+    {
+      "rounded": 0.0,
+      "value": 0.0
+    },
+    {
+      "rounded": 0.0,
+      "value": 0.0004
+    },
+    {
+      "rounded": 0.001,
+      "value": 0.0005
+    },
+    {
+      "rounded": 0.001,
+      "value": 0.0006
+    },
+    {
+      "rounded": 0.002,
+      "value": 0.0015
+    },
+    {
+      "rounded": 7075.0,
+      "value": 7075.0
+    },
+    {
+      "rounded": 7075.0,
+      "value": 7075.0004
+    },
+    {
+      "rounded": 7075.001,
+      "value": 7075.0005
+    },
+    {
+      "rounded": 7075.001,
+      "value": 7075.0006
+    },
+    {
+      "rounded": 7075.123,
+      "value": 7075.12345
+    },
+    {
+      "rounded": -1.235,
+      "value": -1.23456
+    },
+    {
+      "rounded": 30000.0,
+      "value": 29999.9999
+    }
+  ],
+  "save": [
+    {
+      "args": {
+        "freq_khz": 7075.0,
+        "server": "http://kiwi.test:8073",
+        "zoom": 13
+      },
+      "name": "basic",
+      "parsed": {
+        "freq_khz": 7075.0,
+        "server": "http://kiwi.test:8073",
+        "version": 4,
+        "zoom": 13
+      },
+      "raw": "{\"freq_khz\": 7075.0, \"server\": \"http://kiwi.test:8073\", \"version\": 4, \"zoom\": 13}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 7075.04,
+        "manual_radio_mode": true,
+        "preferences": {
+          "audio_backend": "alsa",
+          "wf_floor": 150
+        },
+        "radio_mode": "usb",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073",
+        "zoom": 13
+      },
+      "name": "full",
+      "parsed": {
+        "freq_khz": 7075.04,
+        "preferences": {
+          "audio_backend": "alsa",
+          "wf_floor": 150
+        },
+        "protocol": "kiwi",
+        "radio_mode": "USB",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073",
+        "version": 4,
+        "zoom": 13
+      },
+      "raw": "{\"freq_khz\": 7075.04, \"preferences\": {\"audio_backend\": \"alsa\", \"wf_floor\": 150}, \"protocol\": \"kiwi\", \"radio_mode\": \"USB\", \"receiver_id\": \"kiwi:http://kiwi.test:8073\", \"receiver_type\": \"kiwi\", \"server\": \"http://kiwi.test:8073\", \"version\": 4, \"zoom\": 13}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 7075.0,
+        "manual_radio_mode": false,
+        "radio_mode": "usb",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073",
+        "zoom": 13
+      },
+      "name": "mode_not_manual",
+      "parsed": {
+        "freq_khz": 7075.0,
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073",
+        "version": 4,
+        "zoom": 13
+      },
+      "raw": "{\"freq_khz\": 7075.0, \"protocol\": \"kiwi\", \"receiver_id\": \"kiwi:http://kiwi.test:8073\", \"receiver_type\": \"kiwi\", \"server\": \"http://kiwi.test:8073\", \"version\": 4, \"zoom\": 13}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 7075.0,
+        "manual_radio_mode": true,
+        "radio_mode": "FM",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073",
+        "zoom": 13
+      },
+      "name": "mode_bad",
+      "parsed": {
+        "freq_khz": 7075.0,
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073",
+        "version": 4,
+        "zoom": 13
+      },
+      "raw": "{\"freq_khz\": 7075.0, \"protocol\": \"kiwi\", \"receiver_id\": \"kiwi:http://kiwi.test:8073\", \"receiver_type\": \"kiwi\", \"server\": \"http://kiwi.test:8073\", \"version\": 4, \"zoom\": 13}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 99500.0,
+        "receiver_type": "FMDX",
+        "server": "http://kiwi.test:8073",
+        "zoom": 8
+      },
+      "name": "receiver_type_case",
+      "parsed": {
+        "freq_khz": 99500.0,
+        "protocol": "fmdx",
+        "receiver_id": "fmdx:http://kiwi.test:8073",
+        "receiver_type": "fmdx",
+        "server": "http://kiwi.test:8073",
+        "version": 4,
+        "zoom": 8
+      },
+      "raw": "{\"freq_khz\": 99500.0, \"protocol\": \"fmdx\", \"receiver_id\": \"fmdx:http://kiwi.test:8073\", \"receiver_type\": \"fmdx\", \"server\": \"http://kiwi.test:8073\", \"version\": 4, \"zoom\": 8}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 7075.0,
+        "receiver_type": "rtl",
+        "server": "http://kiwi.test:8073",
+        "zoom": 13
+      },
+      "name": "receiver_type_unknown",
+      "parsed": {
+        "freq_khz": 7075.0,
+        "server": "http://kiwi.test:8073",
+        "version": 4,
+        "zoom": 13
+      },
+      "raw": "{\"freq_khz\": 7075.0, \"server\": \"http://kiwi.test:8073\", \"version\": 4, \"zoom\": 13}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 7075.0,
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073/",
+        "zoom": 13
+      },
+      "name": "trailing_slash",
+      "parsed": {
+        "freq_khz": 7075.0,
+        "protocol": "kiwi",
+        "receiver_id": "kiwi:http://kiwi.test:8073",
+        "receiver_type": "kiwi",
+        "server": "http://kiwi.test:8073/",
+        "version": 4,
+        "zoom": 13
+      },
+      "raw": "{\"freq_khz\": 7075.0, \"protocol\": \"kiwi\", \"receiver_id\": \"kiwi:http://kiwi.test:8073\", \"receiver_type\": \"kiwi\", \"server\": \"http://kiwi.test:8073/\", \"version\": 4, \"zoom\": 13}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 7075.0,
+        "server": "http://kiwi.test:8073",
+        "zoom": 13
+      },
+      "name": "zoom_truncates",
+      "parsed": {
+        "freq_khz": 7075.0,
+        "server": "http://kiwi.test:8073",
+        "version": 4,
+        "zoom": 13
+      },
+      "raw": "{\"freq_khz\": 7075.0, \"server\": \"http://kiwi.test:8073\", \"version\": 4, \"zoom\": 13}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 7075.0,
+        "preferences": {},
+        "server": "http://kiwi.test:8073",
+        "zoom": 13
+      },
+      "name": "empty_preferences",
+      "parsed": {
+        "freq_khz": 7075.0,
+        "server": "http://kiwi.test:8073",
+        "version": 4,
+        "zoom": 13
+      },
+      "raw": "{\"freq_khz\": 7075.0, \"server\": \"http://kiwi.test:8073\", \"version\": 4, \"zoom\": 13}\n",
+      "written": true
+    },
+    {
+      "args": {
+        "freq_khz": 7075.0,
+        "server": "not a url",
+        "zoom": 13
+      },
+      "name": "invalid_server",
+      "parsed": null,
+      "raw": null,
+      "written": false
+    }
+  ]
+}

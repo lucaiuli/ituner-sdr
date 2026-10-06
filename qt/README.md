@@ -1,0 +1,346 @@
+# iTuner SDR Qt runtime
+
+The C++20 / Qt Quick replacement for the Python pygame renderer, built on branch
+`qt-redesign`. The plan is
+[`docs/superpowers/plans/2026-10-06-qt-redesign.md`](../docs/superpowers/plans/2026-10-06-qt-redesign.md).
+
+**Status: Task 1.** The domain core is ported and verified against Python
+goldens: geometry and touch mapping, the receiver catalog and capability
+contract, the tuning/zoom math, the waterfall levels/cadence/palette/ring, the
+swipe gesture model and the remembered-view state store. The application entry
+point and the QML test pattern still carry the whole UI; no receiver transport
+is ported yet. The Python application in [`UI/`](../UI) is untouched and remains
+the only shipping runtime.
+
+## What is here
+
+| Path | Purpose |
+| --- | --- |
+| `src/core/` | Domain logic, QtCore only: the panel orientation and touch mapping, the receiver catalog and capability contract, the tuning/zoom math, the waterfall levels, cadence, slider mapping, region ring and colour ramp, the swipe/tuning gesture model, and the remembered-view state store. |
+| `src/app/` | Entry point, command line, platform defaults, the QML-visible `Runtime` object. |
+| `qml/` | The test pattern: grid, corner markers, edge labels, frame-rate overlay. |
+| `tests/core/` | Unit tests, plus the parity checks against the Python implementations. |
+| `tests/golden/` | Shared fixtures and the expectations captured from the Python modules. |
+| `tests/parity/` | The capture scripts that produce `tests/golden/*_expected.json`. |
+
+## Prerequisites
+
+- Qt 6.5 or newer. The target runs the 6.8 package set from Raspberry Pi OS
+  Trixie; do not install a second Qt from another source on the CM5.
+- CMake 3.24 or newer and a C++20 compiler.
+
+```sh
+# Debian / Raspberry Pi OS
+sudo apt install qt6-base-dev qt6-declarative-dev cmake g++ ninja-build
+
+# macOS development host
+brew install qt cmake
+```
+
+## Build
+
+```sh
+cmake -S qt -B qt/build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build qt/build -j
+ctest --test-dir qt/build --output-on-failure
+```
+
+On macOS, Homebrew's Qt is not in the default search path:
+
+```sh
+cmake -S qt -B qt/build -DCMAKE_PREFIX_PATH="$(brew --prefix qt)"
+```
+
+## Test on macOS
+
+Everything below runs on the development host with no panel attached. Qt 6.11.2
+from Homebrew is what these results were produced with.
+
+```sh
+# one-time
+cmake -S qt -B qt/build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_PREFIX_PATH="$(brew --prefix qt)"
+cmake --build qt/build -j
+
+# look at it
+./qt/build/ituner-sdr-qt --desktop                    # 1280x800 window, text upright
+./qt/build/ituner-sdr-qt --desktop --duration 10      # same, exits on its own
+./qt/build/ituner-sdr-qt --panel 800x1280 --orientation flipped   # device geometry
+
+# check it without looking
+./qt/build/ituner-sdr-qt --desktop --self-test        # exits 0 on success, 1 on failure
+ctest --test-dir qt/build --output-on-failure
+```
+
+The `--panel` form is the closest Mac analogue to the device: the window is the
+panel's 800x1280 and the canvas inside it carries the real rotation, so the
+content appears sideways on the Mac exactly as it would on a wrongly oriented
+panel. Use `--desktop` when you want to read the pattern.
+
+A Retina display renders at 2x, so `grabWindow()` returns 2560x1600 for the
+1280x800 window and `--screenshot-path` writes a 2560x1600 PNG. The self-test
+accounts for the ratio and prints it, so windowed and offscreen runs are both
+meaningful.
+
+Input is not wired up yet: clicks and touches do nothing until the touch mapping
+lands. What is worth looking at on the Mac today is the pattern itself, the
+measured frame rate in the overlay, and whether the corner letters and the
+diagonal are where the rotation says they should be.
+
+Measured on this host, each run reporting 7 checks:
+
+| Configuration | Result |
+| --- | --- |
+| `--desktop --self-test` in a Cocoa window (2x) | 7/7, `self-test: PASS` |
+| `--panel 800x1280 --orientation flipped --self-test` (Cocoa, 2x) | 7/7, `self-test: PASS` |
+| `--panel 800x1280 --orientation normal --self-test` (Cocoa, 2x) | 7/7, `self-test: PASS` |
+| `--desktop --self-test` offscreen (1:1) | 7/7, `self-test: PASS` |
+| `--panel 800x1280 --orientation flipped --self-test` offscreen (1:1) | 7/7, `self-test: PASS` |
+
+## Run
+
+Desktop preview at the true 1280x800 logical size, no rotation:
+
+```sh
+./qt/build/ituner-sdr-qt --desktop --fps 24
+```
+
+On the LCD the binary drives the framebuffer directly. `main` selects `eglfs`
+itself when there is no `DISPLAY` and no `WAYLAND_DISPLAY`, so the systemd unit
+only needs the geometry flags:
+
+```sh
+./qt/build/ituner-sdr-qt --orientation flipped --fps 24
+```
+
+Environment overrides, all of which are honoured ahead of the built-in defaults:
+
+| Variable | Purpose |
+| --- | --- |
+| `QT_QPA_PLATFORM` | `eglfs` (default on the LCD), `linuxfb` or `offscreen`. |
+| `QT_QPA_EGLFS_INTEGRATION` | `eglfs_kms` on the CM5. |
+| `QT_QPA_EGLFS_ALWAYS_SET_MODE` | `1` to force a mode set on the panel. |
+| `QT_QPA_GENERIC_PLUGINS` | `evdevtouch` for the Goodix touchscreen. |
+| `QT_QPA_EGLFS_HIDECURSOR` | `1` keeps a cursor off the panel. |
+
+Useful flags: `--platform <plugin>` (equivalent to setting `QT_QPA_PLATFORM`
+before launch), `--panel WxH` to override the detected framebuffer size,
+`--duration <seconds>` to auto-exit a measurement run, `--screenshot-path <file>`
+to save the rendered frame, and `--self-test` to verify it (below).
+
+### Fallbacks to measure on the device
+
+```sh
+QT_QPA_PLATFORM=linuxfb ./qt/build/ituner-sdr-qt --orientation flipped
+QT_QUICK_BACKEND=software ./qt/build/ituner-sdr-qt --orientation flipped
+```
+
+## Receiver catalog parity
+
+`src/core/receiver_capabilities.*` and `src/core/receiver_catalog.*` are a port of
+`UI/receiver_catalog.py`, which stays the specification. The subtle parts are
+the ones the Python tests already pin down, and they are pinned here too:
+
+- `SOURCE_FILTERS` order is `local, kiwi, openwebrx, fmdx, all`, and an unknown
+  segment falls back to `all`.
+- A record's transport and its browser segment are separate: a LAN Kiwi is
+  `protocol=kiwi` with `source_group=local`.
+- The four FM-DX rejection strings must match character for character, and the
+  shared-tuner frequency control stays blocked until an explicit, session-only
+  acknowledgement.
+- `controls or default` and `controls if controls is not None` are different
+  rules: an empty `controls` list means the protocol default everywhere except
+  FM-DX, where it means no controls at all.
+- `frequency_ranges_khz` empty means unrestricted, and the tuning bounds are the
+  outer edges of the declared ranges.
+
+Rather than hand-writing expectations, `tests/parity/capture_receiver_catalog.py`
+runs the real Python module over the fixtures in
+`tests/golden/receiver_catalog_inputs.json` and records what it produced in
+`tests/golden/receiver_catalog_expected.json`. `tst_receiver_catalog` replays the
+same fixtures through the port and compares field by field. Regenerate the
+goldens after changing the fixtures or the Python module:
+
+```sh
+python3 qt/tests/parity/capture_receiver_catalog.py
+ctest --test-dir qt/build --output-on-failure
+```
+
+This harness has already earned its place: it caught the port passing
+underscores through where Python's `_humanize` replaces them with spaces, which
+would have shown operators `Spectrum_Tilt is unavailable on this receiver`.
+
+## Tuning and waterfall parity
+
+`src/core/tuning.*` and `src/core/waterfall_model.*` are ports of
+`UI/kiwi_live_display_fb.py` and the `WATERFALL_*` helpers in
+`UI/kiwi_gl_display.py`. Two details are easy to get wrong and are pinned by
+goldens:
+
+- The zoom ladder is two-stage. Kiwi stops at level 14 and levels 15 and 16 are a
+  local digital magnifier (factors 4.0 and 8.0), which is why `--max-zoom` is 16
+  while `kiwi_zoom_level` clamps to 14.
+- Python's `round()` rounds a half to the nearest **even** integer. The floor and
+  ceiling sliders depend on it, so `pythonRoundToInt` is part of the public API
+  and is compared against Python on the exact `.5` cases; `std::lround` would
+  disagree there.
+
+The slider helpers in Python read their box from module globals. The port takes
+the x edges as parameters so the QML sliders can supply their own, and the golden
+rows record the real LCD boxes so the mapping itself is still compared against
+the Python functions.
+
+This capture imports the renderer module, so it needs the application runtime:
+
+```sh
+UI/.venv/bin/python3 qt/tests/parity/capture_tuning_waterfall.py
+UI/.venv/bin/python3 qt/tests/parity/capture_waterfall_palette.py
+ctest --test-dir qt/build --output-on-failure
+```
+
+## Waterfall colour, levels and ring
+
+`src/core/waterfall_palette.*` ports `make_waterfall_mapper()`,
+`WaterfallLeveler` and `waterfall_line()`. Three things are worth knowing:
+
+- The colour ramp is three 256-entry tables and must match exactly; the goldens
+  compare all 768 values.
+- The capture calls `waterfall_line()` at `width == len(samples)`, where PIL's
+  resize is the identity, so the golden pixels are exactly the normalised levels
+  through the palette and can be compared byte for byte. The port resamples with
+  plain linear interpolation and is **not** bit-identical to PIL's bilinear
+  kernel, because the Qt renderer keeps each row at its source width and lets the
+  GPU filter it. That is a rendering choice, not a tolerance: colour and level
+  parity is what is verified.
+- The Python `clamp(value, low, high)` is `max(low, min(high, value))`, which is
+  not `std::clamp`. Once a hot band pushes the leveler's target floor up, the
+  ceiling clamp is called with `low > high`, and Python answers `low` — so an
+  auto-levelled ceiling can exceed 255. `std::clamp` is undefined behaviour in
+  that case; the port reproduces the Python answer deliberately, and the goldens
+  are what exposed it.
+
+`WaterfallRing` and `WaterfallQueue` port the texture history and the pending-row
+queue from `WaterfallTexture` and `LiveState.update_waterfall`. Those cases are
+source-derived unit tests rather than goldens, because `WaterfallTexture.__init__`
+needs a GL context and cannot be driven headlessly. The cursor advances and the
+per-row centre/span metadata is rewritten even when a row is rejected for having
+the wrong length, and a rejected row never throws.
+
+## Swipe gesture and remembered state
+
+`src/core/swipe_gesture.*` ports the touch gesture model — the sensitivity ramp,
+the velocity filter and its travel boost, the consecutive-swipe repeat machine,
+the ordered auto zoom-out, the deliberate-drag gate, the drag/tap/detent tuning
+math and the inertia decay. `src/core/state_store.*` ports `load_remembered_view`
+and `save_remembered_view`, including the version-4 field names, the per-field
+accept/reject rules, the atomic write and the rule that a shared FM-DX control is
+never restored. Three details matter:
+
+- Python's `round(value, 3)` is **not** `nearbyint(value * 1000.0) / 1000.0`. The
+  multiply introduces its own rounding, so the two disagree on values whose exact
+  binary form sits just above a half (`round(7075.0005, 3)` is 7075.001, whereas
+  the multiply-then-round form answers 7075.0). The port uses a correctly-rounded
+  `snprintf("%.3f")` + `strtod`, which matches CPython and the golden sweep.
+- `QJsonDocument` stores every JSON number as a double, so the port cannot tell
+  `"zoom": 13` from `"zoom": 13.0` the way Python's `isinstance(zoom, int)` does;
+  it accepts any integral zoom. Recorded on `state_store.h`.
+- The written file is not byte-identical to Python's `json.dumps(...,
+  sort_keys=True)` output: the port uses `QJsonDocument`'s canonical compact
+  form. Both runtimes read either encoding, so the test compares the parsed
+  object and then feeds the written file back through `loadRememberedView` — the
+  round trip the product needs.
+
+The gesture model needed extraction, not translation: the velocity filter, the
+repeat machine, the auto zoom-out and the travel boost live inline in the
+renderer's input loop, so `capture_swipe_gesture.py` restates those rules read
+from the source to build the golden, while `swipe_effective_sensitivity`,
+`retune_*` and the step helpers are the real Python functions. The
+`rf_canvas_width()` dependency of the tuning helpers is monkeypatched so the
+golden covers several canvas widths. Unlike the others, the state-store capture
+runs with the system `python3` — it imports only `kiwi_gl_display`'s headless
+load/save path, not the renderer:
+
+```sh
+python3 qt/tests/parity/capture_state_store.py
+UI/.venv/bin/python3 qt/tests/parity/capture_swipe_gesture.py
+ctest --test-dir qt/build --output-on-failure
+```
+
+## Automated verification of the transform
+
+`--self-test` grabs the frame that actually rendered and checks it against the
+same geometry module the touch mapper will use. The four corner markers, the
+centre crosshair and both border bands are mapped from logical coordinates to
+panel pixels, and the colour that rendered there is compared with the expected
+one. A wrong rotation, a mirrored transform, a scaled canvas or a QML layout that
+does not follow the transform fails the run and exits 1.
+
+It also proves the device geometry on a development host, with no panel. Run it
+windowed, or add `QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software` to keep
+it headless.
+
+Suite results on this macOS host with Qt 6.11.2:
+
+| Check | Result |
+| --- | --- |
+| `ctest` (`display_geometry`) | passed, 11 cases |
+| `ctest` (`receiver_catalog`), parity vs Python | passed, 15 records and every filter, adapter and migration fixture |
+| `ctest` (`tuning_waterfall`), parity vs Python | passed, 322 golden rows |
+| `ctest` (`waterfall_palette`), parity vs Python | passed, 768 palette entries, 52 rows, 5 leveler sequences |
+| `ctest` (`state_store`), parity vs Python | passed, 23 load and 10 save rows, the invalid-endpoint guard and a 12-value rounding sweep |
+| `ctest` (`swipe_gesture`), parity vs Python | passed, 4 normalization variants, 72 sensitivity, 24 repeat, 8 zoom and 4 inertia rows, plus the tuning rows |
+| `python3 UI/test_receiver_catalog.py` (unchanged) | passed, 19 tests |
+
+For example, `flipped` maps the top-left marker's logical `(20,20)` to panel
+`(20,1260)` and the renderer puts the cyan fill exactly there. This is host
+evidence for the transform and the QML layout. It is **not** evidence for the
+panel, the touch digitiser, the frame rate or the platform plugin.
+
+## The Task 0 checks on the CM5
+
+Run the guard first. Only one process may hold DRM master, and the Python
+service holds it while it runs:
+
+```sh
+scripts/guard-drm-master.sh ituner-sdr.service && ./qt/build/ituner-sdr-qt --orientation flipped
+```
+
+Then confirm, on the physical panel:
+
+1. All four corner letters (`TL`, `TR`, `BL`, `BR`) are in the matching physical
+   corners and every edge label is upright and readable.
+2. The magenta diagonal runs from the cyan `TL` corner to the green `BR` corner;
+   if it runs to `BL`, the transform is mirrored.
+3. The amber circle is a circle, not an ellipse, and its centre sits on the
+   crosshair: that is the aspect-ratio check.
+4. The ruler ticks under the circle are evenly spaced across the canvas.
+5. Touch a corner marker and a ruler tick: the touch must land where the artwork
+   is drawn, which is what `tests/core` proves for the same transform.
+6. The overlay reports the measured frame rate next to the target.
+
+Repeat with `--orientation normal` to confirm the other rotation.
+
+Record what the run actually produced. Do not report a frame rate that was not
+measured on the hardware:
+
+| Measurement | Device | Result |
+| --- | --- | --- |
+| `eglfs` test pattern, 24 fps target | CM5 reference display | *not yet measured* |
+| `eglfs` test pattern, 24 fps target | Raspberry Pi 5 / YX45011A | *not yet measured* |
+| `linuxfb` fallback frame rate | CM5 reference display | *not yet measured* |
+| software renderer fallback frame rate | CM5 reference display | *not yet measured* |
+
+## Geometry contract
+
+`src/core/display_geometry.*` is a port, not a redesign. The forward mapping
+mirrors the Python `logical_to_native()` and the inverse mirrors the touch
+branch of the Python input loop, including its one-pixel index adjustment:
+
+| Orientation | Logical to panel | Panel to logical |
+| --- | --- | --- |
+| `flipped` | `(y + visibleYOffset, panelH - x)` | `(panelH - 1 - py, px - visibleYOffset)` |
+| `normal` | `(panelW - y, x)` | `(py, panelW - 1 - px)` |
+
+The QML canvas uses `rotation: -90` about the top-left at `(0, panelH)` for
+`flipped`, and `rotation: +90` at `(panelW, 0)` for `normal`. Those are the only
+two places the transform is expressed; QML reads them from `Runtime` so the drawn
+canvas and the future touch mapper share one source of truth.

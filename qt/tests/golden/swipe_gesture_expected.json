@@ -1,0 +1,5230 @@
+{
+  "base": {
+    "auto_zoom_budget": 5,
+    "fast_px_s": 420.0,
+    "fast_sensitivity": 2.4,
+    "fast_zoom_distance_px": 180,
+    "fast_zoom_min": 4,
+    "fast_zoom_out": 5,
+    "fast_zoom_px_s": 1400.0,
+    "fine_px_s": 130.0,
+    "fine_sensitivity": 0.12,
+    "finger_tune_positional": true,
+    "inertia_min_px_s": 520.0,
+    "inertia_strength": 0.0,
+    "inertia_tau": 0.3,
+    "invert_tune": false,
+    "max_zoom": 16,
+    "repeat_boost": 0.65,
+    "repeat_max": 3,
+    "repeat_window_s": 1.4,
+    "repeat_zoom_min": 11,
+    "repeat_zoom_out": 1,
+    "repeat_zoom_threshold": 2,
+    "slow_sensitivity": 1.15,
+    "station_zoom": 13,
+    "swipe_sensitivity": null,
+    "swipe_start_px": 4,
+    "tap_px": 12,
+    "tune_step_hz": 100
+  },
+  "boost": [
+    {
+      "active_boost": 1.0,
+      "boost": 1.0,
+      "velocity": 0.0
+    },
+    {
+      "active_boost": 1.65,
+      "boost": 1.0,
+      "velocity": 0.0
+    },
+    {
+      "active_boost": 2.95,
+      "boost": 1.0,
+      "velocity": 0.0
+    },
+    {
+      "active_boost": 1.0,
+      "boost": 1.0,
+      "velocity": 100.0
+    },
+    {
+      "active_boost": 1.65,
+      "boost": 1.0,
+      "velocity": 100.0
+    },
+    {
+      "active_boost": 2.95,
+      "boost": 1.0,
+      "velocity": 100.0
+    },
+    {
+      "active_boost": 1.0,
+      "boost": 1.0,
+      "velocity": 420.0
+    },
+    {
+      "active_boost": 1.65,
+      "boost": 1.0,
+      "velocity": 420.0
+    },
+    {
+      "active_boost": 2.95,
+      "boost": 1.0,
+      "velocity": 420.0
+    },
+    {
+      "active_boost": 1.0,
+      "boost": 1.0,
+      "velocity": 500.0
+    },
+    {
+      "active_boost": 1.65,
+      "boost": 1.0617643882950005,
+      "velocity": 500.0
+    },
+    {
+      "active_boost": 2.95,
+      "boost": 1.1852931648850016,
+      "velocity": 500.0
+    },
+    {
+      "active_boost": 1.0,
+      "boost": 1.0,
+      "velocity": 840.0
+    },
+    {
+      "active_boost": 1.65,
+      "boost": 1.65,
+      "velocity": 840.0
+    },
+    {
+      "active_boost": 2.95,
+      "boost": 2.95,
+      "velocity": 840.0
+    },
+    {
+      "active_boost": 1.0,
+      "boost": 1.0,
+      "velocity": -840.0
+    },
+    {
+      "active_boost": 1.65,
+      "boost": 1.65,
+      "velocity": -840.0
+    },
+    {
+      "active_boost": 2.95,
+      "boost": 2.95,
+      "velocity": -840.0
+    },
+    {
+      "active_boost": 1.0,
+      "boost": 1.0,
+      "velocity": 1200.0
+    },
+    {
+      "active_boost": 1.65,
+      "boost": 1.65,
+      "velocity": 1200.0
+    },
+    {
+      "active_boost": 2.95,
+      "boost": 2.95,
+      "velocity": 1200.0
+    }
+  ],
+  "drag_start_px": 14,
+  "fmdx_tune_steps_hz": [
+    50000,
+    100000,
+    200000
+  ],
+  "horizontal_drag_ratio": 1.5,
+  "inertia": [
+    {
+      "decays": [
+        -86.64156137245335,
+        -73.34049831777031,
+        -62.08139152036339
+      ],
+      "invert": false,
+      "khz_s": -102.35491071428571,
+      "span_khz": 96.0,
+      "strength": 1.0,
+      "tau": 0.3,
+      "velocity": 600.0
+    },
+    {
+      "decays": [
+        -85.70627464517467,
+        -72.54879519559616,
+        -61.41122929590413
+      ],
+      "invert": false,
+      "khz_s": -101.25,
+      "span_khz": 96.0,
+      "strength": 0.5,
+      "tau": 0.3,
+      "velocity": 900.0
+    },
+    {
+      "decays": [
+        86.64156137245335,
+        73.34049831777031,
+        62.08139152036339
+      ],
+      "invert": true,
+      "khz_s": 102.35491071428571,
+      "span_khz": 96.0,
+      "strength": 1.0,
+      "tau": 0.3,
+      "velocity": 600.0
+    },
+    {
+      "decays": [
+        -6.240811948444112,
+        -2.29586641204968,
+        -0.8446020526691206
+      ],
+      "invert": false,
+      "khz_s": -16.964285714285715,
+      "span_khz": 12.0,
+      "strength": 2.0,
+      "tau": 0.05,
+      "velocity": 500.0
+    }
+  ],
+  "normalized": {
+    "clamped_high": {
+      "auto_zoom_budget": 0,
+      "fast_px_s": 420.0,
+      "fast_sensitivity": 3.0,
+      "fast_zoom_distance_px": 4,
+      "fast_zoom_min": 16,
+      "fast_zoom_out": 0,
+      "fast_zoom_px_s": 420.0,
+      "fine_px_s": 130.0,
+      "fine_sensitivity": 1.0,
+      "finger_tune_positional": true,
+      "inertia_min_px_s": 520.0,
+      "inertia_strength": 0.0,
+      "inertia_tau": 0.3,
+      "invert_tune": false,
+      "max_zoom": 16,
+      "repeat_boost": 0.65,
+      "repeat_max": 3,
+      "repeat_window_s": 1.4,
+      "repeat_zoom_min": 0,
+      "repeat_zoom_out": 0,
+      "repeat_zoom_threshold": 1,
+      "slow_sensitivity": 3.0,
+      "station_zoom": 13,
+      "swipe_start_px": 4,
+      "tap_px": 12,
+      "tune_step_hz": 100
+    },
+    "clamped_low": {
+      "auto_zoom_budget": 5,
+      "fast_px_s": 50.0,
+      "fast_sensitivity": 0.2,
+      "fast_zoom_distance_px": 180,
+      "fast_zoom_min": 4,
+      "fast_zoom_out": 5,
+      "fast_zoom_px_s": 1400.0,
+      "fine_px_s": 19.0,
+      "fine_sensitivity": 0.1,
+      "finger_tune_positional": true,
+      "inertia_min_px_s": 520.0,
+      "inertia_strength": 0.0,
+      "inertia_tau": 0.05,
+      "invert_tune": false,
+      "max_zoom": 16,
+      "repeat_boost": 0.0,
+      "repeat_max": 0,
+      "repeat_window_s": 0.2,
+      "repeat_zoom_min": 16,
+      "repeat_zoom_out": 1,
+      "repeat_zoom_threshold": 2,
+      "slow_sensitivity": 0.1,
+      "station_zoom": 0,
+      "swipe_start_px": 4,
+      "tap_px": 12,
+      "tune_step_hz": 1
+    },
+    "defaults": {
+      "auto_zoom_budget": 5,
+      "fast_px_s": 420.0,
+      "fast_sensitivity": 2.4,
+      "fast_zoom_distance_px": 180,
+      "fast_zoom_min": 4,
+      "fast_zoom_out": 5,
+      "fast_zoom_px_s": 1400.0,
+      "fine_px_s": 130.0,
+      "fine_sensitivity": 0.12,
+      "finger_tune_positional": true,
+      "inertia_min_px_s": 520.0,
+      "inertia_strength": 0.0,
+      "inertia_tau": 0.3,
+      "invert_tune": false,
+      "max_zoom": 16,
+      "repeat_boost": 0.65,
+      "repeat_max": 3,
+      "repeat_window_s": 1.4,
+      "repeat_zoom_min": 11,
+      "repeat_zoom_out": 1,
+      "repeat_zoom_threshold": 2,
+      "slow_sensitivity": 1.15,
+      "station_zoom": 13,
+      "swipe_start_px": 4,
+      "tap_px": 12,
+      "tune_step_hz": 100
+    },
+    "sensitivity_alias": {
+      "auto_zoom_budget": 5,
+      "fast_px_s": 420.0,
+      "fast_sensitivity": 2.4,
+      "fast_zoom_distance_px": 180,
+      "fast_zoom_min": 4,
+      "fast_zoom_out": 5,
+      "fast_zoom_px_s": 1400.0,
+      "fine_px_s": 130.0,
+      "fine_sensitivity": 0.12,
+      "finger_tune_positional": true,
+      "inertia_min_px_s": 520.0,
+      "inertia_strength": 0.0,
+      "inertia_tau": 0.3,
+      "invert_tune": false,
+      "max_zoom": 16,
+      "repeat_boost": 0.65,
+      "repeat_max": 3,
+      "repeat_window_s": 1.4,
+      "repeat_zoom_min": 11,
+      "repeat_zoom_out": 1,
+      "repeat_zoom_threshold": 2,
+      "slow_sensitivity": 2.0,
+      "station_zoom": 13,
+      "swipe_start_px": 4,
+      "tap_px": 12,
+      "tune_step_hz": 100
+    }
+  },
+  "repeat": [
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "defaults"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          0.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        }
+      ],
+      "variant": "defaults"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          1.0
+        ],
+        [
+          1,
+          1.5
+        ],
+        [
+          1,
+          2.0
+        ],
+        [
+          1,
+          2.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        },
+        {
+          "boost": 2.3,
+          "count": 2
+        },
+        {
+          "boost": 2.95,
+          "count": 3
+        },
+        {
+          "boost": 2.95,
+          "count": 3
+        }
+      ],
+      "variant": "defaults"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          2.0
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "defaults"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          0,
+          0.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "defaults"
+    },
+    {
+      "gestures": [
+        [
+          0,
+          0.0
+        ],
+        [
+          1,
+          0.3
+        ],
+        [
+          1,
+          0.6
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        }
+      ],
+      "variant": "defaults"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "sensitivity_alias"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          0.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        }
+      ],
+      "variant": "sensitivity_alias"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          1.0
+        ],
+        [
+          1,
+          1.5
+        ],
+        [
+          1,
+          2.0
+        ],
+        [
+          1,
+          2.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        },
+        {
+          "boost": 2.3,
+          "count": 2
+        },
+        {
+          "boost": 2.95,
+          "count": 3
+        },
+        {
+          "boost": 2.95,
+          "count": 3
+        }
+      ],
+      "variant": "sensitivity_alias"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          2.0
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "sensitivity_alias"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          0,
+          0.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "sensitivity_alias"
+    },
+    {
+      "gestures": [
+        [
+          0,
+          0.0
+        ],
+        [
+          1,
+          0.3
+        ],
+        [
+          1,
+          0.6
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        }
+      ],
+      "variant": "sensitivity_alias"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_low"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          0.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_low"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          1.0
+        ],
+        [
+          1,
+          1.5
+        ],
+        [
+          1,
+          2.0
+        ],
+        [
+          1,
+          2.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_low"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          2.0
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_low"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          0,
+          0.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_low"
+    },
+    {
+      "gestures": [
+        [
+          0,
+          0.0
+        ],
+        [
+          1,
+          0.3
+        ],
+        [
+          1,
+          0.6
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_low"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_high"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          0.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        }
+      ],
+      "variant": "clamped_high"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          1.0
+        ],
+        [
+          1,
+          1.5
+        ],
+        [
+          1,
+          2.0
+        ],
+        [
+          1,
+          2.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        },
+        {
+          "boost": 2.3,
+          "count": 2
+        },
+        {
+          "boost": 2.95,
+          "count": 3
+        },
+        {
+          "boost": 2.95,
+          "count": 3
+        }
+      ],
+      "variant": "clamped_high"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          1,
+          2.0
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_high"
+    },
+    {
+      "gestures": [
+        [
+          1,
+          0.0
+        ],
+        [
+          0,
+          0.5
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        }
+      ],
+      "variant": "clamped_high"
+    },
+    {
+      "gestures": [
+        [
+          0,
+          0.0
+        ],
+        [
+          1,
+          0.3
+        ],
+        [
+          1,
+          0.6
+        ]
+      ],
+      "states": [
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.0,
+          "count": 0
+        },
+        {
+          "boost": 1.65,
+          "count": 1
+        }
+      ],
+      "variant": "clamped_high"
+    }
+  ],
+  "sensitivity": [
+    {
+      "sensitivity": 2.4,
+      "speed": -900.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.4476190476190476,
+      "speed": -500.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": -420.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": -419.9,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": -300.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": -130.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": 0.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": 50.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": 200.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": 419.9,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.15,
+      "speed": 420.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.153720238095238,
+      "speed": 421.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.4476190476190476,
+      "speed": 500.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 1.8196428571428571,
+      "speed": 600.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": 756.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": 757.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": 900.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": 2000.0,
+      "variant": "defaults"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": -900.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0952380952380953,
+      "speed": -500.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": -420.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": -419.9,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": -300.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": -130.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": 0.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": 50.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": 200.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": 419.9,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0,
+      "speed": 420.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.001190476190476,
+      "speed": 421.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.0952380952380953,
+      "speed": 500.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.2142857142857144,
+      "speed": 600.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": 756.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": 757.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": 900.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 2.4,
+      "speed": 2000.0,
+      "variant": "sensitivity_alias"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": -900.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": -500.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": -420.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": -419.9,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": -300.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": -130.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.1,
+      "speed": 0.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.1,
+      "speed": 50.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 200.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 419.9,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 420.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 421.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 500.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 600.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 756.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 757.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 900.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 0.2,
+      "speed": 2000.0,
+      "variant": "clamped_low"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": -900.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": -500.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": -420.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": -419.9,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": -300.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": -130.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 0.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 50.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 200.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 419.9,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 420.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 421.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 500.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 600.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 756.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 757.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 900.0,
+      "variant": "clamped_high"
+    },
+    {
+      "sensitivity": 3.0,
+      "speed": 2000.0,
+      "variant": "clamped_high"
+    }
+  ],
+  "tuning": {
+    "deliberate": [
+      {
+        "deliberate": false,
+        "start": [
+          100.0,
+          100.0
+        ],
+        "x": 100.0,
+        "y": 100.0
+      },
+      {
+        "deliberate": false,
+        "start": [
+          100.0,
+          100.0
+        ],
+        "x": 103.0,
+        "y": 100.0
+      },
+      {
+        "deliberate": false,
+        "start": [
+          100.0,
+          100.0
+        ],
+        "x": 104.0,
+        "y": 110.0
+      },
+      {
+        "deliberate": true,
+        "start": [
+          100.0,
+          100.0
+        ],
+        "x": 114.0,
+        "y": 100.0
+      },
+      {
+        "deliberate": true,
+        "start": [
+          100.0,
+          100.0
+        ],
+        "x": 120.0,
+        "y": 113.0
+      },
+      {
+        "deliberate": false,
+        "start": [
+          100.0,
+          100.0
+        ],
+        "x": 120.0,
+        "y": 114.0
+      },
+      {
+        "deliberate": true,
+        "start": [
+          100.0,
+          100.0
+        ],
+        "x": 50.0,
+        "y": 102.0
+      },
+      {
+        "deliberate": false,
+        "start": [
+          100.0,
+          200.0
+        ],
+        "x": 100.0,
+        "y": 200.0
+      },
+      {
+        "deliberate": false,
+        "start": [
+          100.0,
+          200.0
+        ],
+        "x": 103.0,
+        "y": 200.0
+      },
+      {
+        "deliberate": false,
+        "start": [
+          100.0,
+          200.0
+        ],
+        "x": 104.0,
+        "y": 210.0
+      },
+      {
+        "deliberate": true,
+        "start": [
+          100.0,
+          200.0
+        ],
+        "x": 114.0,
+        "y": 200.0
+      },
+      {
+        "deliberate": true,
+        "start": [
+          100.0,
+          200.0
+        ],
+        "x": 120.0,
+        "y": 213.0
+      },
+      {
+        "deliberate": false,
+        "start": [
+          100.0,
+          200.0
+        ],
+        "x": 120.0,
+        "y": 214.0
+      },
+      {
+        "deliberate": true,
+        "start": [
+          100.0,
+          200.0
+        ],
+        "x": 50.0,
+        "y": 202.0
+      }
+    ],
+    "delta": [
+      {
+        "canvas": 800,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 7.2,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -7.2,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 60.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -60.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 69.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -69.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 144.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -144.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 1.728,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -1.728,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 14.4,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -14.4,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 16.56,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -16.56,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 34.56,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -34.56,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.014399999999999998,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.014399999999999998,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.12,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.12,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.138,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.138,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.288,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.288,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.014399999999999998,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.014399999999999998,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.12,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.12,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.138,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.138,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.288,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.288,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -0.54,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 0.54,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -4.5,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 4.5,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -5.175,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 5.175,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -10.8,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 10.8,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -1.728,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 1.728,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -14.4,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 14.4,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -16.56,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 16.56,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -34.56,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 34.56,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -7.2,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 7.2,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -60.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 60.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -69.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 69.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -144.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 144.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 5.625,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -5.625,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 46.875,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -46.875,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 53.90624999999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -53.90624999999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 112.5,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -112.5,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 1.35,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -1.35,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 11.25,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -11.25,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 12.937499999999998,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -12.937499999999998,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 27.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -27.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.01125,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.01125,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.09375,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.09375,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.10781249999999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.10781249999999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.225,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.225,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.01125,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.01125,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.09375,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.09375,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.10781249999999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.10781249999999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.225,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.225,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -0.421875,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 0.421875,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -3.515625,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 3.515625,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -4.042968749999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 4.042968749999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -8.4375,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 8.4375,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -1.35,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 1.35,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -11.25,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 11.25,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -12.937499999999998,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 12.937499999999998,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -27.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 27.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -5.625,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 5.625,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -46.875,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 46.875,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -53.90624999999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 53.90624999999999,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -112.5,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 112.5,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 4.5,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -4.5,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 37.5,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -37.5,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 43.125,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -43.125,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -500.0,
+        "invert": false,
+        "khz": 90.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -500.0,
+        "invert": true,
+        "khz": -90.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 1.08,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -1.08,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 9.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -9.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 10.35,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -10.35,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -120.0,
+        "invert": false,
+        "khz": 21.6,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -120.0,
+        "invert": true,
+        "khz": -21.6,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.009,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.009,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.075,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.075,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.08625,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.08625,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -1.0,
+        "invert": false,
+        "khz": 0.18,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": -1.0,
+        "invert": true,
+        "khz": -0.18,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 0.0,
+        "invert": false,
+        "khz": -0.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 0.0,
+        "invert": true,
+        "khz": 0.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.009,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.009,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.075,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.075,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.08625,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.08625,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 1.0,
+        "invert": false,
+        "khz": -0.18,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 1.0,
+        "invert": true,
+        "khz": 0.18,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -0.3375,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 0.3375,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -2.8125,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 2.8125,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -3.2343749999999996,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 3.2343749999999996,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 37.5,
+        "invert": false,
+        "khz": -6.75,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 37.5,
+        "invert": true,
+        "khz": 6.75,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -1.08,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 1.08,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -9.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 9.0,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -10.35,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 10.35,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 120.0,
+        "invert": false,
+        "khz": -21.6,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 120.0,
+        "invert": true,
+        "khz": 21.6,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -4.5,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 4.5,
+        "sensitivity": 0.12,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -37.5,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 37.5,
+        "sensitivity": 1.0,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -43.125,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 43.125,
+        "sensitivity": 1.15,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 500.0,
+        "invert": false,
+        "khz": -90.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "delta_px": 500.0,
+        "invert": true,
+        "khz": 90.0,
+        "sensitivity": 2.4,
+        "span_khz": 96.0
+      }
+    ],
+    "drag_span": [
+      {
+        "canvas": 800,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 50000,
+        "khz": 1000.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "khz": 2000.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 200000,
+        "khz": 4000.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 25000,
+        "khz": 500.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 50000,
+        "khz": 1280.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "khz": 2560.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 200000,
+        "khz": 5120.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 25000,
+        "khz": 640.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "kiwi",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 50000,
+        "khz": 1600.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "khz": 3200.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 200000,
+        "khz": 6400.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 25000,
+        "khz": 800.0,
+        "receiver_type": "fmdx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "openwebrx",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 50000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 200000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 25000,
+        "khz": 96.0,
+        "receiver_type": "local",
+        "span_khz": 96.0
+      }
+    ],
+    "finger_step": [
+      {
+        "base_step": 1,
+        "canvas": 800,
+        "hz": 1,
+        "zoom": 0
+      },
+      {
+        "base_step": 100,
+        "canvas": 800,
+        "hz": 100,
+        "zoom": 0
+      },
+      {
+        "base_step": 1000,
+        "canvas": 800,
+        "hz": 1000,
+        "zoom": 0
+      },
+      {
+        "base_step": 1,
+        "canvas": 800,
+        "hz": 1,
+        "zoom": 4
+      },
+      {
+        "base_step": 100,
+        "canvas": 800,
+        "hz": 100,
+        "zoom": 4
+      },
+      {
+        "base_step": 1000,
+        "canvas": 800,
+        "hz": 1000,
+        "zoom": 4
+      },
+      {
+        "base_step": 1,
+        "canvas": 800,
+        "hz": 1,
+        "zoom": 9
+      },
+      {
+        "base_step": 100,
+        "canvas": 800,
+        "hz": 50,
+        "zoom": 9
+      },
+      {
+        "base_step": 1000,
+        "canvas": 800,
+        "hz": 50,
+        "zoom": 9
+      },
+      {
+        "base_step": 1,
+        "canvas": 800,
+        "hz": 1,
+        "zoom": 13
+      },
+      {
+        "base_step": 100,
+        "canvas": 800,
+        "hz": 2,
+        "zoom": 13
+      },
+      {
+        "base_step": 1000,
+        "canvas": 800,
+        "hz": 2,
+        "zoom": 13
+      },
+      {
+        "base_step": 1,
+        "canvas": 800,
+        "hz": 1,
+        "zoom": 14
+      },
+      {
+        "base_step": 100,
+        "canvas": 800,
+        "hz": 2,
+        "zoom": 14
+      },
+      {
+        "base_step": 1000,
+        "canvas": 800,
+        "hz": 2,
+        "zoom": 14
+      },
+      {
+        "base_step": 1,
+        "canvas": 800,
+        "hz": 1,
+        "zoom": 16
+      },
+      {
+        "base_step": 100,
+        "canvas": 800,
+        "hz": 1,
+        "zoom": 16
+      },
+      {
+        "base_step": 1000,
+        "canvas": 800,
+        "hz": 1,
+        "zoom": 16
+      },
+      {
+        "base_step": 1,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 0
+      },
+      {
+        "base_step": 100,
+        "canvas": 1024,
+        "hz": 100,
+        "zoom": 0
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1024,
+        "hz": 1000,
+        "zoom": 0
+      },
+      {
+        "base_step": 1,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 4
+      },
+      {
+        "base_step": 100,
+        "canvas": 1024,
+        "hz": 100,
+        "zoom": 4
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1024,
+        "hz": 1000,
+        "zoom": 4
+      },
+      {
+        "base_step": 1,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 9
+      },
+      {
+        "base_step": 100,
+        "canvas": 1024,
+        "hz": 50,
+        "zoom": 9
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1024,
+        "hz": 50,
+        "zoom": 9
+      },
+      {
+        "base_step": 1,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 13
+      },
+      {
+        "base_step": 100,
+        "canvas": 1024,
+        "hz": 2,
+        "zoom": 13
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1024,
+        "hz": 2,
+        "zoom": 13
+      },
+      {
+        "base_step": 1,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 14
+      },
+      {
+        "base_step": 100,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 14
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 14
+      },
+      {
+        "base_step": 1,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 16
+      },
+      {
+        "base_step": 100,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 16
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1024,
+        "hz": 1,
+        "zoom": 16
+      },
+      {
+        "base_step": 1,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 0
+      },
+      {
+        "base_step": 100,
+        "canvas": 1280,
+        "hz": 100,
+        "zoom": 0
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1280,
+        "hz": 1000,
+        "zoom": 0
+      },
+      {
+        "base_step": 1,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 4
+      },
+      {
+        "base_step": 100,
+        "canvas": 1280,
+        "hz": 100,
+        "zoom": 4
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1280,
+        "hz": 1000,
+        "zoom": 4
+      },
+      {
+        "base_step": 1,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 9
+      },
+      {
+        "base_step": 100,
+        "canvas": 1280,
+        "hz": 25,
+        "zoom": 9
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1280,
+        "hz": 25,
+        "zoom": 9
+      },
+      {
+        "base_step": 1,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 13
+      },
+      {
+        "base_step": 100,
+        "canvas": 1280,
+        "hz": 2,
+        "zoom": 13
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1280,
+        "hz": 2,
+        "zoom": 13
+      },
+      {
+        "base_step": 1,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 14
+      },
+      {
+        "base_step": 100,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 14
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 14
+      },
+      {
+        "base_step": 1,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 16
+      },
+      {
+        "base_step": 100,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 16
+      },
+      {
+        "base_step": 1000,
+        "canvas": 1280,
+        "hz": 1,
+        "zoom": 16
+      }
+    ],
+    "from_drag": [
+      {
+        "canvas": 800,
+        "invert": false,
+        "khz": 7130.2,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 0.0
+      },
+      {
+        "canvas": 800,
+        "invert": false,
+        "khz": 7116.4,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 100.0
+      },
+      {
+        "canvas": 800,
+        "invert": false,
+        "khz": 7059.544,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 512.0
+      },
+      {
+        "canvas": 800,
+        "invert": false,
+        "khz": 7006.0,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 900.0
+      },
+      {
+        "canvas": 800,
+        "invert": false,
+        "khz": 6953.56,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 1280.0
+      },
+      {
+        "canvas": 1024,
+        "invert": false,
+        "khz": 7118.125,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 0.0
+      },
+      {
+        "canvas": 1024,
+        "invert": false,
+        "khz": 7107.34375,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 100.0
+      },
+      {
+        "canvas": 1024,
+        "invert": false,
+        "khz": 7062.925,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 512.0
+      },
+      {
+        "canvas": 1024,
+        "invert": false,
+        "khz": 7021.09375,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 900.0
+      },
+      {
+        "canvas": 1024,
+        "invert": false,
+        "khz": 6980.125,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 1280.0
+      },
+      {
+        "canvas": 1280,
+        "invert": false,
+        "khz": 7109.5,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 0.0
+      },
+      {
+        "canvas": 1280,
+        "invert": false,
+        "khz": 7100.875,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 100.0
+      },
+      {
+        "canvas": 1280,
+        "invert": false,
+        "khz": 7065.34,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 512.0
+      },
+      {
+        "canvas": 1280,
+        "invert": false,
+        "khz": 7031.875,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 900.0
+      },
+      {
+        "canvas": 1280,
+        "invert": false,
+        "khz": 6999.1,
+        "sensitivity": 1.15,
+        "span_khz": 96.0,
+        "start_freq": 7075.0,
+        "start_x": 400.0,
+        "x": 1280.0
+      }
+    ],
+    "from_tap": [
+      {
+        "canvas": 800,
+        "freq": 7075.0,
+        "khz": 7027.0,
+        "span_khz": 96.0,
+        "x": 0.0
+      },
+      {
+        "canvas": 800,
+        "freq": 7075.0,
+        "khz": 7039.0,
+        "span_khz": 96.0,
+        "x": 100.0
+      },
+      {
+        "canvas": 800,
+        "freq": 7075.0,
+        "khz": 7088.44,
+        "span_khz": 96.0,
+        "x": 512.0
+      },
+      {
+        "canvas": 800,
+        "freq": 7075.0,
+        "khz": 7135.0,
+        "span_khz": 96.0,
+        "x": 900.0
+      },
+      {
+        "canvas": 800,
+        "freq": 7075.0,
+        "khz": 7180.6,
+        "span_khz": 96.0,
+        "x": 1280.0
+      },
+      {
+        "canvas": 1024,
+        "freq": 7075.0,
+        "khz": 7027.0,
+        "span_khz": 96.0,
+        "x": 0.0
+      },
+      {
+        "canvas": 1024,
+        "freq": 7075.0,
+        "khz": 7036.375,
+        "span_khz": 96.0,
+        "x": 100.0
+      },
+      {
+        "canvas": 1024,
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "span_khz": 96.0,
+        "x": 512.0
+      },
+      {
+        "canvas": 1024,
+        "freq": 7075.0,
+        "khz": 7111.375,
+        "span_khz": 96.0,
+        "x": 900.0
+      },
+      {
+        "canvas": 1024,
+        "freq": 7075.0,
+        "khz": 7147.0,
+        "span_khz": 96.0,
+        "x": 1280.0
+      },
+      {
+        "canvas": 1280,
+        "freq": 7075.0,
+        "khz": 7027.0,
+        "span_khz": 96.0,
+        "x": 0.0
+      },
+      {
+        "canvas": 1280,
+        "freq": 7075.0,
+        "khz": 7034.5,
+        "span_khz": 96.0,
+        "x": 100.0
+      },
+      {
+        "canvas": 1280,
+        "freq": 7075.0,
+        "khz": 7065.4,
+        "span_khz": 96.0,
+        "x": 512.0
+      },
+      {
+        "canvas": 1280,
+        "freq": 7075.0,
+        "khz": 7094.5,
+        "span_khz": 96.0,
+        "x": 900.0
+      },
+      {
+        "canvas": 1280,
+        "freq": 7075.0,
+        "khz": 7123.0,
+        "span_khz": 96.0,
+        "x": 1280.0
+      }
+    ],
+    "receiver_step": [
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 4
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 50,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 9
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 13
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 14
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 16
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 4
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 9
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 13
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 14
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 16
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 4
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 50,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 9
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 13
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 14
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 16
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 0
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 4
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 50,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 9
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 13
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 14
+      },
+      {
+        "canvas": 800,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 16
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 4
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 50,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 9
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 13
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 14
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 16
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 4
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 9
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 13
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 14
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 16
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 4
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 50,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 9
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 13
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 14
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 16
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 0
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 4
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 50,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 9
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 13
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 14
+      },
+      {
+        "canvas": 1024,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 16
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 4
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 25,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 9
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 13
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 14
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "kiwi",
+        "zoom": 16
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 4
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 9
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 13
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 14
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100000,
+        "kiwi_step": 100,
+        "receiver_type": "fmdx",
+        "zoom": 16
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 4
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 25,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 9
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 13
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 14
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "openwebrx",
+        "zoom": 16
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 0
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 100,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 4
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 25,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 9
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 2,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 13
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 14
+      },
+      {
+        "canvas": 1280,
+        "fm_step_hz": 100000,
+        "hz": 1,
+        "kiwi_step": 100,
+        "receiver_type": "local",
+        "zoom": 16
+      }
+    ],
+    "snap": [
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 1
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 10
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7074.96,
+        "step_hz": 1
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7074.96,
+        "step_hz": 10
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.04,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.04,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.05,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.05,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.06,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.06,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.1,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.456,
+        "step_hz": 1
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.46,
+        "step_hz": 10
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.5,
+        "step_hz": 100
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 123.456,
+        "khz": 125.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 1
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 10
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7074.96,
+        "step_hz": 1
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7074.96,
+        "step_hz": 10
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.04,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.04,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.05,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.05,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.06,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.06,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.1,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.456,
+        "step_hz": 1
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.46,
+        "step_hz": 10
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.5,
+        "step_hz": 100
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 123.456,
+        "khz": 125.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 1
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 10
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 0.0,
+        "khz": 0.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7074.96,
+        "step_hz": 1
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7074.96,
+        "step_hz": 10
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7074.96,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.0,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.04,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.04,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.04,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.05,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.05,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.05,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.06,
+        "step_hz": 1
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.06,
+        "step_hz": 10
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.1,
+        "step_hz": 100
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 7075.06,
+        "khz": 7075.0,
+        "step_hz": 5000
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.456,
+        "step_hz": 1
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.46,
+        "step_hz": 10
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.5,
+        "step_hz": 100
+      },
+      {
+        "freq": 123.456,
+        "khz": 123.0,
+        "step_hz": 1000
+      },
+      {
+        "freq": 123.456,
+        "khz": 125.0,
+        "step_hz": 5000
+      }
+    ]
+  },
+  "variant_inputs": {
+    "clamped_high": {
+      "auto_zoom_budget": -1,
+      "fast_zoom_distance_px": 1,
+      "fast_zoom_min": 20,
+      "fast_zoom_out": -3,
+      "fast_zoom_px_s": 200.0,
+      "fine_sensitivity": 1.0,
+      "repeat_zoom_min": -2,
+      "repeat_zoom_out": -1,
+      "repeat_zoom_threshold": 0,
+      "slow_sensitivity": 3.0
+    },
+    "clamped_low": {
+      "fast_px_s": 20.0,
+      "fast_sensitivity": 0.2,
+      "fine_px_s": 900.0,
+      "fine_sensitivity": 5.0,
+      "inertia_strength": -5.0,
+      "inertia_tau": 0.0,
+      "max_zoom": 99,
+      "repeat_boost": -2.0,
+      "repeat_max": -1,
+      "repeat_window_s": 0.1,
+      "repeat_zoom_min": 42,
+      "slow_sensitivity": 0.01,
+      "station_zoom": -4,
+      "tune_step_hz": 0
+    },
+    "defaults": {},
+    "sensitivity_alias": {
+      "swipe_sensitivity": 2.0
+    }
+  },
+  "velocity": [
+    {
+      "current": 0.0,
+      "instant": 0.0,
+      "velocity": 0.0
+    },
+    {
+      "current": 0.0,
+      "instant": 100.0,
+      "velocity": 46.0
+    },
+    {
+      "current": 0.0,
+      "instant": -100.0,
+      "velocity": -46.0
+    },
+    {
+      "current": 300.0,
+      "instant": 100.0,
+      "velocity": 156.0
+    },
+    {
+      "current": 100.0,
+      "instant": 300.0,
+      "velocity": 192.0
+    },
+    {
+      "current": 420.0,
+      "instant": -420.0,
+      "velocity": 33.599999999999994
+    },
+    {
+      "current": 0.0,
+      "instant": 1000.0,
+      "velocity": 460.0
+    }
+  ],
+  "zoom": [
+    {
+      "positional": false,
+      "repeat_count": 2,
+      "start_zoom": 13,
+      "steps": [
+        {
+          "used": 1,
+          "zoom": 12
+        },
+        {
+          "used": 1,
+          "zoom": 12
+        }
+      ],
+      "travel": 200.0,
+      "velocity": 600.0
+    },
+    {
+      "positional": false,
+      "repeat_count": 3,
+      "start_zoom": 13,
+      "steps": [
+        {
+          "used": 1,
+          "zoom": 12
+        },
+        {
+          "used": 1,
+          "zoom": 12
+        }
+      ],
+      "travel": 200.0,
+      "velocity": 600.0
+    },
+    {
+      "positional": false,
+      "repeat_count": 3,
+      "start_zoom": 13,
+      "steps": [
+        {
+          "used": 5,
+          "zoom": 8
+        },
+        {
+          "used": 5,
+          "zoom": 8
+        }
+      ],
+      "travel": 200.0,
+      "velocity": 1500.0
+    },
+    {
+      "positional": false,
+      "repeat_count": 3,
+      "start_zoom": 6,
+      "steps": [
+        {
+          "used": 2,
+          "zoom": 4
+        },
+        {
+          "used": 2,
+          "zoom": 4
+        }
+      ],
+      "travel": 200.0,
+      "velocity": 1500.0
+    },
+    {
+      "positional": false,
+      "repeat_count": 3,
+      "start_zoom": 13,
+      "steps": [
+        {
+          "used": 0,
+          "zoom": 13
+        },
+        {
+          "used": 0,
+          "zoom": 13
+        }
+      ],
+      "travel": 100.0,
+      "velocity": 600.0
+    },
+    {
+      "positional": true,
+      "repeat_count": 3,
+      "start_zoom": 13,
+      "steps": [
+        {
+          "used": 0,
+          "zoom": 13
+        },
+        {
+          "used": 0,
+          "zoom": 13
+        }
+      ],
+      "travel": 200.0,
+      "velocity": 600.0
+    },
+    {
+      "positional": false,
+      "repeat_count": 3,
+      "start_zoom": 4,
+      "steps": [
+        {
+          "used": 0,
+          "zoom": 4
+        },
+        {
+          "used": 0,
+          "zoom": 4
+        }
+      ],
+      "travel": 200.0,
+      "velocity": 600.0
+    },
+    {
+      "positional": false,
+      "repeat_count": 3,
+      "start_zoom": 12,
+      "steps": [
+        {
+          "used": 5,
+          "zoom": 7
+        },
+        {
+          "used": 5,
+          "zoom": 7
+        }
+      ],
+      "travel": 200.0,
+      "velocity": 1500.0
+    }
+  ]
+}

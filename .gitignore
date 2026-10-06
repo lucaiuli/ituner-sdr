@@ -12,3 +12,7 @@ vendor/
 *.bak-*
 *.log
 /.freebuff
+
+# Qt / C++ build trees (the Qt runtime lives in qt/).
+qt/build/
+qt/build-*/

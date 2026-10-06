@@ -1,0 +1,216 @@
+{
+  "_comment": "Shared fixtures for the receiver catalog parity check. qt/tests/parity/capture_receiver_catalog.py runs the Python implementation over these inputs and writes receiver_catalog_expected.json; tst_receiver_catalog replays the same inputs through the C++ port and compares. Both sides read this one file so the inputs cannot drift.",
+  "records": [
+    {
+      "input": {
+        "id": "k",
+        "protocol": "kiwi",
+        "endpoint": "https://kiwi",
+        "name": "Kiwi A",
+        "location": "Somewhere",
+        "used": 2,
+        "total": 4,
+        "lat": 1.5,
+        "lon": -2.5
+      },
+      "decisions": [
+        { "control": "frequency" },
+        { "control": "mode" },
+        { "control": "passband" },
+        { "control": "agc" },
+        { "control": "squelch" },
+        { "control": "volume" },
+        { "control": "waterfall_pan" },
+        { "control": "waterfall_zoom" },
+        { "control": "spectrum_tilt" }
+      ],
+      "supports_frequency_khz": [7075.0, 145500.0]
+    },
+    {
+      "input": { "endpoint": "owrx://receiver.local/", "name": "Inferred" },
+      "decisions": [
+        { "control": "frequency" },
+        { "control": "passband" },
+        { "control": "agc" }
+      ],
+      "supports_frequency_khz": [10.0]
+    },
+    {
+      "input": {
+        "endpoint": "local://rtlsdr",
+        "name": "Local RTL-SDR",
+        "label": "RTL-SDR"
+      },
+      "decisions": [
+        { "control": "frequency" },
+        { "control": "passband" },
+        { "control": "agc" },
+        { "control": "waterfall_pan" },
+        { "control": "volume" }
+      ]
+    },
+    {
+      "input": {
+        "protocol": "kiwi",
+        "source_group": "local",
+        "endpoint": "http://kiwisdr.local:8073",
+        "name": "Local KiwiSDR"
+      },
+      "decisions": [{ "control": "frequency" }]
+    },
+    {
+      "input": {
+        "protocol": "kiwi",
+        "source_group": "bogus",
+        "endpoint": "https://kiwi-bad-segment",
+        "name": "Bad segment"
+      },
+      "decisions": []
+    },
+    {
+      "input": {
+        "protocol": "fmdx",
+        "endpoint": "https://fm.test",
+        "name": "FM A",
+        "control_scope": "shared_server"
+      },
+      "decisions": [
+        { "control": "frequency" },
+        { "control": "frequency", "shared_acknowledged": true },
+        { "control": "volume" },
+        { "control": "mode" },
+        { "control": "waterfall_pan" },
+        { "control": "waterfall_zoom" },
+        { "control": "passband" },
+        { "control": "agc" },
+        { "control": "squelch" }
+      ]
+    },
+    {
+      "input": { "protocol": "fmdx", "endpoint": "https://fm.test2" },
+      "decisions": [{ "control": "volume" }, { "control": "mode" }],
+      "supports_frequency_khz": [100000.0]
+    },
+    {
+      "input": {
+        "protocol": "fmdx",
+        "endpoint": "https://fm.test3",
+        "controls": []
+      },
+      "decisions": [{ "control": "volume" }, { "control": "frequency" }]
+    },
+    {
+      "input": {
+        "protocol": "openwebrx",
+        "endpoint": "owrxs://rx.oh6ah.fi/",
+        "name": "OH6AH",
+        "label": "OH6AH",
+        "modes": ["lsb", "usb"],
+        "frequency_ranges_khz": [[0.0, 2000.0]],
+        "source_span_khz": 1000.0
+      },
+      "decisions": [{ "control": "passband" }, { "control": "agc" }],
+      "supports_frequency_khz": [500.0, 2000.0, 3000.0]
+    },
+    {
+      "input": {
+        "protocol": "local",
+        "endpoint": "usb://airspy",
+        "name": "Airspy HF",
+        "label": "AIRSPY",
+        "controls": ["frequency", "volume"],
+        "modes": ["AM", "CW"],
+        "frequency_ranges_khz": [[0.5, 31000.0]],
+        "source_span_khz": 768.0
+      },
+      "decisions": [{ "control": "mode" }, { "control": "passband" }, { "control": "agc" }],
+      "supports_frequency_khz": [1000.0, 40000.0]
+    },
+    {
+      "input": { "endpoint": "https://kiwi-empty-label", "label": "" },
+      "decisions": [{ "control": "frequency" }]
+    },
+    {
+      "input": { "id": "", "endpoint": "https://kiwi-null-id" },
+      "decisions": []
+    },
+    {
+      "input": {
+        "protocol": "kiwi",
+        "endpoint": "Owrxs://Mixed.Case/",
+        "name": "Case"
+      },
+      "decisions": [{ "control": "frequency" }]
+    },
+    {
+      "input": {
+        "protocol": "local",
+        "endpoint": "local://airspy",
+        "name": "Airspy with fixed override",
+        "controls": ["frequency", "mode"],
+        "waterfall_kind": "audio_spectrum"
+      },
+      "decisions": [{ "control": "squelch" }, { "control": "passband" }]
+    },
+    {
+      "input": {
+        "endpoint": "https://kiwi-favorite",
+        "name": "Favorite",
+        "favorite": true,
+        "listeners_used": 0,
+        "listeners_total": 8
+      },
+      "decisions": [{ "control": "frequency" }]
+    }
+  ],
+  "filters": ["all", "kiwi", "local", "openwebrx", "fmdx", "bogus", "ALL"],
+  "kiwi_rows": [
+    ["Kiwi A", "Somewhere", "http://kiwi.test:8073", 1, 4, 1.0, 2.0, "kiwi"],
+    ["OH6AH", "Finland", "owrxs://rx.oh6ah.fi/", 0, 0, 62.0, 25.0, "openwebrx"],
+    ["Short row", "Nowhere", "http://kiwi-short.test:8073"],
+    ["Too short"],
+    ["Null fields", "Void", "http://kiwi-null.test:8073", null, null, null, null, null]
+  ],
+  "fmdx_rows": [
+    {
+      "name": "FM A",
+      "location": "FM land",
+      "server": "https://fm.test",
+      "lat": 44.4,
+      "lon": 26.1,
+      "used": 0,
+      "total": 0
+    },
+    { "name": "FM band only", "server": "https://fm.band", "minimum_khz": 64.0, "maximum_khz": 108.0 },
+    { "name": "No endpoint", "location": "Nowhere" }
+  ],
+  "migrate_payloads": [
+    {
+      "server": "https://fm.test",
+      "receiver_type": "fmdx",
+      "frequency_khz": 101700,
+      "source": "fmdx",
+      "view": "map"
+    },
+    {
+      "server": "http://kiwi.test:8073/",
+      "receiver_type": "kiwi",
+      "mode": "LSB",
+      "frequency_khz": 7075.0,
+      "zoom": 8
+    },
+    {
+      "server": "http://kiwi.test:8073",
+      "receiver_type": "kiwi",
+      "source": "nonsense",
+      "view": "nonsense"
+    },
+    {
+      "endpoint": "local://rtlsdr",
+      "receiver_id": "local:rtlsdr",
+      "protocol": "local",
+      "source": "LOCAL",
+      "view": "list"
+    }
+  ]
+}
