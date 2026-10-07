@@ -2,24 +2,36 @@
 
 The C++20 / Qt Quick replacement for the Python pygame renderer, built on branch
 `qt-redesign`. The plan is
-[`docs/superpowers/plans/2026-10-06-qt-redesign.md`](../docs/superpowers/plans/2026-10-06-qt-redesign.md).
+[`docs/superpowers/plans/2026-10-06-qt-redesign.md`](../docs/superpowers/plans/2026-10-06-qt-redesign.md);
+the consolidated what-is-ported / how-to-run reference is
+[`docs/qt-port-status.md`](../docs/qt-port-status.md).
 
-**Status: Task 1.** The domain core is ported and verified against Python
-goldens: geometry and touch mapping, the receiver catalog and capability
-contract, the tuning/zoom math, the waterfall levels/cadence/palette/ring, the
-swipe gesture model and the remembered-view state store. The application entry
-point and the QML test pattern still carry the whole UI; no receiver transport
-is ported yet. The Python application in [`UI/`](../UI) is untouched and remains
-the only shipping runtime.
+**Status: Task 3 (complete on the host).** The domain core is ported and verified
+against Python goldens: geometry and touch mapping, the receiver catalog and
+capability contract, the tuning/zoom math, the waterfall levels/cadence/palette/
+ring, the swipe gesture model and the remembered-view state store. The KiwiSDR
+transport's deterministic core (endpoint parsing, redirect capture, the pairing
+clock, the SND header decode and the audio downmix) is also ported and verified;
+its live `QWebSocket` session and the audio engine are not built yet. The
+waterfall and spectrum surface renders through custom scene-graph items and
+matches the Python renderer **pixel for pixel** on a captured row set, with
+tuning, zoom, passband and control gestures wired and tested; only its on-device
+frame budget is unmeasured. The Home screen and drawer system (Task 4) are next.
+The Python application in [`UI/`](../UI) is untouched and remains the only
+shipping runtime.
 
 ## What is here
 
 | Path | Purpose |
 | --- | --- |
-| `src/core/` | Domain logic, QtCore only: the panel orientation and touch mapping, the receiver catalog and capability contract, the tuning/zoom math, the waterfall levels, cadence, slider mapping, region ring and colour ramp, the swipe/tuning gesture model, and the remembered-view state store. |
-| `src/app/` | Entry point, command line, platform defaults, the QML-visible `Runtime` object. |
-| `qml/` | The test pattern: grid, corner markers, edge labels, frame-rate overlay. |
+| `src/core/` | Domain logic, QtCore only: the panel orientation and touch mapping, the receiver catalog and capability contract, the tuning/zoom math, the waterfall levels, cadence, slider mapping, region ring and colour ramp, the swipe/tuning gesture model, the remembered-view state store, and the renderer-neutral spectrum, passband and control models with their draw list. |
+| `src/transport/` | KiwiSDR protocol and transport I/O, QtCore only. |
+| `src/audio/` | PCM conversion and level math, QtCore only. |
+| `src/ui/` | The scene-graph layer: the RGBA waterfall item, the draw-list overlay item, and the gesture/wiring seam the QML screen talks to. |
+| `src/app/` | Entry point, command line, platform defaults, the QML-visible `Runtime` object and the waterfall bench. |
+| `qml/` | The test pattern (grid, corner markers, edge labels, frame-rate overlay) and the waterfall screen. |
 | `tests/core/` | Unit tests, plus the parity checks against the Python implementations. |
+| `tests/ui/` | The waterfall screen's touch and display wiring, offscreen. |
 | `tests/golden/` | Shared fixtures and the expectations captured from the Python modules. |
 | `tests/parity/` | The capture scripts that produce `tests/golden/*_expected.json`. |
 
@@ -265,6 +277,104 @@ UI/.venv/bin/python3 qt/tests/parity/capture_swipe_gesture.py
 ctest --test-dir qt/build --output-on-failure
 ```
 
+## KiwiSDR transport parity
+
+`src/transport/kiwi_transport.*` ports the deterministic core of `KiwiWebSocket`
+from `UI/kiwi_live_display_fb.py` and the SND helpers in `UI/kiwi_gl_display.py`.
+It is deliberately free of sockets, clocks and devices, so the parity suite
+verifies it headlessly; the live session builds on top. Two protocol rules are
+load-bearing:
+
+- SND and `W/F` are a *single* Kiwi listener. Both sockets must carry the same
+  client-side millisecond pairing timestamp, or a receiver at capacity treats the
+  second socket as another listener and drops the waterfall. A plain
+  `time.time() * 1000` collides whenever several workers start in the same
+  millisecond, so `nextKiwiSessionTimestamp` returns `max(now, last + 1)`.
+- A public proxy may answer the upgrade with an HTTP 307 rather than a WebSocket
+  close. Only 301/302/307/308 with a trusted absolute `Location` are followed,
+  and the transport must never follow a redirect loop.
+
+The stereo downmix reproduces Python's floor division: `(a + b) // 2` floors a
+negative odd sum, where C++ integer division would truncate toward zero.
+
+The transport I/O layer mirrors the existing Python suite
+`UI/test_kiwi_transport.py`: the `too_busy` access-error taxonomy (0 is a
+permanent "external app access disabled", a positive value a temporary busy
+error with that capacity, a non-numeric value capacity -1), `recvExact` (a
+boundary timeout is re-raised for the worker, but buffered bytes either complete
+or fail with a partial-frame timeout), and the frame reader (mask unmasking, the
+16 MiB guard enforced before the payload read, close frames carrying the peer's
+code and reason, and a pong answered to a ping). The byte source and clock are
+injected so those rules are testable without a socket.
+`capture_kiwi_transport.py` replaces the wall clock with a controlled sequence
+so the pairing behaviour is reproducible:
+
+```sh
+UI/.venv/bin/python3 qt/tests/parity/capture_kiwi_transport.py
+ctest --test-dir qt/build --output-on-failure
+```
+
+## Waterfall and spectrum rendering
+
+Task 3 ports the RF surface, the spectrum trace, the passband overlay and the
+touch controls. The guiding rule is that the Python drawing functions are pure
+draw-log producers — stub `draw_logical_rect/_line/_area/_polyline` and
+`draw_text` and they return a list of calls — so they are ported as producers of
+the same draw list and compared command by command. `src/core/draw_list.*` is
+that list; `src/core/spectrum_model.*`, `src/core/passband_overlay.*` and
+`src/core/waterfall_controls.*` are the models.
+
+On the Qt side `src/ui/waterfall_item.*` is a `QQuickItem` owning a fixed 800-row
+RGBA texture ring, `src/ui/overlay_item.*` rasterizes a draw list, and
+`src/ui/waterfall_view.*` is the seam that owns the gesture state, the control
+geometry and the spectrum/passband state. `qml/WaterfallScreen.qml` only places
+the items and forwards touches.
+
+Three properties are worth knowing because they are easy to lose:
+
+- The scene-graph nodes are keyed by texture **slot**, not by age. A slot keeps
+  its texture until it is overwritten while its age changes on every push, so
+  walking ages would re-upload every visible row per received line. The result is
+  one texture upload per received line, and
+  `tst_waterfall_view::eachReceivedRowCostsOneTextureUpload` asserts it by
+  rendering between pushes.
+- A node with no texture is never attached, and a texture is never built from an
+  image that borrows a row buffer: the software renderer dereferences the texture
+  of every dirty node, and it uploads after the borrowed buffer is gone. Both
+  crashed or corrupted the frame before they were fixed.
+- The passband control never occupies the centre gesture area, which
+  `passbandControlClearsCentreBand` checks against the real control boxes rather
+  than a comment.
+
+The verification is a real pixel comparison, not a stored impression.
+`capture_waterfall_frames.py` records 12 rows across 5 streams (auto-levelling
+on and off, row-pixels 1/2/4, two floor levels) with a per-frame `sha256`, and
+`verify_waterfall_render.py` renders the same rows through the real Python
+pipeline and compares them with the Qt offscreen screenshot:
+
+```sh
+QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software ./qt/build/ituner-sdr-qt \
+  --desktop --waterfall-frame qt/tests/golden/waterfall_frames_expected.json \
+  --waterfall-stream 0 --screenshot-path /tmp/wf_0.png
+UI/.venv/bin/python3 qt/tests/parity/verify_waterfall_render.py \
+  /tmp/wf_0.png qt/tests/golden/waterfall_frames_expected.json 0
+```
+
+All five streams match byte for byte, and two of them are ctest cases
+(`waterfall_render_row1` / `waterfall_render_row2`).
+
+### Measure the render cost
+
+```sh
+./qt/build/ituner-sdr-qt --desktop --waterfall-bench 10    # offscreen works too
+```
+
+It pushes rows at the Kiwi speed-4 cadence (23 Hz) and reports the frame period
+and the `beforeRendering`→`afterRendering` render time. On this host it reports
+23.2 rows/s sustained, a 0.23 ms mean render time and a 15.0 ms mean frame
+period. That is the software backend at 1× scale on a Mac: it is a regression
+canary, **not** the CM5 frame budget, which still needs the device.
+
 ## Automated verification of the transform
 
 `--self-test` grabs the frame that actually rendered and checks it against the
@@ -288,6 +398,11 @@ Suite results on this macOS host with Qt 6.11.2:
 | `ctest` (`waterfall_palette`), parity vs Python | passed, 768 palette entries, 52 rows, 5 leveler sequences |
 | `ctest` (`state_store`), parity vs Python | passed, 23 load and 10 save rows, the invalid-endpoint guard and a 12-value rounding sweep |
 | `ctest` (`swipe_gesture`), parity vs Python | passed, 4 normalization variants, 72 sensitivity, 24 repeat, 8 zoom and 4 inertia rows, plus the tuning rows |
+| `ctest` (`kiwi_transport`), parity vs Python | passed, 13 endpoints, 8 redirects, 6 SND rows, the pairing clock, swap/downmix and playability, plus the access-error, `recvExact` and frame-reader rows |
+| `ctest` (`spectrum_model`), parity vs Python | passed, 10 binning, 8 zoom, 13 state steps and 10 draw lists, bit-exact |
+| `ctest` (`waterfall_frames`), parity vs Python | passed, 12 rows across 5 streams through the leveler, palette and queue |
+| `ctest` (`waterfall_view`) | passed, 12 methods: controls, zoom, tune/drag/inertia, passband handles, spectrum feed and one-upload-per-row |
+| `ctest` (`waterfall_render_row1` / `_row2`) | passed, 5/5 captured frames pixel-identical to the Python renderer |
 | `python3 UI/test_receiver_catalog.py` (unchanged) | passed, 19 tests |
 
 For example, `flipped` maps the top-left marker's logical `(20,20)` to panel

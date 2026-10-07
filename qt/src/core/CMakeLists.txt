@@ -4,16 +4,24 @@
 add_library(ituner_core STATIC
     display_geometry.cpp
     display_geometry.h
+    draw_list.cpp
+    draw_list.h
+    passband_overlay.cpp
+    passband_overlay.h
     receiver_capabilities.cpp
     receiver_capabilities.h
     receiver_catalog.cpp
     receiver_catalog.h
+    spectrum_model.cpp
+    spectrum_model.h
     state_store.cpp
     state_store.h
     swipe_gesture.cpp
     swipe_gesture.h
     tuning.cpp
     tuning.h
+    waterfall_controls.cpp
+    waterfall_controls.h
     waterfall_model.cpp
     waterfall_model.h
     waterfall_palette.cpp

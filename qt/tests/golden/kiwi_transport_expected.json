@@ -1,0 +1,851 @@
+{
+  "accept_keys": [
+    {
+      "accept": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+      "key": "dGhlIHNhbXBsZSBub25jZQ=="
+    },
+    {
+      "accept": "HSmrc0sMlYUkAGmm5OPpG2HaGWk=",
+      "key": "x3JJHMbDL1EzLkh9GBhXDw=="
+    },
+    {
+      "accept": "ICX+Yqv66kxgM0FcWaLWlFLwTAI=",
+      "key": "AAAAAAAAAAAAAAAAAAAAAA=="
+    }
+  ],
+  "busy": [
+    {
+      "capacity": 0,
+      "error": "KiwiExternalApiDisabledError",
+      "message": "external app access disabled by receiver",
+      "params": {
+        "too_busy": "0"
+      }
+    },
+    {
+      "capacity": 4,
+      "error": "KiwiServerBusyError",
+      "message": "receiver busy (external app capacity 4)",
+      "params": {
+        "too_busy": "4"
+      }
+    },
+    {
+      "capacity": 7,
+      "error": "KiwiServerBusyError",
+      "message": "receiver busy (external app capacity 7)",
+      "params": {
+        "too_busy": 7
+      }
+    },
+    {
+      "capacity": 0,
+      "error": "KiwiExternalApiDisabledError",
+      "message": "external app access disabled by receiver",
+      "params": {
+        "too_busy": "0"
+      }
+    },
+    {
+      "ok": null,
+      "params": {
+        "sample_rate": "12000"
+      }
+    },
+    {
+      "capacity": -1,
+      "error": "KiwiServerBusyError",
+      "message": "receiver busy (external app capacity -1)",
+      "params": {
+        "too_busy": "not-a-number"
+      }
+    },
+    {
+      "ok": null,
+      "params": {}
+    }
+  ],
+  "constants": {
+    "guid": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+    "keepalive_seconds": 1.0,
+    "non_audio_modes": [
+      "drm",
+      "iq"
+    ],
+    "quantum_frames": 512,
+    "snd_stream": "SND",
+    "stereo_modes": [
+      "qam",
+      "sas"
+    ],
+    "waterfall_stream": "W/F"
+  },
+  "endpoints": [
+    {
+      "host": "kiwi.test",
+      "input": "http://kiwi.test:8073",
+      "ok": true,
+      "port": 8073,
+      "scheme": "http"
+    },
+    {
+      "host": "kiwi.test",
+      "input": "https://kiwi.test:8073",
+      "ok": true,
+      "port": 8073,
+      "scheme": "https"
+    },
+    {
+      "host": "kiwi.test",
+      "input": "wss://kiwi.test",
+      "ok": true,
+      "port": 443,
+      "scheme": "wss"
+    },
+    {
+      "host": "kiwi.test",
+      "input": "ws://kiwi.test:8073/",
+      "ok": true,
+      "port": 8073,
+      "scheme": "ws"
+    },
+    {
+      "host": "kiwi.test",
+      "input": "kiwi.test:8073",
+      "ok": true,
+      "port": 8073,
+      "scheme": "http"
+    },
+    {
+      "host": "kiwi.test",
+      "input": "kiwi.test",
+      "ok": true,
+      "port": 8073,
+      "scheme": "http"
+    },
+    {
+      "host": "kx4az.proxy.kiwisdr.com",
+      "input": "http://KX4AZ.PROXY.KIWISDR.COM:8073",
+      "ok": true,
+      "port": 8073,
+      "scheme": "http"
+    },
+    {
+      "host": "kiwi.test",
+      "input": "http://kiwi.test:8074/extra/path?x=1",
+      "ok": true,
+      "port": 8074,
+      "scheme": "http"
+    },
+    {
+      "host": "kiwi.test",
+      "input": "https://kiwi.test",
+      "ok": true,
+      "port": 443,
+      "scheme": "https"
+    },
+    {
+      "input": "http://",
+      "ok": false
+    },
+    {
+      "input": "",
+      "ok": false
+    },
+    {
+      "input": "http://kiwi.test:not-a-port",
+      "ok": false
+    },
+    {
+      "input": "http://kiwi.test:99999",
+      "ok": false
+    }
+  ],
+  "frames": [
+    {
+      "events": [
+        "8105",
+        "68656c6c6f"
+      ],
+      "name": "text",
+      "ok_hex": "68656c6c6f",
+      "sent_count": 0
+    },
+    {
+      "events": [
+        "8203",
+        "000102"
+      ],
+      "name": "binary",
+      "ok_hex": "000102",
+      "sent_count": 0
+    },
+    {
+      "events": [
+        "8185",
+        "01020304",
+        "69676f686e"
+      ],
+      "name": "masked_text",
+      "ok_hex": "68656c6c6f",
+      "sent_count": 0
+    },
+    {
+      "error": "EOFError",
+      "events": [
+        "8802",
+        "03e8"
+      ],
+      "message": "websocket closed code=1000",
+      "name": "close_code_only",
+      "sent_count": 0
+    },
+    {
+      "error": "EOFError",
+      "events": [
+        "8806",
+        "03e8",
+        "6279652e"
+      ],
+      "message": "websocket closed code=1000 reason=bye.",
+      "name": "close_code_reason",
+      "sent_count": 0
+    },
+    {
+      "error": "EOFError",
+      "events": [
+        "8800"
+      ],
+      "message": "websocket closed",
+      "name": "close_empty",
+      "sent_count": 0
+    },
+    {
+      "events": [
+        "8a00",
+        "8102",
+        "6871"
+      ],
+      "name": "pong_skipped",
+      "ok_hex": "6871",
+      "sent_count": 0
+    },
+    {
+      "events": [
+        "8902",
+        "6869",
+        "8101",
+        "78"
+      ],
+      "name": "ping_then_text",
+      "ok_hex": "78",
+      "sent_count": 1
+    },
+    {
+      "events": [
+        "817e",
+        "0002",
+        "6869"
+      ],
+      "name": "extended_16bit",
+      "ok_hex": "6869",
+      "sent_count": 0
+    },
+    {
+      "error": "ValueError",
+      "events": [
+        "827f",
+        "0000000001000001"
+      ],
+      "message": "websocket frame too large: 16777217 bytes",
+      "name": "frame_too_large",
+      "sent_count": 0
+    },
+    {
+      "error": "EOFError",
+      "events": [
+        ""
+      ],
+      "message": "socket closed",
+      "name": "socket_closed",
+      "sent_count": 0
+    }
+  ],
+  "live_state": [
+    {
+      "args": {
+        "freq": 7075.0
+      },
+      "op": "set_freq",
+      "result": 1,
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 1
+    },
+    {
+      "args": {
+        "freq": 7100.0
+      },
+      "op": "preview_freq",
+      "result": null,
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 1
+    },
+    {
+      "args": {
+        "seen": 0
+      },
+      "op": "get_tune",
+      "result": [
+        1,
+        7100.0
+      ],
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 1
+    },
+    {
+      "args": {
+        "seen": 1
+      },
+      "op": "get_tune",
+      "result": [
+        1,
+        null
+      ],
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 1
+    },
+    {
+      "args": {
+        "seen": 2
+      },
+      "op": "get_tune",
+      "result": [
+        1,
+        7100.0
+      ],
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 1
+    },
+    {
+      "args": {
+        "zoom": 13
+      },
+      "op": "set_zoom",
+      "result": 1,
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 1
+    },
+    {
+      "args": {
+        "zoom": 10
+      },
+      "op": "set_zoom",
+      "result": 2,
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 2
+    },
+    {
+      "args": {
+        "seen": 1
+      },
+      "op": "get_view",
+      "result": [
+        2,
+        [
+          7100.0,
+          10
+        ]
+      ],
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 2
+    },
+    {
+      "args": {
+        "seen": 2
+      },
+      "op": "get_view",
+      "result": [
+        2,
+        null
+      ],
+      "server_gen": 0,
+      "tune_gen": 1,
+      "view_gen": 2
+    },
+    {
+      "args": {
+        "freq": 7106.0,
+        "zoom": 9
+      },
+      "op": "set_freq_zoom",
+      "result": 3,
+      "server_gen": 0,
+      "tune_gen": 2,
+      "view_gen": 3
+    },
+    {
+      "args": {
+        "seen": 1
+      },
+      "op": "get_tune",
+      "result": [
+        2,
+        7106.0
+      ],
+      "server_gen": 0,
+      "tune_gen": 2,
+      "view_gen": 3
+    },
+    {
+      "args": {
+        "seen": 2
+      },
+      "op": "get_view",
+      "result": [
+        3,
+        [
+          7106.0,
+          9
+        ]
+      ],
+      "server_gen": 0,
+      "tune_gen": 2,
+      "view_gen": 3
+    },
+    {
+      "args": {
+        "server": "http://a.test:8073"
+      },
+      "op": "set_server",
+      "result": 1,
+      "server_gen": 1,
+      "tune_gen": 2,
+      "view_gen": 4
+    },
+    {
+      "args": {
+        "seen": 0
+      },
+      "op": "get_server",
+      "result": [
+        1,
+        "http://a.test:8073"
+      ],
+      "server_gen": 1,
+      "tune_gen": 2,
+      "view_gen": 4
+    },
+    {
+      "args": {
+        "seen": 1
+      },
+      "op": "get_server",
+      "result": [
+        1,
+        null
+      ],
+      "server_gen": 1,
+      "tune_gen": 2,
+      "view_gen": 4
+    },
+    {
+      "args": {
+        "server": "http://b.test:8073",
+        "zoom": 6
+      },
+      "op": "set_server",
+      "result": 2,
+      "server_gen": 2,
+      "tune_gen": 2,
+      "view_gen": 5
+    },
+    {
+      "args": {
+        "seen": 1
+      },
+      "op": "get_server",
+      "result": [
+        2,
+        "http://b.test:8073"
+      ],
+      "server_gen": 2,
+      "tune_gen": 2,
+      "view_gen": 5
+    },
+    {
+      "args": {},
+      "op": "get_zoom",
+      "result": 6,
+      "server_gen": 2,
+      "tune_gen": 2,
+      "view_gen": 5
+    },
+    {
+      "args": {},
+      "op": "get_span",
+      "result": 468.75,
+      "server_gen": 2,
+      "tune_gen": 2,
+      "view_gen": 5
+    },
+    {
+      "args": {},
+      "op": "current_server",
+      "result": "http://b.test:8073",
+      "server_gen": 2,
+      "tune_gen": 2,
+      "view_gen": 5
+    },
+    {
+      "args": {
+        "zoom": 20
+      },
+      "op": "set_zoom",
+      "result": 6,
+      "server_gen": 2,
+      "tune_gen": 2,
+      "view_gen": 6
+    },
+    {
+      "args": {},
+      "op": "get_span",
+      "result": 1.8310546875,
+      "server_gen": 2,
+      "tune_gen": 2,
+      "view_gen": 6
+    }
+  ],
+  "live_state_max_zoom": 14,
+  "playable": [
+    {
+      "channels": 1,
+      "flags": 128,
+      "playable": true,
+      "radio_mode": "usb"
+    },
+    {
+      "channels": 2,
+      "flags": 128,
+      "playable": false,
+      "radio_mode": "lsb"
+    },
+    {
+      "channels": 1,
+      "flags": 192,
+      "playable": true,
+      "radio_mode": "am"
+    },
+    {
+      "channels": 1,
+      "flags": 0,
+      "playable": true,
+      "radio_mode": "usb"
+    },
+    {
+      "channels": 1,
+      "flags": 136,
+      "playable": true,
+      "radio_mode": "sas"
+    },
+    {
+      "channels": 1,
+      "flags": 136,
+      "playable": false,
+      "radio_mode": "usb"
+    },
+    {
+      "channels": 1,
+      "flags": 128,
+      "playable": false,
+      "radio_mode": "iq"
+    },
+    {
+      "channels": 1,
+      "flags": 128,
+      "playable": false,
+      "radio_mode": "drm"
+    },
+    {
+      "channels": 1,
+      "flags": 144,
+      "playable": false,
+      "radio_mode": "usb"
+    },
+    {
+      "channels": 2,
+      "flags": 144,
+      "playable": false,
+      "radio_mode": "sas"
+    }
+  ],
+  "recv_exact": [
+    {
+      "clock": [
+        0.0,
+        0.1
+      ],
+      "count": 4,
+      "events": [
+        {
+          "hex": "6162"
+        },
+        {
+          "timeout": true
+        },
+        {
+          "hex": "6364"
+        }
+      ],
+      "name": "partial_survives_timeout",
+      "ok_hex": "61626364"
+    },
+    {
+      "clock": [
+        0.0,
+        0.1
+      ],
+      "count": 2,
+      "error": "TimeoutError",
+      "events": [
+        {
+          "timeout": true
+        }
+      ],
+      "message": "",
+      "name": "idle_timeout_reraises"
+    },
+    {
+      "clock": [
+        0.0,
+        8.5
+      ],
+      "count": 4,
+      "error": "TimeoutError",
+      "events": [
+        {
+          "hex": "61"
+        },
+        {
+          "timeout": true
+        }
+      ],
+      "message": "websocket partial frame timed out",
+      "name": "partial_frame_times_out"
+    },
+    {
+      "clock": [
+        0.0
+      ],
+      "count": 2,
+      "error": "EOFError",
+      "events": [
+        {
+          "hex": ""
+        }
+      ],
+      "message": "socket closed",
+      "name": "closed_socket"
+    },
+    {
+      "clock": [
+        0.0
+      ],
+      "count": 6,
+      "events": [
+        {
+          "hex": "6162"
+        },
+        {
+          "hex": "6364"
+        },
+        {
+          "hex": "6566"
+        }
+      ],
+      "name": "chunked",
+      "ok_hex": "616263646566"
+    },
+    {
+      "clock": [
+        0.0
+      ],
+      "count": 0,
+      "events": [],
+      "name": "zero_count",
+      "ok_hex": ""
+    }
+  ],
+  "redirects": [
+    {
+      "name": "307_absolute",
+      "redirect": "http://new.kiwi.test:8073",
+      "response": "HTTP/1.1 307 Temporary Redirect\r\nLocation: http://new.kiwi.test:8073\r\n\r\n"
+    },
+    {
+      "name": "301_relative_scheme_ok",
+      "redirect": "https://new.kiwi.test:8073",
+      "response": "HTTP/1.1 301 Moved Permanently\r\nLocation: https://new.kiwi.test:8073\r\n\r\n"
+    },
+    {
+      "name": "302_wss",
+      "redirect": "wss://secure.kiwi.test",
+      "response": "HTTP/1.1 302 Found\r\nlocation: wss://secure.kiwi.test\r\n\r\n"
+    },
+    {
+      "name": "200_not_redirect",
+      "redirect": null,
+      "response": "HTTP/1.1 200 OK\r\nLocation: http://new.kiwi.test:8073\r\n\r\n"
+    },
+    {
+      "name": "307_no_location",
+      "redirect": null,
+      "response": "HTTP/1.1 307 Temporary Redirect\r\nServer: kiwisdr\r\n\r\n"
+    },
+    {
+      "name": "307_bad_scheme",
+      "redirect": null,
+      "response": "HTTP/1.1 307 Temporary Redirect\r\nLocation: ftp://new.kiwi.test\r\n\r\n"
+    },
+    {
+      "name": "307_no_host",
+      "redirect": null,
+      "response": "HTTP/1.1 307 Temporary Redirect\r\nLocation: http://\r\n\r\n"
+    },
+    {
+      "name": "308_first_location_wins",
+      "redirect": "http://a.kiwi.test:8073",
+      "response": "HTTP/1.1 308 Permanent Redirect\r\nLocation: http://a.kiwi.test:8073\r\nLocation: http://b.kiwi.test:8073\r\n\r\n"
+    }
+  ],
+  "session_paths": [
+    {
+      "path": "/ws/kiwi/1000000/SND",
+      "stream": "SND",
+      "timestamp": 1000000
+    },
+    {
+      "path": "/ws/kiwi/1000000/W/F",
+      "stream": "W/F",
+      "timestamp": 1000000
+    },
+    {
+      "path": "/ws/kiwi/1786000000123/W/F",
+      "stream": "W/F",
+      "timestamp": 1786000000123
+    }
+  ],
+  "snd": [
+    {
+      "flags": 128,
+      "message_hex": "534e44800700000000c8000102030405060708090a0b0c0d0e0f10111213",
+      "name": "normal_le",
+      "ok": true,
+      "pcm_hex": "000102030405060708090a0b0c0d0e0f10111213",
+      "sequence": 7,
+      "smeter_dbm": -107.0
+    },
+    {
+      "flags": 200,
+      "message_hex": "534e44c800286bee0000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "name": "stereo_squelch",
+      "ok": true,
+      "pcm_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "sequence": 4000000000,
+      "smeter_dbm": -127.0
+    },
+    {
+      "flags": 16,
+      "message_hex": "534e441001000000ffff000102030405060708090a0b0c0d0e0f",
+      "name": "compressed_big_endian",
+      "ok": true,
+      "pcm_hex": "000102030405060708090a0b0c0d0e0f",
+      "sequence": 1,
+      "smeter_dbm": 6426.5
+    },
+    {
+      "flags": 0,
+      "message_hex": "534e440000000000012c",
+      "name": "no_pcm",
+      "ok": true,
+      "pcm_hex": "",
+      "sequence": 0,
+      "smeter_dbm": -97.0
+    },
+    {
+      "message_hex": "534e448000",
+      "name": "short",
+      "ok": false
+    },
+    {
+      "message_hex": "58595a800000000000000000000000000000000000000000",
+      "name": "bad_tag",
+      "ok": false
+    }
+  ],
+  "stereo_mono": [
+    {
+      "in_hex": "01000200fdfffcff0700f9ff0080ff7f",
+      "out_hex": "0100fcff0000ffff"
+    },
+    {
+      "in_hex": "6400c800",
+      "out_hex": "9600"
+    },
+    {
+      "in_hex": "",
+      "out_hex": ""
+    },
+    {
+      "in_hex": "010002000300",
+      "out_hex": "0100"
+    }
+  ],
+  "swap": [
+    {
+      "in_hex": "000102030405",
+      "out_hex": "010003020504"
+    },
+    {
+      "in_hex": "0080ff7f",
+      "out_hex": "80007fff"
+    },
+    {
+      "in_hex": "",
+      "out_hex": ""
+    }
+  ],
+  "timestamps": [
+    {
+      "now_ms": 1000000,
+      "result": 1000000
+    },
+    {
+      "now_ms": 1000000,
+      "result": 1000001
+    },
+    {
+      "now_ms": 1000400,
+      "result": 1000400
+    },
+    {
+      "now_ms": 1000900,
+      "result": 1000900
+    },
+    {
+      "now_ms": 1002000,
+      "result": 1002000
+    },
+    {
+      "now_ms": 999000,
+      "result": 1002001
+    }
+  ]
+}

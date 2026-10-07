@@ -60,10 +60,28 @@ CliOptions parseCommandLine(QCoreApplication &app) {
         QStringLiteral("self-test"),
         QStringLiteral("Check the rendered frame against the geometry contract, then exit with "
                        "0 on success or 1 on failure."));
+    const QCommandLineOption waterfallFrameOption(
+        QStringLiteral("waterfall-frame"),
+        QStringLiteral("Render the captured waterfall row set in this golden file, then exit "
+                       "after the screenshot."),
+        QStringLiteral("file"));
+    const QCommandLineOption waterfallStreamOption(
+        QStringLiteral("waterfall-stream"),
+        QStringLiteral("Which captured stream to render (the wf_row_pixels variant)."),
+        QStringLiteral("index"), QStringLiteral("0"));
+    const QCommandLineOption waterfallBenchOption(
+        QStringLiteral("waterfall-bench"),
+        QStringLiteral("Measure the waterfall render cost for this many seconds, then exit."),
+        QStringLiteral("seconds"), QStringLiteral("0"));
+    const QCommandLineOption wfRowPixelsOption(
+        QStringLiteral("wf-row-pixels"),
+        QStringLiteral("Waterfall screen rows per received line."), QStringLiteral("rows"),
+        QStringLiteral("1"));
 
     parser.addOptions({serverOption,      frequencyOption, orientationOption, fpsOption,
                        desktopOption,     durationOption,  panelOption,       platformOption,
-                       screenshotOption,  selfTestOption});
+                       screenshotOption,  selfTestOption,  waterfallFrameOption,
+                       waterfallStreamOption, waterfallBenchOption, wfRowPixelsOption});
     // process() performs the standard --help/--version handling and terminates
     // the process on an unknown or malformed option.
     parser.process(app);
@@ -93,6 +111,22 @@ CliOptions parseCommandLine(QCoreApplication &app) {
 
     options.screenshotPath = parser.value(screenshotOption);
     options.selfTest = parser.isSet(selfTestOption);
+    options.waterfallFramePath = parser.value(waterfallFrameOption);
+
+    const int stream = parser.value(waterfallStreamOption).toInt(&ok);
+    if (!ok || stream < 0) {
+        parser.showHelp(2);
+    }
+    options.waterfallStream = stream;
+
+    const double bench = parser.value(waterfallBenchOption).toDouble(&ok);
+    if (ok && bench > 0.0) {
+        options.waterfallBenchSeconds = bench;
+    }
+    const int rowPixels = parser.value(wfRowPixelsOption).toInt(&ok);
+    if (ok && rowPixels > 0) {
+        options.waterfallRowPixels = rowPixels;
+    }
 
     const QString panel = parser.value(panelOption);
     if (!panel.isEmpty()) {

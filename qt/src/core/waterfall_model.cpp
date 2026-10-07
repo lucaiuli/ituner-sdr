@@ -137,6 +137,20 @@ int WaterfallRing::indexForAge(int age) const {
     return ((m_row + age) % m_capacity + m_capacity) % m_capacity;
 }
 
+int WaterfallRing::ageAtIndex(int index) const {
+    if (m_capacity <= 0) {
+        return 0;
+    }
+    return ((index - m_row) % m_capacity + m_capacity) % m_capacity;
+}
+
+QByteArray WaterfallRing::rowAtAge(int age) const {
+    if (m_capacity <= 0 || age < 0 || age >= m_rowsWritten) {
+        return {};
+    }
+    return m_rows.at(indexForAge(age));
+}
+
 std::optional<double> WaterfallRing::centerKhzAtAge(int age) const {
     if (m_capacity <= 0 || age < 0 || age >= m_rowsWritten) {
         return std::nullopt;

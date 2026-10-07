@@ -121,3 +121,51 @@ if(NOT MSVC)
 endif()
 
 add_test(NAME swipe_gesture COMMAND tst_swipe_gesture)
+
+# The scope, the passband overlay and the waterfall control grouping replay
+# goldens recorded from the real Python drawing functions.
+qt_add_executable(tst_spectrum_model
+    tst_spectrum_model.cpp
+)
+
+target_link_libraries(tst_spectrum_model
+    PRIVATE
+        ituner_core
+        Qt6::Test
+)
+
+target_compile_definitions(tst_spectrum_model
+    PRIVATE ITUNER_QT_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+)
+
+target_include_directories(tst_spectrum_model PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(NOT MSVC)
+    target_compile_options(tst_spectrum_model PRIVATE -Wall -Wextra)
+endif()
+
+add_test(NAME spectrum_model COMMAND tst_spectrum_model)
+
+# The streamed frame test: a captured row set through the leveler, the palette
+# and the row queue, checked by whole-frame checksum.
+qt_add_executable(tst_waterfall_frames
+    tst_waterfall_frames.cpp
+)
+
+target_link_libraries(tst_waterfall_frames
+    PRIVATE
+        ituner_core
+        Qt6::Test
+)
+
+target_compile_definitions(tst_waterfall_frames
+    PRIVATE ITUNER_QT_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+)
+
+target_include_directories(tst_waterfall_frames PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(NOT MSVC)
+    target_compile_options(tst_waterfall_frames PRIVATE -Wall -Wextra)
+endif()
+
+add_test(NAME waterfall_frames COMMAND tst_waterfall_frames)

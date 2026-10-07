@@ -186,6 +186,8 @@ void WaterfallPaletteTest::ringMovesUpwardAndKeepsMetadata() {
 
     QVERIFY(ring.pushLine(rowA, 4, 7000.0, 30.0));
     QCOMPARE(ring.newestIndex(), 7);
+    QCOMPARE(ring.rowAtAge(0), rowA);
+    QVERIFY(ring.rowAtAge(1).isEmpty());
     QVERIFY(ring.pushLine(rowB, 4, 7001.0, 31.0));
     QCOMPARE(ring.newestIndex(), 6);
     QCOMPARE(ring.rowsWritten(), 2);
@@ -193,6 +195,11 @@ void WaterfallPaletteTest::ringMovesUpwardAndKeepsMetadata() {
     // Age 0 is the newest row, and age walks toward older rows.
     QCOMPARE(ring.indexForAge(0), 6);
     QCOMPARE(ring.indexForAge(1), 7);
+    // `ageAtIndex` is the inverse the renderer walks with, so a slot can keep its
+    // texture while its screen position moves.
+    QCOMPARE(ring.ageAtIndex(6), 0);
+    QCOMPARE(ring.ageAtIndex(7), 1);
+    QCOMPARE(ring.ageAtIndex(ring.indexForAge(3)), 3);
     QCOMPARE(ring.centerKhzAtAge(0).value_or(0.0), 7001.0);
     QCOMPARE(ring.centerKhzAtAge(1).value_or(0.0), 7000.0);
     // Age 1 is the row pushed first, with its own span.
@@ -224,6 +231,19 @@ void WaterfallPaletteTest::ringRejectsMalformedRowsWithoutStopping() {
     // WaterfallTexture.push_line does; only the pixels are dropped.
     QCOMPARE(ring.newestIndex(), (before - 1 + 4) % 4);
     QCOMPARE(ring.rowsWritten(), 1);
+    // The rejected row leaves its slot alone, so the renderer shows history
+    // rather than a hole where the row would have been.
+    QVERIFY(ring.rowAtAge(0).isEmpty());
+    // Fill every slot, then reject a row: the slot it claims keeps the older
+    // pixels, exactly as the GL texture would.
+    for (int index = 0; index < 4; ++index) {
+        QVERIFY(ring.pushLine(good, 4));
+    }
+    QCOMPARE(ring.rowsWritten(), 4);
+    const int filledCursor = ring.newestIndex();
+    QVERIFY(!ring.pushLine(bad, 4));
+    QCOMPARE(ring.newestIndex(), (filledCursor - 1 + 4) % 4);
+    QCOMPARE(ring.rowAtAge(0), good);
     // The rejected row carried no metadata, so the slot it claimed is empty even
     // though the cursor moved onto it.
     QVERIFY(!ring.centerKhzAtAge(0).has_value());

@@ -32,6 +32,11 @@ class RuntimeInfo : public QObject {
     Q_PROPERTY(QString server READ server CONSTANT)
     Q_PROPERTY(double startFrequencyKhz READ startFrequencyKhz CONSTANT)
     Q_PROPERTY(QString summary READ summary CONSTANT)
+    Q_PROPERTY(QString waterfallFramePath READ waterfallFramePath CONSTANT)
+    Q_PROPERTY(int waterfallStream READ waterfallStream CONSTANT)
+    Q_PROPERTY(int waterfallRowPixels READ waterfallRowPixels CONSTANT)
+    Q_PROPERTY(double waterfallBenchSeconds READ waterfallBenchSeconds CONSTANT)
+    Q_PROPERTY(int rfCanvasWidth READ rfCanvasWidth CONSTANT)
 
 public:
     explicit RuntimeInfo(CliOptions options, QObject *parent = nullptr);
@@ -53,6 +58,14 @@ public:
     /// The resolved layout, shared with the visual self-test so both use one
     /// transform.
     const core::PanelLayout &panelLayout() const { return m_layout; }
+
+    /// The captured row set to render, or empty for the normal scene.
+    QString waterfallFramePath() const { return m_options.waterfallFramePath; }
+    int waterfallStream() const { return m_options.waterfallStream; }
+    int waterfallRowPixels() const { return m_options.waterfallRowPixels; }
+    double waterfallBenchSeconds() const { return m_options.waterfallBenchSeconds; }
+    /// Width of the live RF surface, excluding the permanent control rail.
+    int rfCanvasWidth() const { return m_layout.logical.width() == 1280 ? 1024 : m_layout.logical.width(); }
 
     double fpsTarget() const { return m_options.fpsTarget; }
     double durationSeconds() const { return m_options.durationSeconds; }

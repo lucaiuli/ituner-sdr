@@ -28,6 +28,15 @@ struct CliOptions {
     QString screenshotPath;
     /// `--self-test` verifies the rendered frame against the geometry contract.
     bool selfTest = false;
+    /// `--waterfall-frame <file>` renders a captured waterfall row set and exits.
+    QString waterfallFramePath;
+    /// Which captured stream to render, so the verification can pick the
+    /// `wf_row_pixels` variant it wants.
+    int waterfallStream = 0;
+    /// `--waterfall-bench <seconds>` measures the waterfall render cost.
+    double waterfallBenchSeconds = 0.0;
+    /// Rows per received line for the bench, matching `--wf-row-pixels`.
+    int waterfallRowPixels = 1;
 };
 
 /// Parse the command line. `--help` and `--version` print and exit here, and an

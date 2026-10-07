@@ -14,6 +14,15 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Build type" FORCE)
 endif()
 
+if(NOT MSVC)
+    # Python evaluates `a * b + c` as two separately rounded operations. Clang's
+    # default `-ffp-contract=fast` may fuse that into a single FMA, which changes
+    # the least significant bit. The ported math is compared bit for bit against
+    # goldens captured from the Python source, so contraction is disabled rather
+    # than approximating Python with a different rounding.
+    add_compile_options(-ffp-contract=off)
+endif()
+
 option(ITUNER_QT_BUILD_TESTS "Build the Qt test suites" ON)
 
 # 6.8 is the version available for arm64 in Raspberry Pi OS Trixie. Do not mix a
@@ -31,6 +40,16 @@ endif()
 # The domain core first: it is the only part that must build without a GUI.
 add_subdirectory(src/core)
 
+# The KiwiSDR protocol layer, also GUI-free and testable on a desktop.
+add_subdirectory(src/transport)
+
+# Pure audio PCM and level math, likewise GUI-free.
+add_subdirectory(src/audio)
+
+# The Qt Quick items. The only module that needs a renderer, and it owns no
+# domain logic: every colour and coordinate it draws comes from ituner_core.
+add_subdirectory(src/ui)
+
 qt_add_executable(ituner-sdr-qt
     src/app/main.cpp
     src/app/cli.cpp
@@ -41,6 +60,8 @@ qt_add_executable(ituner-sdr-qt
     src/app/runtime_platform.h
     src/app/visual_self_test.cpp
     src/app/visual_self_test.h
+    src/app/waterfall_bench.cpp
+    src/app/waterfall_bench.h
 )
 
 qt_add_qml_module(ituner-sdr-qt
@@ -48,6 +69,7 @@ qt_add_qml_module(ituner-sdr-qt
     VERSION 0.1
     QML_FILES
         qml/Main.qml
+        qml/WaterfallScreen.qml
         qml/OrientationCanvas.qml
         qml/TestPattern.qml
         qml/CornerMarker.qml
@@ -58,6 +80,9 @@ qt_add_qml_module(ituner-sdr-qt
 target_link_libraries(ituner-sdr-qt
     PRIVATE
         ituner_core
+        ituner_transport
+        ituner_audio
+        ituner_ui
         Qt6::Core
         Qt6::Gui
         Qt6::Qml

@@ -79,6 +79,21 @@ public:
 
     /// Texture index for a row, where age 0 is the newest row.
     int indexForAge(int age) const;
+
+    /// The age of a texture index: the inverse of `indexForAge`.
+    ///
+    /// A renderer walks *slots* rather than ages, because a slot keeps its
+    /// texture until it is overwritten while its age changes on every push. That
+    /// is what makes one upload per received row sufficient: the slot already
+    /// shows the right pixels, it only has to move up the screen.
+    int ageAtIndex(int index) const;
+
+    /// The pixels stored at an age, or an empty array for a slot that has never
+    /// been written. A row rejected by `pushLine` leaves the previous contents of
+    /// its slot in place, which is what the GL texture does, so the renderer never
+    /// sees a hole where history used to be.
+    QByteArray rowAtAge(int age) const;
+
     std::optional<double> centerKhzAtAge(int age) const;
     std::optional<double> spanKhzAtAge(int age) const;
 

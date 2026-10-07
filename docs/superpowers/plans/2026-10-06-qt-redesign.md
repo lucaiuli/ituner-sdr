@@ -225,16 +225,130 @@ the runtime.
 
 **Exit gate:** the Qt app connects to a real KiwiSDR, tunes, and plays continuous audio through both output backends for 30 minutes without a dropout.
 
+### Task 2 progress
+
+The transport's deterministic core has landed in `qt/src/transport/kiwi_transport.*`,
+kept free of sockets, clocks and devices so it can be verified headlessly:
+`parse_endpoint` (scheme defaulting, the 8073/443 port rule, the rejections),
+`websocket_redirect_endpoint` (301/302/307/308 only, and only a trusted absolute
+`Location`), the `next_kiwi_session_timestamp` monotonic clock,
+`websocketAcceptForKey`, the `/ws/kiwi/{timestamp}/{stream}` path, the SND
+seven-byte-header decode, `swap_s16_bytes`, the stereo-to-mono downmix and the
+SND playability predicate. `qt/tests/parity/capture_kiwi_transport.py` captures
+the goldens from the real Python helpers (the wall clock is replaced with a
+controlled sequence so the pairing behaviour is reproducible) and
+`tst_kiwi_transport` replays them. `ctest` is green at 7/7 suites.
+
+The transport I/O layer landed next, ported against the existing Python suite
+`UI/test_kiwi_transport.py` so every assertion that suite makes has a C++
+counterpart: `raiseForKiwiServerMessage` with the `KiwiServerBusyError` /
+`KiwiExternalApiDisabledError` taxonomy (`too_busy` 0 is a permanent access
+policy error, a positive value a temporary busy error, a non-numeric value
+capacity -1), `recvExact` (a timeout at a frame boundary is re-raised for the
+worker to poll again, but once bytes have arrived it either completes or fails
+with a partial-frame timeout rather than returning a short buffer), and the
+`recvWebSocketFrame` reader (mask unmasking, the 16 MiB size guard checked before
+the payload is read, close frames surfacing the peer's code and reason, and ping
+frames answered with a pong). `ByteSource` and the clock are injected so the
+timeout rules are testable without a socket.
+
+Two further pure slices landed: the tune/view/server commit protocol
+(`qt/src/transport/live_state.*`, ported from `LiveState`) and the audio PCM
+resampler plus S-meter display maps (`qt/src/audio/audio_math.*`, ported from
+`resample_mono_s16le` and the `smeter_*` helpers). The commit protocol is the
+mechanism that stops a stale response reaching a newer request: a worker passes
+the generation it last saw and only acts when the generation has moved.
+`qt/tests/parity/capture_kiwi_transport.py` drives the real `LiveState` through a
+scripted 22-step sequence, and `capture_audio_math.py` records the resampler and
+S-meter goldens. `ctest` is green at 8/8 suites.
+
+Still open in this task: the live `QWebSocket` session (the upgrade request, the
+`read_http_header` loop, the accept check, the redirect follow), the SND worker
+loop that clocks 512-frame quanta and sends the once-per-second keepalive, and
+the audio engine with its two output backends. The stereo downmix already
+reproduces Python's floor division, which integer division would get wrong on
+negative samples.
+
 ## Task 3: Waterfall and spectrum rendering
 
-- [ ] Implement `WaterfallItem` as a custom quick item with an RGBA texture updated per received row, one screen row per waterfall line by default, matching the current row-pixel behaviour.
-- [ ] Implement the palette generation and the floor/ceiling and speed mapping in the GPU-agnostic core so the colours are identical to the Python Classic palette and the Kiwi default.
-- [ ] Implement the spectrum overlay and its trace toggle, with the same fixed floor/ceiling defaults and the same accumulation behaviour as the Python spectrum layer.
-- [ ] Implement drag-to-tune, zoom in/out, passband dragging, and the spectrum/passband control grouping exactly as documented in the interface reference, including the rule that the passband control never occupies the centre gesture area.
+- [x] Implement `WaterfallItem` as a custom quick item with an RGBA texture updated per received row, one screen row per waterfall line by default, matching the current row-pixel behaviour.
+- [x] Implement the palette generation and the floor/ceiling and speed mapping in the GPU-agnostic core so the colours are identical to the Python Classic palette and the Kiwi default.
+- [x] Implement the spectrum overlay and its trace toggle, with the same fixed floor/ceiling defaults and the same accumulation behaviour as the Python spectrum layer.
+- [x] Implement drag-to-tune, zoom in/out, passband dragging, and the spectrum/passband control grouping exactly as documented in the interface reference, including the rule that the passband control never occupies the centre gesture area.
 - [ ] Verify the render cost: at speed 4, hold 23 waterfall rows per second plus 24 fps UI with no frame-time spikes on the CM5. Record the measurement, not an impression.
-- [ ] Add a golden-image or checksum test for a captured waterfall row set so palette regressions are caught automatically.
+- [x] Add a golden-image or checksum test for a captured waterfall row set so palette regressions are caught automatically.
 
 **Exit gate:** live waterfall and spectrum look correct against the reference, tuning gestures behave identically, and the frame-rate budget is met with measurements recorded.
+
+### Task 3 progress
+
+The waterfall and spectrum surface is ported and verified against the Python
+renderer, and the frame check is a real pixel comparison rather than a
+hand-written expectation.
+
+**What landed.** `src/core/draw_list.*` is a renderer-neutral draw log
+(`Rect`/`Line`/`Area`/`Polyline`/`Text`) so the Python drawing functions can be
+ported as pure producers and compared command by command.
+`src/core/spectrum_model.*` ports `update_spectrum` and `zoomed_spectrum_values`
+(240 bins, the `old*0.56 + new*0.44` blend, the ten-second peak-hold window, the
+different-width reset) plus the `draw_spectrum` command list.
+`src/core/passband_overlay.*` ports `draw_filter_overlay`, `filter_x`,
+`filter_cut_at_x`, `filter_edit_limit`, the `FILTER_*` constants and `set_filter`
+(`applyFilterCuts`). `src/core/waterfall_controls.*` ports the LCD control boxes,
+`is_waterfall_tune_touch`, `waterfall_touch_bounds` and the rule that the
+passband control never clears the centre tuning band. `waterfall_model.*` gained
+`WaterfallRing::rowAtAge` / `ageAtIndex`.
+
+**The Qt objects.** `src/ui/waterfall_item.*` is the `QQuickItem` with the RGBA
+texture ring (fixed 800-row `WF_TEX_H`), one texture upload per received line.
+`src/ui/overlay_item.*` rasterizes a draw list into one vertex-coloured
+geometry node plus one texture node per text command. `src/ui/waterfall_view.*`
+is the seam: it owns the gesture state, the control geometry, the spectrum and
+passband state, and the filter sheet gate. `qml/WaterfallScreen.qml` places the
+items and forwards touches; nothing about the display is decided in QML.
+
+**Goldens and tests.** `capture_spectrum_model.py`, `capture_passband_overlay.py`
+and `capture_waterfall_frames.py` capture the expectation from the real Python
+functions, not from the port: 240-bin spectra and zoom resamples, 19 overlay
+draw lists, 27 handle cases, 16 edit-limit rows, 96 touch samples, and 12
+waterfall rows across 5 streams (auto on/off, row-pixels 1/2/4, two floors) with
+per-frame sha256. `tst_spectrum_model` compares the draw lists bit-exactly via
+the shared `golden_draw_list.h` helper; `tst_waterfall_frames` replays whole
+frames through the leveler, `normalizeLevels`, `renderRowRgba` and the queue;
+`tst_waterfall_palette` covers the new ring accessors.
+
+**Pixel parity, end to end.** `verify_waterfall_render.py` renders the captured
+row set with the real Python pipeline and compares it with the Qt offscreen
+screenshot, row for row. All five streams match exactly (512x12, 512x24,
+512x12, 512x12, 512x48 -- sha256 `c7edd03775df08a0`, `01fcf0247bc509fa`,
+`c35e6833f807a5ea`, `d0bee1abe00be90e`, `a8b23a651f091846`) and are wired as the
+`waterfall_render_row1`/`waterfall_render_row2` ctest cases. `ctest` is green at
+13/13.
+
+That check caught three real defects. The scene-graph nodes were indexed by age
+instead of texture slot, so a row that received new pixels was drawn from the
+wrong texture once the history scrolled; the texture was built from a `QImage`
+that borrowed a freed row buffer, so older rows rendered as garbage; and the
+overlays tinted the captured frame, hiding the comparison. The first two only
+appear once rows scroll, which is why a one-shot frame check also needed a
+driven-render test -- `eachReceivedRowCostsOneTextureUpload` pushes rows with a
+render between each and asserts the upload count equals the row count, and it
+fails if the nodes are keyed by age again. It is worth being explicit that the
+`.copy()` is **not** caught by any host-side test: the offscreen software
+renderer uploads immediately, so only the deferred upload on the GPU/`eglfs`
+path would exercise it.
+
+Sixteen mutations of the ported constants and rules were confirmed to fail a
+suite before being reverted (blend weight, hold window, field alpha, bin clamp,
+rule alpha, dBm labels, bracket threshold, edge clip, edit-limit scale, edge
+alpha, dash height, the inclusive `contains` edge, the touch guard, the zoom
+group inset, and both palette clamps), plus the two UI-layer mutations above.
+
+**Not done.** The fifth bullet is open because it needs the CM5: the host bench
+(`--waterfall-bench`) reports 23.2 rows/s sustained with a 0.23 ms mean render
+time and a 15.0 ms mean frame period, but that is this host's renderer at 1x
+scale on the software backend and says nothing about the panel. `clang-format`
+and the sanitizers are still not run (both tools are absent on this host).
 
 ## Task 4: Home screen and the drawer system
 
