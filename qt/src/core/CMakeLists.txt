@@ -2,10 +2,20 @@
 # testable on a desktop with no display attached. Files are read through QtCore
 # only (`QFile`/`QJsonDocument`), so the module never needs a platform plugin.
 add_library(ituner_core STATIC
+    audio_controls.cpp
+    audio_controls.h
     display_geometry.cpp
     display_geometry.h
     draw_list.cpp
     draw_list.h
+    drawer_bodies.cpp
+    drawer_bodies.h
+    drawer_geometry.cpp
+    drawer_geometry.h
+    menu_icons.cpp
+    menu_icons.h
+    navigation.cpp
+    navigation.h
     passband_overlay.cpp
     passband_overlay.h
     receiver_capabilities.cpp

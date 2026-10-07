@@ -146,6 +146,54 @@ endif()
 
 add_test(NAME spectrum_model COMMAND tst_spectrum_model)
 
+# The Home rail, the drawers and the navigation rules, replayed from the Python
+# geometry helpers and the navigation functions.
+qt_add_executable(tst_navigation
+    tst_navigation.cpp
+)
+
+target_link_libraries(tst_navigation
+    PRIVATE
+        ituner_core
+        Qt6::Test
+)
+
+target_compile_definitions(tst_navigation
+    PRIVATE ITUNER_QT_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+)
+
+target_include_directories(tst_navigation PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(NOT MSVC)
+    target_compile_options(tst_navigation PRIVATE -Wall -Wextra)
+endif()
+
+add_test(NAME navigation COMMAND tst_navigation)
+
+# The Audio and Display drawer bodies, replayed from the real Python drawers with
+# their tile primitives wrapped.
+qt_add_executable(tst_drawer_bodies
+    tst_drawer_bodies.cpp
+)
+
+target_link_libraries(tst_drawer_bodies
+    PRIVATE
+        ituner_core
+        Qt6::Test
+)
+
+target_compile_definitions(tst_drawer_bodies
+    PRIVATE ITUNER_QT_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+)
+
+target_include_directories(tst_drawer_bodies PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(NOT MSVC)
+    target_compile_options(tst_drawer_bodies PRIVATE -Wall -Wextra)
+endif()
+
+add_test(NAME drawer_bodies COMMAND tst_drawer_bodies)
+
 # The streamed frame test: a captured row set through the leveler, the palette
 # and the row queue, checked by whole-frame checksum.
 qt_add_executable(tst_waterfall_frames
