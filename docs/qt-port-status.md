@@ -55,9 +55,10 @@ below means the C++ QtTest suite replays that golden and passes.
 
 | 18 | Audio & Display drawer bodies | `UI/kiwi_gl_display.py` — `audio_option_at`, `audio_volume_at_x`, `audio_squelch_at_x`, `audio_denoise_level_at_x`, `squelch_maximum`, `main_volume_label`, `format_filter_width`, `display_option_at`, `draw_lcd_audio_drawer`, `draw_display_setup_panel` | `qt/src/core/audio_controls.*`, `qt/src/core/drawer_bodies.*`, `qt/src/core/drawer_geometry.*` | `tst_drawer_bodies` (12) | `drawer_bodies_expected.json` — 15 audio boxes, 8 display boxes, every hit test, the drawer tiles the real Python drawers draw (4 audio states × 13 tiles, 3 display states), the three slider maps, the speed/palette boxes, the preset tables and the label rules |
 | 19 | Audio & Display drawer wiring | — (new) | `qt/src/ui/home_view.*`, `qt/qml/HomeScreen.qml` | `tst_home_view` (14), `home_icons`, `audio_render`, `display_render` | the drawer's own tiles on screen, the volume/squelch/denoise drags, the squelch scale following the mode, the layout toggle, the waterfall following the Display drawer |
+| 20 | Shared UI style tokens | `UI/ui_style.py` — `UIPalette`, `ButtonVisualState`, `ButtonStyle.resolve`, `AppUIStyle`, `APP_UI_STYLE` | `qt/src/core/ui_style.*` | `tst_ui_style` (8), `tst_home_view` (3) | `ui_style_expected.json` — every palette token, the button metrics and font fallbacks, all eight resolved button states, and the token values themselves compared against the rendered frames |
 
-**Totals:** 20 ctest tests (14 unit suites plus six render checks), 160 declared
-test slots across the suites, 12 golden files, 12 capture scripts, ~8.6k lines of
+**Totals:** 21 ctest tests (15 unit suites plus six render checks), 168 declared
+test slots across the suites, 14 golden files, 13 capture scripts, ~8.7k lines of
 library code across `src/core`, `src/transport`, `src/audio` and `src/ui`.
 
 ### 1.1 Modules
@@ -80,7 +81,7 @@ library code across `src/core`, `src/transport`, `src/audio` and `src/ui`.
 | **Task 1** — domain core | **Complete** | — |
 | **Task 2** — Kiwi transport, audio, first live signal | Partial | Live `QWebSocket` session (upgrade request, `read_http_header`, accept check, redirect follow); SND worker loop (512-frame quanta + 1 s keepalive); PipeWire and ALSA audio backends; spectrum/s-meter *extraction* from live PCM. |
 | **Task 3** — waterfall & spectrum rendering | Complete on host | Only the frame-budget bullet is open, and it needs the CM5. Everything else renders and is verified offscreen. |
-| **Task 4** — Home screen & drawers | In progress | Rail, drawer geometry, navigation and icons ported and verified; Home screen renders; Frequency, Passband, Modes, Info, Apps, Audio and Display drawer bodies ported and rendered. Open: the receiver-browser body (LIST/MAP plus the five source segments), the installed icon artwork, and touch on the device. |
+| **Task 4** — Home screen & drawers | In progress | Rail, drawer geometry, navigation and icons ported and verified; the shared UI style tokens ported, so the rail tiles and the drawer controls are drawn in the Python colours rather than in literals; Home screen renders; Frequency, Passband, Modes, Info, Apps, Audio and Display drawer bodies ported and rendered. Open: the receiver-browser body (LIST/MAP plus the five source segments), the rail's own renderer colours (panel, heading, mode grid, instruments -- these are `kiwi_gl_display.py` constants and are still literals in the QML), the installed icon artwork, and touch on the device. |
 | **Task 5** — configuration, persistence, deployment | Not started | Install layout, `receiver_sources.json` path wiring, the documented Python⇄Qt switch, remembered-receiver continuity. |
 | **Task 6** — parity harness & handover | Not started | Whole-project parity run, switch/revert instructions, maintainer handover. |
 
@@ -101,19 +102,20 @@ $ ctest --test-dir qt/build
      6/20 swipe_gesture ........ Passed
      7/20 spectrum_model ....... Passed
      8/20 navigation ........... Passed
-     9/20 drawer_bodies ........ Passed
-    10/20 waterfall_frames ..... Passed
-    11/20 kiwi_transport ....... Passed
-    12/20 audio_math ........... Passed
-    13/20 waterfall_view ....... Passed
-    14/20 home_view ............ Passed
-    15/20 home_render .......... Passed
-    16/20 home_icons ........... Passed
-    17/20 audio_render ......... Passed
-    18/20 display_render ....... Passed
-    19/20 waterfall_render_row1  Passed
-    20/20 waterfall_render_row2  Passed
-100% tests passed, 0 tests failed out of 20
+     9/21 drawer_bodies ........ Passed
+    10/21 ui_style ............. Passed
+    11/21 waterfall_frames ..... Passed
+    12/21 kiwi_transport ....... Passed
+    13/21 audio_math ........... Passed
+    14/21 waterfall_view ....... Passed
+    15/21 home_view ............ Passed
+    16/21 home_render .......... Passed
+    17/21 home_icons ........... Passed
+    18/21 audio_render ......... Passed
+    19/21 display_render ....... Passed
+    20/21 waterfall_render_row1  Passed
+    21/21 waterfall_render_row2  Passed
+100% tests passed, 0 tests failed out of 21
 ```
 
 The two `waterfall_render_*` cases are the end-to-end check: the runtime renders

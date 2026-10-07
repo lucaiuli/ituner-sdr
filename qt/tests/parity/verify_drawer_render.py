@@ -28,6 +28,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[3]
 GOLDEN = ROOT / "qt/tests/golden/drawer_bodies_expected.json"
+STYLE_GOLDEN = ROOT / "qt/tests/golden/ui_style_expected.json"
 RAIL_X0 = 1024
 
 # How far outside a control's pinned box its own antialiased edge may land. The
@@ -116,6 +117,22 @@ def main():
         hits = pixels_in(box)
         if hits < 40:
             problems.append(f"the {label} control painted only {hits} distinct pixels")
+
+    # Every control is the shared styled button, so its surface must be one of the
+    # fills the captured style table can produce -- the token's own value, read
+    # from the Python golden rather than written here. A screen that kept a
+    # literal colour fails this even though it still painted something.
+    style = json.loads(STYLE_GOLDEN.read_text())
+    themed_fills = {tuple(style["palette"][role][:3])
+                    for role in ("surface", "focus", "untested")}
+    for label, box in painted_boxes:
+        x0, y0, _x1, y1 = box
+        sample = pixel(x0 + 6, (y0 + y1) / 2)
+        if sample not in themed_fills:
+            problems.append(
+                f"the {label} control is painted {sample}, which is none of the style "
+                f"table's button fills {sorted(themed_fills)}"
+            )
 
     # The rail panel and its heading are drawn in two very close flat colours;
     # both are "background" as far as this check is concerned.

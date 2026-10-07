@@ -30,6 +30,8 @@ add_library(ituner_core STATIC
     swipe_gesture.h
     tuning.cpp
     tuning.h
+    ui_style.cpp
+    ui_style.h
     waterfall_controls.cpp
     waterfall_controls.h
     waterfall_model.cpp

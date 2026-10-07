@@ -23,13 +23,46 @@ QVariantMap boxMap(const ControlBox &box) {
             {QStringLiteral("y1"), box.y1}};
 }
 
+/// One resolved button visual as the screen consumes it: three colours and the
+/// border width, all decided here rather than in QML.
+QVariantMap visualMap(const ituner::core::ButtonVisualState &visual) {
+    return {{QStringLiteral("fill"), ituner::core::qmlColor(visual.fill)},
+            {QStringLiteral("border"), ituner::core::qmlColor(visual.border)},
+            {QStringLiteral("text"), ituner::core::qmlColor(visual.text)},
+            {QStringLiteral("borderWidth"), visual.borderWidth}};
+}
+
+/// The paint for one control, from the ported style table.
+///
+/// A control the runtime cannot honour is drawn from the `untested` tokens: the
+/// style table has no disabled state of its own, and `untested` is the token the
+/// palette reserves for a control that cannot be exercised. The reason string
+/// still comes from the capability contract; this only decides the paint.
+QVariantMap buttonVisual(bool active = false, bool enabled = true, bool danger = false) {
+    const ituner::core::ButtonStyle &style = ituner::core::appUiStyle().button;
+    if (!enabled) {
+        return visualMap(ituner::core::ButtonVisualState{
+            style.palette.untested, style.palette.border, style.palette.untestedText, 1});
+    }
+    return visualMap(style.resolve(active, false, danger));
+}
+
 QVariantMap controlMap(const QString &name, const QString &label, const ControlBox &box,
                        bool enabled = true, const QString &message = QString()) {
     return {{QStringLiteral("name"), name},
             {QStringLiteral("label"), label},
             {QStringLiteral("box"), boxMap(box)},
             {QStringLiteral("enabled"), enabled},
-            {QStringLiteral("message"), message}};
+            {QStringLiteral("message"), message},
+            {QStringLiteral("visual"), buttonVisual(false, enabled)}};
+}
+
+/// Mark a control active and re-resolve its paint, so the active state and the
+/// colour it is drawn in can never be set from two different places.
+void setActive(QVariantMap *entry, bool active) {
+    (*entry)[QStringLiteral("active")] = active;
+    (*entry)[QStringLiteral("visual")] =
+        buttonVisual(active, entry->value(QStringLiteral("enabled")).toBool());
 }
 
 /// The surfaces whose drawer body is not ported yet. They are named explicitly
@@ -104,6 +137,11 @@ void HomeView::decorate(QVariantMap *entry, const QString &control) const {
     const ituner::core::ControlDecision decision = capabilities().decide(control);
     (*entry)[QStringLiteral("enabled")] = decision.allowed;
     (*entry)[QStringLiteral("message")] = decision.message;
+    // The paint is re-resolved here because the verdict decides it: a control the
+    // receiver cannot honour is drawn disabled, and resolving the visual before
+    // the verdict would leave every disabled control looking usable.
+    (*entry)[QStringLiteral("visual")] =
+        buttonVisual(entry->value(QStringLiteral("active")).toBool(), decision.allowed);
 }
 
 QVariantList HomeView::railTiles() const {
@@ -125,9 +163,37 @@ QVariantList HomeView::railTiles() const {
             boxMap(ituner::core::lcdNavBox(index, items.size(), hasBack));
         tile[QStringLiteral("enabled")] = true;
         tile[QStringLiteral("message")] = QString();
+        // A rail tile is the same styled button in Python: `draw_lcd_navigation`
+        // resolves it through `draw_styled_button_frame`.
+        tile[QStringLiteral("visual")] = buttonVisual();
         tiles.append(tile);
     }
     return tiles;
+}
+
+QVariantMap HomeView::theme() const {
+    const ituner::core::AppUiStyle &style = ituner::core::appUiStyle();
+    const ituner::core::UiPalette &palette = style.palette;
+    QVariantMap map;
+    map[QStringLiteral("background")] = ituner::core::qmlColor(palette.background);
+    map[QStringLiteral("sidebar")] = ituner::core::qmlColor(palette.sidebar);
+    map[QStringLiteral("surface")] = ituner::core::qmlColor(palette.surface);
+    map[QStringLiteral("selectedSurface")] = ituner::core::qmlColor(palette.selectedSurface);
+    map[QStringLiteral("border")] = ituner::core::qmlColor(palette.border);
+    map[QStringLiteral("text")] = ituner::core::qmlColor(palette.text);
+    map[QStringLiteral("secondaryText")] = ituner::core::qmlColor(palette.secondaryText);
+    map[QStringLiteral("focus")] = ituner::core::qmlColor(palette.focus);
+    map[QStringLiteral("focusText")] = ituner::core::qmlColor(palette.focusText);
+    map[QStringLiteral("ready")] = ituner::core::qmlColor(palette.ready);
+    map[QStringLiteral("waiting")] = ituner::core::qmlColor(palette.waiting);
+    map[QStringLiteral("untested")] = ituner::core::qmlColor(palette.untested);
+    map[QStringLiteral("untestedText")] = ituner::core::qmlColor(palette.untestedText);
+    map[QStringLiteral("danger")] = ituner::core::qmlColor(palette.danger);
+    map[QStringLiteral("dangerBorder")] = ituner::core::qmlColor(palette.dangerBorder);
+    map[QStringLiteral("buttonRadius")] = style.button.radius;
+    map[QStringLiteral("labelSize")] = style.button.labelSize;
+    map[QStringLiteral("buttonFont")] = style.button.fontFamily;
+    return map;
 }
 
 QVariantMap HomeView::backBox() const {
@@ -145,7 +211,7 @@ QVariantList HomeView::homeModes() const {
             button.label == QStringLiteral("FMDX") ? QStringLiteral("NBFM") : button.label;
         QVariantMap entry = controlMap(QStringLiteral("mode"), button.label, button.box);
         entry[QStringLiteral("mode")] = committed;
-        entry[QStringLiteral("active")] = committed == m_mode;
+        setActive(&entry, committed == m_mode);
         decorate(&entry, QStringLiteral("mode"));
         modes.append(entry);
     }
@@ -261,7 +327,7 @@ QVariantList HomeView::drawerControls() const {
                 tile.isSlider() ? QStringLiteral("slider") : QStringLiteral("tile");
             entry[QStringLiteral("title")] = tile.title;
             entry[QStringLiteral("detail")] = tile.detail;
-            entry[QStringLiteral("active")] = tile.active;
+            setActive(&entry, tile.active);
             entry[QStringLiteral("value")] = tile.value;
             entry[QStringLiteral("maximum")] = tile.maximum;
             entry[QStringLiteral("fraction")] = tile.fraction();
@@ -277,7 +343,7 @@ QVariantList HomeView::drawerControls() const {
                 tile.isSlider() ? QStringLiteral("slider") : QStringLiteral("tile");
             entry[QStringLiteral("title")] = tile.title;
             entry[QStringLiteral("detail")] = tile.detail;
-            entry[QStringLiteral("active")] = tile.active;
+            setActive(&entry, tile.active);
             entry[QStringLiteral("fraction")] = tile.fraction();
             controls.append(entry);
         }
@@ -287,7 +353,7 @@ QVariantList HomeView::drawerControls() const {
             entry[QStringLiteral("kind")] = QStringLiteral("choice");
             entry[QStringLiteral("title")] = QString();
             entry[QStringLiteral("detail")] = choice.label;
-            entry[QStringLiteral("active")] = choice.active;
+            setActive(&entry, choice.active);
             controls.append(entry);
         }
         return controls;

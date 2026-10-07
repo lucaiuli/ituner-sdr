@@ -194,6 +194,30 @@ endif()
 
 add_test(NAME drawer_bodies COMMAND tst_drawer_bodies)
 
+# The shared UI style tokens and the button-state resolver, replayed from
+# `UI/ui_style.py`.
+qt_add_executable(tst_ui_style
+    tst_ui_style.cpp
+)
+
+target_link_libraries(tst_ui_style
+    PRIVATE
+        ituner_core
+        Qt6::Test
+)
+
+target_compile_definitions(tst_ui_style
+    PRIVATE ITUNER_QT_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+)
+
+target_include_directories(tst_ui_style PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(NOT MSVC)
+    target_compile_options(tst_ui_style PRIVATE -Wall -Wextra)
+endif()
+
+add_test(NAME ui_style COMMAND tst_ui_style)
+
 # The streamed frame test: a captured row set through the leveler, the palette
 # and the row queue, checked by whole-frame checksum.
 qt_add_executable(tst_waterfall_frames

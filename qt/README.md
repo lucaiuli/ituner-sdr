@@ -423,6 +423,19 @@ slider maps and the tiles the Python drawers draw are pinned by
 rendered frame. `--surface <name>` opens one drawer immediately so it can be
 rendered and checked headlessly, which is how the two render checks work.
 
+The rail tiles and the drawer controls are drawn from the ported style table in
+`src/core/ui_style.*`, which is a port of `UI/ui_style.py`: a tile is the same
+styled button the Python rail resolves through `draw_styled_button_frame`, so its
+fill, border, border width, text colour and corner radius come from tokens rather
+than from the QML. `HomeView.theme` hands the palette to the screen, and the
+render checks compare the *painted* pixel with the token value captured from
+Python, so a screen that keeps a literal colour fails the frame check.
+
+What is still drawn from literals is the rail's own furniture, which comes from
+`kiwi_gl_display.py` rather than from the style table: the panel and heading
+background, the mode grid, and the Home instruments. Porting those tokens is the
+next step and is recorded in `docs/qt-port-status.md`.
+
 The rail draws labels only unless `--menu-icons <dir>` points at the installed
 artwork; installing it is Task 5, and the icons are not copied into the build.
 The runtime resolves that directory to an absolute `file:` URL, because a
@@ -482,7 +495,8 @@ Suite results on this macOS host with Qt 6.11.2:
 | `ctest` (`waterfall_render_row1` / `_row2`) | passed, 5/5 captured frames pixel-identical to the Python renderer |
 | `ctest` (`navigation`), parity vs Python | passed, 15 test methods: 3 rails, 13 tiles, the navigation matrix, icons, both frequency layouts, filter presets, drawer box tables, Apps boxes, the Modes matrix, the manual-entry parser and the Home instrument stack |
 | `ctest` (`drawer_bodies`), parity vs Python | passed, 10 test methods: the Audio and Display boxes and hit tests, the tiles the real Python drawers draw (4 audio and 3 display states), the volume/squelch/denoise and floor/ceiling slider maps, the preset tables and label rules |
-| `ctest` (`home_view`) | passed, 12 test methods: one shared Back target, drawers inside the rail, no Home control in the RF canvas, parent-aware Back, capability-disabled instruments, and both drawer bodies acting on their own state |
+| `ctest` (`ui_style`), parity vs Python | passed, 8 test methods: every `UIPalette` token, the button metrics and font fallbacks, all eight resolved button states, that a press and an active state agree and beat `danger`, that the button style shares the app palette, and the `#AARRGGBB` packing |
+| `ctest` (`home_view`) | passed, 15 test methods: one shared Back target, drawers inside the rail, no Home control in the RF canvas, parent-aware Back, capability-disabled instruments, both drawer bodies acting on their own state, the theme the screen reads, the paint every control carries, and the `untested` tokens a disabled control is drawn from |
 | `ctest` (`home_render`) | passed, the rendered Home frame has a painted rail, six tiles, readout, passband and volume |
 | `ctest` (`home_icons`) | passed, every rail icon the checked-in artwork ships loaded and drew, and the RF canvas is unchanged by `--menu-icons` |
 | `ctest` (`audio_render` / `display_render`) | passed, the rendered Audio and Display drawers have every control box painted plus the shared Back control |

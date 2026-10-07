@@ -15,11 +15,15 @@ instruments are visible rather than transparent. It deliberately asserts
 the RF canvas) rather than exact colours, so a palette change does not fail it.
 """
 
+import json
 import sys
 from pathlib import Path
 
 from PIL import Image
 
+ROOT = Path(__file__).resolve().parents[3]
+STYLE_GOLDEN = ROOT / "qt/tests/golden/ui_style_expected.json"
+NAV_GOLDEN = ROOT / "qt/tests/golden/navigation_expected.json"
 RAIL_X0 = 1024
 TILE_CENTRES = [(1114, 489), (1214, 489), (1114, 617), (1214, 617), (1114, 745), (1214, 745)]
 READOUT_BOX = (1035, 12, 1269, 83)
@@ -49,6 +53,23 @@ def main():
     for centre in TILE_CENTRES:
         if pixel(*centre) == rail_background:
             problems.append(f"no tile was drawn at {centre}")
+
+    # The tile *surface* is the Python style token, not a colour chosen here: a
+    # rail tile is the shared styled button, so this is what proves the ported
+    # style reached the frame instead of only the model. Each sample sits just
+    # inside the tile's left edge, clear of the icon, the label and the rounded
+    # corners.
+    style = json.loads(STYLE_GOLDEN.read_text())
+    tile_surface = tuple(style["palette"]["surface"][:3])
+    tiles = [box for rail, _index, box in json.loads(NAV_GOLDEN.read_text())["nav_boxes"]
+             if rail == "home"]
+    for index, (x0, y0, _x1, y1) in enumerate(tiles):
+        sample = pixel(x0 + 6, (y0 + y1) / 2)
+        if sample != tile_surface:
+            problems.append(
+                f"Home tile {index} is painted {sample}, but the style table's surface "
+                f"token is {tile_surface}"
+            )
 
     # The instruments must paint something inside their boxes. A box whose whole
     # area is rail background means the QML placed it somewhere else, which is

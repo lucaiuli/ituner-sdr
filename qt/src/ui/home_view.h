@@ -23,6 +23,7 @@
 #include <drawer_bodies.h>
 #include <navigation.h>
 #include <receiver_capabilities.h>
+#include <ui_style.h>
 
 namespace ituner::ui {
 
@@ -34,6 +35,8 @@ class HomeView : public QObject {
     Q_PROPERTY(QString drawerTitle READ drawerTitle NOTIFY stateChanged)
     Q_PROPERTY(QString receiverProtocol READ receiverProtocol WRITE setReceiverProtocol NOTIFY stateChanged)
     Q_PROPERTY(QVariantList railTiles READ railTiles NOTIFY stateChanged)
+    /// The ported style tokens, so the screen never writes a colour of its own.
+    Q_PROPERTY(QVariantMap theme READ theme NOTIFY stateChanged)
     Q_PROPERTY(QVariantMap backBox READ backBox NOTIFY stateChanged)
     Q_PROPERTY(QVariantList homeModes READ homeModes NOTIFY stateChanged)
     Q_PROPERTY(QVariantMap instruments READ instruments NOTIFY stateChanged)
@@ -67,6 +70,7 @@ public:
     void setReceiverProtocol(const QString &protocol);
 
     QVariantList railTiles() const;
+    QVariantMap theme() const;
     QVariantMap backBox() const;
     QVariantList homeModes() const;
     QVariantMap instruments() const;

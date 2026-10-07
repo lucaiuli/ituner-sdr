@@ -77,6 +77,7 @@ qt/
   qml/
     Main.qml, HomeScreen.qml, rail/ drawers/ widgets/ components/
     theme/                    palette and metrics mirroring UI/ui_style.py tokens
+                              (landed as src/core/ui_style.* so it stays display-free)
   assets/                     symlinks or copies of existing UI/assets
   tests/
     core/                     QtTest unit tests
@@ -449,6 +450,19 @@ the receiver's own ceiling); and the audio drawer's Denoise row is a detent
 slider that the Python option function deliberately does not name. Nine mutations
 were caught, one of them (the Denoise tie-break) only after the tie position was
 added to the golden.
+
+**The shared style tokens landed after them, because the screen did not look like
+the application.** The QML was drawing literal colours of its own -- `#050d13` for
+a rail the Python paints as `(3, 6, 9)`, flat tiles where the Python resolves
+`draw_styled_button_frame` -- so nothing pinned the appearance and a palette
+change had to be found by eye. `UI/ui_style.py` is now ported to
+`src/core/ui_style.*` (it lives in the core rather than a `qml/theme/` directory,
+so it is testable with no display and no QML), `capture_ui_style.py` records every
+token and all eight resolved button states, `tst_ui_style` (8 methods) replays
+them, `HomeView.theme` and every control entry carry the resolved paint, and the
+two render checks now compare the *painted* pixel against the captured token, so a
+screen that keeps a literal fails on the frame rather than passing by looking
+plausible.
 
 **Still open in this task.** The icon layer resolves filenames and renders them
 when `--menu-icons <dir>` is supplied, but installing the artwork is Task 5, so a

@@ -176,6 +176,12 @@ Item {
         // behind the drawer would let their labels show through the gaps between
         // the drawer's own tiles, which is exactly the kind of defect only the
         // rendered frame can see.
+        //
+        // A tile is the *same styled button* the Python rail draws:
+        // `draw_lcd_navigation` resolves each one through
+        // `draw_styled_button_frame`, so the fill, the border, the border width,
+        // the text colour and the corner radius all come from the ported style
+        // rather than from a literal here.
         Repeater {
             model: home.drawerOpen ? [] : home.railTiles
             delegate: Rectangle {
@@ -183,9 +189,10 @@ Item {
                 y: modelData.box.y
                 width: modelData.box.width
                 height: modelData.box.height
-                color: modelData.isBack ? "#12262e" : "#0d1b22"
-                border.color: "#243940"
-                border.width: 1
+                color: modelData.visual.fill
+                border.color: modelData.visual.border
+                border.width: modelData.visual.borderWidth
+                radius: home.theme.buttonRadius
 
                 // The icon directory is supplied by the launcher, so a build with
                 // no installed artwork shows the label rather than a broken image.
@@ -207,7 +214,7 @@ Item {
                     anchors.bottomMargin: modelData.isBack ? 0 : 8
                     anchors.verticalCenter: modelData.isBack ? parent.verticalCenter : undefined
                     text: modelData.label
-                    color: "#d3e6ea"
+                    color: modelData.visual.text
                     font.pixelSize: modelData.isBack ? 14 : 12
                     font.bold: true
                 }
@@ -231,16 +238,13 @@ Item {
                 y: modelData.box.y
                 width: modelData.box.width
                 height: modelData.box.height
-                color: modelData.active ? "#1d4a38"
-                                       : (modelData.enabled ? "#12262e" : "#0b1418")
-                border.color: modelData.active ? "#3f9c72"
-                                               : (modelData.enabled ? "#2c464f" : "#233034")
-                border.width: 1
+                color: modelData.visual.fill
+                border.color: modelData.visual.border
+                border.width: modelData.visual.borderWidth
+                radius: home.theme.buttonRadius
 
                 readonly property string kind: modelData.kind === undefined ? "label" : modelData.kind
-                readonly property var textColor: modelData.enabled
-                    ? (modelData.active ? "#d8f4e7" : "#dcecef")
-                    : "#5d6f75"
+                readonly property var textColor: modelData.visual.text
 
                 // A continuous instrument: its box is the touch target, so the
                 // track is drawn inset the way the Python drawer draws it.
@@ -276,8 +280,9 @@ Item {
                     text: drawerControl.kind === "label"
                         ? modelData.label
                         : (modelData.detail === undefined ? modelData.label : modelData.detail)
-                    color: drawerControl.kind === "label" ? drawerControl.textColor : "#9dc0c7"
-                    font.pixelSize: drawerControl.kind === "label" ? 13 : 12
+                    color: drawerControl.kind === "label" ? drawerControl.textColor
+                                                          : home.theme.secondaryText
+                    font.pixelSize: drawerControl.kind === "label" ? home.theme.labelSize : 12
                     font.bold: true
                 }
             }

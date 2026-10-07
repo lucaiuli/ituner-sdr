@@ -14,6 +14,7 @@
 #include <drawer_geometry.h>
 #include <navigation.h>
 #include <receiver_capabilities.h>
+#include <ui_style.h>
 #include <waterfall_model.h>
 
 #include <home_view.h>
@@ -60,6 +61,9 @@ private slots:
     void audioDrawerActsOnItsOwnState();
     void displayDrawerEditsTheWaterfall();
     void drawerBodiesAreNoLongerPlaceholders();
+    void themeIsThePortedStyleTokens();
+    void controlsCarryTheirResolvedPaint();
+    void disabledControlsArePaintedFromTheUntestedTokens();
 
 private:
     /// Open a leaf so its drawer controls are available. Uses the rail when the
@@ -559,6 +563,126 @@ void HomeViewTest::drawerBodiesAreNoLongerPlaceholders() {
         QVERIFY(!action.isEmpty());
         QVERIFY(action != QStringLiteral("unwired"));
     }
+}
+
+void HomeViewTest::themeIsThePortedStyleTokens() {
+    // The screen must not own a colour. Everything it paints a control with comes
+    // from the ported style table, so this walks the theme the QML reads and
+    // compares it with the style itself.
+    HomeView view;
+    const QVariantMap theme = view.theme();
+    const ituner::core::AppUiStyle &style = ituner::core::appUiStyle();
+
+    const struct {
+        const char *property;
+        ituner::core::Rgba colour;
+    } roles[] = {
+        {"background", style.palette.background},
+        {"sidebar", style.palette.sidebar},
+        {"surface", style.palette.surface},
+        {"selectedSurface", style.palette.selectedSurface},
+        {"border", style.palette.border},
+        {"text", style.palette.text},
+        {"secondaryText", style.palette.secondaryText},
+        {"focus", style.palette.focus},
+        {"focusText", style.palette.focusText},
+        {"ready", style.palette.ready},
+        {"waiting", style.palette.waiting},
+        {"untested", style.palette.untested},
+        {"untestedText", style.palette.untestedText},
+        {"danger", style.palette.danger},
+        {"dangerBorder", style.palette.dangerBorder},
+    };
+    for (const auto &role : roles) {
+        const QString name = QLatin1String(role.property);
+        QVERIFY2(theme.contains(name), qPrintable(QStringLiteral("the theme omits %1").arg(name)));
+        const QString colour = theme.value(name).toString();
+        QCOMPARE(colour, ituner::core::qmlColor(role.colour));
+        // A QML colour is `#AARRGGBB`: eight digits plus the hash. A `#RRGGBB`
+        // answer would silently draw every token opaque.
+        QCOMPARE(colour.size(), 9);
+        QVERIFY(colour.startsWith(QLatin1Char('#')));
+    }
+
+    QCOMPARE(theme.value(QStringLiteral("buttonRadius")).toInt(), style.button.radius);
+    QCOMPARE(theme.value(QStringLiteral("labelSize")).toInt(), style.button.labelSize);
+    QCOMPARE(theme.value(QStringLiteral("buttonFont")).toStringList(), style.button.fontFamily);
+}
+
+void HomeViewTest::controlsCarryTheirResolvedPaint() {
+    HomeView view;
+    const ituner::core::AppUiStyle &style = ituner::core::appUiStyle();
+    const QString surface = ituner::core::qmlColor(style.palette.surface);
+    const QString border = ituner::core::qmlColor(style.palette.border);
+    const QString focus = ituner::core::qmlColor(style.palette.focus);
+    const QString focusText = ituner::core::qmlColor(style.palette.focusText);
+
+    // Every resting rail tile is the styled surface at border width 1, which is
+    // what `draw_styled_button_frame` paints for the Python rail.
+    const QVariantList tiles = view.railTiles();
+    QVERIFY(!tiles.isEmpty());
+    for (const QVariant &value : tiles) {
+        const QVariantMap visual = value.toMap().value(QStringLiteral("visual")).toMap();
+        QCOMPARE(visual.value(QStringLiteral("fill")).toString(), surface);
+        QCOMPARE(visual.value(QStringLiteral("border")).toString(), border);
+        QCOMPARE(visual.value(QStringLiteral("borderWidth")).toInt(), 1);
+    }
+
+    // A drawer control resolves the same way, and an active one resolves to the
+    // focus colour at border width 2 rather than to a colour chosen here.
+    view.openSurface(QStringLiteral("audio"));
+    const auto controlNamed = [&view](const QString &name) {
+        for (const QVariant &value : view.drawerControls()) {
+            const QVariantMap entry = value.toMap();
+            if (entry.value(QStringLiteral("name")).toString() == name) {
+                return entry;
+            }
+        }
+        return QVariantMap{};
+    };
+
+    const QVariantMap resting = controlNamed(QStringLiteral("mute"));
+    QVERIFY2(!resting.isEmpty(), "the audio drawer should offer MUTE");
+    QCOMPARE(resting.value(QStringLiteral("visual")).toMap().value(QStringLiteral("fill")).toString(),
+             surface);
+
+    // Activate it the way an operator does. The drawer's MUTE tile follows the
+    // Audio controls, which is its own state: the Home rail's speaker toggle is a
+    // different control and is deliberately not what this reads.
+    const ControlBox mute = ituner::core::audioDrawerBoxes().mute;
+    QCOMPARE(view.touch((mute.x0 + mute.x1) / 2.0, (mute.y0 + mute.y1) / 2.0),
+             QStringLiteral("audio_mute"));
+    const QVariantMap active = controlNamed(QStringLiteral("mute"));
+    QVERIFY(active.value(QStringLiteral("active")).toBool());
+    const QVariantMap visual = active.value(QStringLiteral("visual")).toMap();
+    QCOMPARE(visual.value(QStringLiteral("fill")).toString(), focus);
+    QCOMPARE(visual.value(QStringLiteral("text")).toString(), focusText);
+    QCOMPARE(visual.value(QStringLiteral("borderWidth")).toInt(), 2);
+}
+
+void HomeViewTest::disabledControlsArePaintedFromTheUntestedTokens() {
+    // A control the receiver cannot honour is drawn from the palette's `untested`
+    // tokens, and it must be resolved *after* the capability verdict: resolving
+    // the paint first would leave a disabled instrument looking usable.
+    HomeView view;
+    view.setReceiverProtocol(QStringLiteral("fmdx"));
+
+    const QVariantMap readout = view.instruments().value(QStringLiteral("frequency")).toMap();
+    QVERIFY(!readout.value(QStringLiteral("enabled")).toBool());
+
+    const ituner::core::UiPalette &palette = ituner::core::appUiStyle().palette;
+    const QVariantMap visual = readout.value(QStringLiteral("visual")).toMap();
+    QCOMPARE(visual.value(QStringLiteral("fill")).toString(), ituner::core::qmlColor(palette.untested));
+    QCOMPARE(visual.value(QStringLiteral("text")).toString(),
+             ituner::core::qmlColor(palette.untestedText));
+
+    // The same control on a Kiwi receiver is enabled and painted normally, so the
+    // grey is the contract's verdict rather than a hard-coded rule.
+    HomeView kiwi;
+    const QVariantMap enabled = kiwi.instruments().value(QStringLiteral("frequency")).toMap();
+    QVERIFY(enabled.value(QStringLiteral("enabled")).toBool());
+    QCOMPARE(enabled.value(QStringLiteral("visual")).toMap().value(QStringLiteral("fill")).toString(),
+             ituner::core::qmlColor(palette.surface));
 }
 
 QTEST_MAIN(HomeViewTest)
