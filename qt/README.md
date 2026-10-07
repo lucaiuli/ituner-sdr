@@ -425,6 +425,11 @@ rendered and checked headlessly, which is how the two render checks work.
 
 The rail draws labels only unless `--menu-icons <dir>` points at the installed
 artwork; installing it is Task 5, and the icons are not copied into the build.
+The runtime resolves that directory to an absolute `file:` URL, because a
+relative path in `Image.source` is resolved against the QML component's own
+`qrc:` URL and would silently load nothing. The checked-in artwork ships every
+Home tile's icon except `favorite.png`, and the runtime asks for that filename
+exactly as the Python renderer does.
 
 ```sh
 # the wiring, through the same object QML uses
@@ -437,6 +442,14 @@ UI/.venv/bin/python3 qt/tests/parity/verify_home_screen.py /tmp/home.png
 QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software ./qt/build/ituner-sdr-qt \
   --desktop --home --surface audio --screenshot-path /tmp/audio.png
 UI/.venv/bin/python3 qt/tests/parity/verify_drawer_render.py /tmp/audio.png audio
+# the installed rail artwork, on the frame: every icon the artwork ships loads
+# and draws, and the run without --menu-icons is otherwise identical
+QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software ./qt/build/ituner-sdr-qt \
+  --desktop --home --menu-icons UI/assets/menu-icons --screenshot-path /tmp/icons.png
+QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software ./qt/build/ituner-sdr-qt \
+  --desktop --home --screenshot-path /tmp/no-icons.png
+UI/.venv/bin/python3 qt/tests/parity/verify_home_icons.py \
+  /tmp/icons.png /tmp/no-icons.png UI/assets/menu-icons
 ```
 
 ## Automated verification of the transform
@@ -471,6 +484,7 @@ Suite results on this macOS host with Qt 6.11.2:
 | `ctest` (`drawer_bodies`), parity vs Python | passed, 10 test methods: the Audio and Display boxes and hit tests, the tiles the real Python drawers draw (4 audio and 3 display states), the volume/squelch/denoise and floor/ceiling slider maps, the preset tables and label rules |
 | `ctest` (`home_view`) | passed, 12 test methods: one shared Back target, drawers inside the rail, no Home control in the RF canvas, parent-aware Back, capability-disabled instruments, and both drawer bodies acting on their own state |
 | `ctest` (`home_render`) | passed, the rendered Home frame has a painted rail, six tiles, readout, passband and volume |
+| `ctest` (`home_icons`) | passed, every rail icon the checked-in artwork ships loaded and drew, and the RF canvas is unchanged by `--menu-icons` |
 | `ctest` (`audio_render` / `display_render`) | passed, the rendered Audio and Display drawers have every control box painted plus the shared Back control |
 | `python3 UI/test_receiver_catalog.py` (unchanged) | passed, 19 tests |
 

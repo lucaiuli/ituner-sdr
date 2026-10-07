@@ -55,6 +55,21 @@ add_test(NAME home_render
         -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/home_screen.png
         -P ${CMAKE_CURRENT_SOURCE_DIR}/run_home_render.cmake)
 
+# The installed rail artwork: the runtime renders the Home screen with and
+# without `--menu-icons` and the two frames are compared, so a directory that
+# cannot be opened and a directory that loads but never draws are both caught.
+# The artwork is the checked-in `UI/assets/menu-icons`, which is what an installed
+# build points at.
+add_test(NAME home_icons
+    COMMAND ${CMAKE_COMMAND}
+        -DAPP=$<TARGET_FILE:ituner-sdr-qt>
+        -DPYTHON=${ITUNER_PYTHON}
+        -DVERIFY=${CMAKE_SOURCE_DIR}/tests/parity/verify_home_icons.py
+        -DICONS=${CMAKE_SOURCE_DIR}/../UI/assets/menu-icons
+        -DWITH_ICONS=${CMAKE_CURRENT_BINARY_DIR}/home_icons.png
+        -DWITHOUT_ICONS=${CMAKE_CURRENT_BINARY_DIR}/home_no_icons.png
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/run_home_icons.cmake)
+
 # The drawer render checks: the runtime opens one drawer offscreen and the frame
 # is checked for that drawer's own body. Geometry is already pinned by
 # `drawer_bodies`; this catches a body that is right in the model and missing on

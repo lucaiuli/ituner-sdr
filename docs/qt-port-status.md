@@ -54,9 +54,9 @@ below means the C++ QtTest suite replays that golden and passes.
 | 17 | Home screen wiring | — (new) | `qt/src/ui/home_view.*`, `qt/qml/HomeScreen.qml` | `tst_home_view` (8), `home_render` | one shared Back target across every drawer, drawers inside the rail, parent-aware Back, capability-disabled instruments, rendered-frame check |
 
 | 18 | Audio & Display drawer bodies | `UI/kiwi_gl_display.py` — `audio_option_at`, `audio_volume_at_x`, `audio_squelch_at_x`, `audio_denoise_level_at_x`, `squelch_maximum`, `main_volume_label`, `format_filter_width`, `display_option_at`, `draw_lcd_audio_drawer`, `draw_display_setup_panel` | `qt/src/core/audio_controls.*`, `qt/src/core/drawer_bodies.*`, `qt/src/core/drawer_geometry.*` | `tst_drawer_bodies` (12) | `drawer_bodies_expected.json` — 15 audio boxes, 8 display boxes, every hit test, the drawer tiles the real Python drawers draw (4 audio states × 13 tiles, 3 display states), the three slider maps, the speed/palette boxes, the preset tables and the label rules |
-| 19 | Audio & Display drawer wiring | — (new) | `qt/src/ui/home_view.*`, `qt/qml/HomeScreen.qml` | `tst_home_view` (14), `audio_render`, `display_render` | the drawer's own tiles on screen, the volume/squelch/denoise drags, the squelch scale following the mode, the layout toggle, the waterfall following the Display drawer |
+| 19 | Audio & Display drawer wiring | — (new) | `qt/src/ui/home_view.*`, `qt/qml/HomeScreen.qml` | `tst_home_view` (14), `home_icons`, `audio_render`, `display_render` | the drawer's own tiles on screen, the volume/squelch/denoise drags, the squelch scale following the mode, the layout toggle, the waterfall following the Display drawer |
 
-**Totals:** 19 ctest tests (14 unit suites plus five render checks), 160 declared
+**Totals:** 20 ctest tests (14 unit suites plus six render checks), 160 declared
 test slots across the suites, 12 golden files, 12 capture scripts, ~8.6k lines of
 library code across `src/core`, `src/transport`, `src/audio` and `src/ui`.
 
@@ -93,26 +93,27 @@ Produced on this macOS host with Qt 6.11.2 (Homebrew), Apple clang 21, CMake
 
 ```
 $ ctest --test-dir qt/build
-     1/19 display_geometry ...... Passed
-     2/19 receiver_catalog ...... Passed
-     3/19 tuning_waterfall ...... Passed
-     4/19 waterfall_palette ..... Passed
-     5/19 state_store .......... Passed
-     6/19 swipe_gesture ........ Passed
-     7/19 spectrum_model ....... Passed
-     8/19 navigation ........... Passed
-     9/19 drawer_bodies ........ Passed
-    10/19 waterfall_frames ..... Passed
-    11/19 kiwi_transport ....... Passed
-    12/19 audio_math ........... Passed
-    13/19 waterfall_view ....... Passed
-    14/19 home_view ............ Passed
-    15/19 home_render .......... Passed
-    16/19 audio_render ......... Passed
-    17/19 display_render ....... Passed
-    18/19 waterfall_render_row1  Passed
-    19/19 waterfall_render_row2  Passed
-100% tests passed, 0 tests failed out of 19
+     1/20 display_geometry ...... Passed
+     2/20 receiver_catalog ...... Passed
+     3/20 tuning_waterfall ...... Passed
+     4/20 waterfall_palette ..... Passed
+     5/20 state_store .......... Passed
+     6/20 swipe_gesture ........ Passed
+     7/20 spectrum_model ....... Passed
+     8/20 navigation ........... Passed
+     9/20 drawer_bodies ........ Passed
+    10/20 waterfall_frames ..... Passed
+    11/20 kiwi_transport ....... Passed
+    12/20 audio_math ........... Passed
+    13/20 waterfall_view ....... Passed
+    14/20 home_view ............ Passed
+    15/20 home_render .......... Passed
+    16/20 home_icons ........... Passed
+    17/20 audio_render ......... Passed
+    18/20 display_render ....... Passed
+    19/20 waterfall_render_row1  Passed
+    20/20 waterfall_render_row2  Passed
+100% tests passed, 0 tests failed out of 20
 ```
 
 The two `waterfall_render_*` cases are the end-to-end check: the runtime renders
@@ -282,7 +283,8 @@ runtime does not ship.
 
 **Not done in this task:** the receiver-browser drawer body (LIST/MAP plus the
 five source segments), the installed icon artwork (the rail draws labels unless
-`--menu-icons` points at a directory), and any on-device touch verification.
+`--menu-icons` points at a directory, and the checked-in artwork ships every Home
+tile's icon except `favorite.png`), and any on-device touch verification.
 
 **Device evidence: none yet.** The CM5, its panel, its touch controller and both
 software fallbacks are unmeasured. The host bench

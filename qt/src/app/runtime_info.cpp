@@ -1,7 +1,9 @@
 #include "runtime_info.h"
 
+#include <QDir>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QUrl>
 
 #include "runtime_platform.h"
 
@@ -10,6 +12,13 @@ namespace ituner::app {
 RuntimeInfo::RuntimeInfo(CliOptions options, QObject *parent)
     : QObject(parent), m_options(std::move(options)) {
     m_layout = core::makeDesktopLayout();
+    if (!m_options.menuIconDir.isEmpty()) {
+        // A relative directory is relative to where the operator started the
+        // runtime, which is what `QDir::absolutePath` resolves against; the QML
+        // then receives a URL and never has to know the difference.
+        const QString absolute = QDir(m_options.menuIconDir).absolutePath();
+        m_menuIconUrl = QUrl::fromLocalFile(absolute).toString();
+    }
 }
 
 void RuntimeInfo::resolvePanelLayout() {

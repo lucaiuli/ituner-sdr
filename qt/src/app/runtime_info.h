@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QSize>
 #include <QString>
+#include <QUrl>
 
 #include <display_geometry.h>
 
@@ -71,8 +72,14 @@ public:
     int rfCanvasWidth() const { return m_layout.logical.width() == 1280 ? 1024 : m_layout.logical.width(); }
     /// True when `--home` selected the Home screen.
     bool home() const { return m_options.home; }
-    /// The configured rail-icon directory, or empty when none was given.
-    QString menuIconDir() const { return m_options.menuIconDir; }
+    /// The rail-icon directory as an absolute `file:` URL, or empty when
+    /// `--menu-icons` was not given.
+    ///
+    /// It is resolved here rather than in the QML because a relative path in an
+    /// `Image.source` is resolved against the component's own URL, which is a
+    /// `qrc:` URL: `--menu-icons UI/assets/menu-icons` would then ask for
+    /// `qrc:/.../UI/assets/menu-icons/audio.png` and silently load nothing.
+    QString menuIconDir() const { return m_menuIconUrl; }
     /// The drawer `--surface` asked to open, or empty for the Home screen.
     QString startSurface() const { return m_options.surface; }
 
@@ -85,6 +92,9 @@ public:
 private:
     CliOptions m_options;
     core::PanelLayout m_layout;
+    /// Resolved once, so the QML sees a URL it can open rather than a path it
+    /// would resolve against its own component.
+    QString m_menuIconUrl;
 };
 
 }  // namespace ituner::app

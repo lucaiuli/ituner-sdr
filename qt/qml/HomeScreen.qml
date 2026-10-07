@@ -189,6 +189,9 @@ Item {
 
                 // The icon directory is supplied by the launcher, so a build with
                 // no installed artwork shows the label rather than a broken image.
+                // `Runtime.menuIconDir` is already an absolute `file:` URL: a
+                // relative path here would resolve against this component's own
+                // `qrc:` URL and quietly load nothing.
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     y: 12
