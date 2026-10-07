@@ -1,3 +1,8 @@
+# The application runtime the pixel-level render checks use. It must be defined
+# before any test that consumes it: an empty path makes the driver report a skip,
+# which looks like a pass.
+set(ITUNER_PYTHON "${CMAKE_CURRENT_SOURCE_DIR}/../../../UI/.venv/bin/python3")
+
 # The waterfall screen's touch and display wiring, offscreen.
 #
 # It links the Qt Quick items, so it needs a platform plugin; the test is run with
@@ -19,11 +24,56 @@ endif()
 add_test(NAME waterfall_view COMMAND tst_waterfall_view)
 set_tests_properties(waterfall_view PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 
+# The Home screen's wiring: the shared Back target, drawers inside the rail, and
+# controls that never cover a Home instrument.
+qt_add_executable(tst_home_view
+    tst_home_view.cpp
+)
+
+target_link_libraries(tst_home_view
+    PRIVATE
+        ituner_ui
+        Qt6::Test
+)
+
+if(NOT MSVC)
+    target_compile_options(tst_home_view PRIVATE -Wall -Wextra)
+endif()
+
+add_test(NAME home_view COMMAND tst_home_view)
+set_tests_properties(home_view PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+
+# The end-to-end Home render: the runtime draws the Home screen offscreen and the
+# frame is checked for a painted rail, tiles and instruments. Geometry is already
+# pinned by `tst_navigation`; this catches a box that is right in the model and
+# wrong on the screen.
+add_test(NAME home_render
+    COMMAND ${CMAKE_COMMAND}
+        -DAPP=$<TARGET_FILE:ituner-sdr-qt>
+        -DPYTHON=${ITUNER_PYTHON}
+        -DVERIFY=${CMAKE_SOURCE_DIR}/tests/parity/verify_home_screen.py
+        -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/home_screen.png
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/run_home_render.cmake)
+
+# The drawer render checks: the runtime opens one drawer offscreen and the frame
+# is checked for that drawer's own body. Geometry is already pinned by
+# `drawer_bodies`; this catches a body that is right in the model and missing on
+# the screen.
+foreach(ITUNER_DRAWER audio display)
+    add_test(NAME ${ITUNER_DRAWER}_render
+        COMMAND ${CMAKE_COMMAND}
+            -DAPP=$<TARGET_FILE:ituner-sdr-qt>
+            -DPYTHON=${ITUNER_PYTHON}
+            -DVERIFY=${CMAKE_SOURCE_DIR}/tests/parity/verify_drawer_render.py
+            -DSURFACE=${ITUNER_DRAWER}
+            -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/${ITUNER_DRAWER}_drawer.png
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/run_drawer_render.cmake)
+endforeach()
+
 # The end-to-end render check: the runtime renders a captured waterfall row set
 # offscreen and the result is compared, pixel for pixel, with the Python
 # renderer's output for the same rows. Two streams are checked so both the
 # one-row-per-line path and the row-pixel duplication path are covered.
-set(ITUNER_PYTHON "${CMAKE_CURRENT_SOURCE_DIR}/../../../UI/.venv/bin/python3")
 set(ITUNER_WATERFALL_GOLDEN
     "${CMAKE_SOURCE_DIR}/tests/golden/waterfall_frames_expected.json")
 set(ITUNER_RENDER_VERIFY "${CMAKE_SOURCE_DIR}/tests/parity/verify_waterfall_render.py")

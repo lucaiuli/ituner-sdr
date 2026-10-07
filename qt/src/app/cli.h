@@ -37,6 +37,17 @@ struct CliOptions {
     double waterfallBenchSeconds = 0.0;
     /// Rows per received line for the bench, matching `--wf-row-pixels`.
     int waterfallRowPixels = 1;
+    /// `--home` shows the Home screen: the Home rail with its instruments and
+    /// drawers over the live RF canvas.
+    bool home = false;
+    /// `--menu-icons <dir>` is the installed `menu-icons` directory. Empty means
+    /// no artwork is configured, and the rail draws its labels without an icon
+    /// rather than showing a broken image. Installing the assets is Task 5.
+    QString menuIconDir;
+    /// `--surface <name>` opens one named drawer immediately. It exists so a
+    /// drawer can be rendered and checked offscreen the way `--home` renders the
+    /// Home screen; an unknown name is rejected rather than ignored.
+    QString surface;
 };
 
 /// Parse the command line. `--help` and `--version` print and exit here, and an

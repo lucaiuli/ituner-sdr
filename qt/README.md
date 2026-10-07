@@ -6,7 +6,13 @@ The C++20 / Qt Quick replacement for the Python pygame renderer, built on branch
 the consolidated what-is-ported / how-to-run reference is
 [`docs/qt-port-status.md`](../docs/qt-port-status.md).
 
-**Status: Task 3 (complete on the host).** The domain core is ported and verified
+**Status: Task 4 (in progress).** Task 3 is complete on the host. For Task 4 the
+Home rail, the drawer geometry, the navigation rules and the icon resolution are
+ported and verified against Python goldens, and a Home screen renders them over
+the live RF canvas. Still open: the Audio, Display and receiver-browser drawer
+bodies, the installed icon artwork, and on-device touch.
+
+Before that, Task 3 (complete on the host). The domain core is ported and verified
 against Python goldens: geometry and touch mapping, the receiver catalog and
 capability contract, the tuning/zoom math, the waterfall levels/cadence/palette/
 ring, the swipe gesture model and the remembered-view state store. The KiwiSDR
@@ -29,9 +35,9 @@ shipping runtime.
 | `src/audio/` | PCM conversion and level math, QtCore only. |
 | `src/ui/` | The scene-graph layer: the RGBA waterfall item, the draw-list overlay item, and the gesture/wiring seam the QML screen talks to. |
 | `src/app/` | Entry point, command line, platform defaults, the QML-visible `Runtime` object and the waterfall bench. |
-| `qml/` | The test pattern (grid, corner markers, edge labels, frame-rate overlay) and the waterfall screen. |
+| `qml/` | The test pattern (grid, corner markers, edge labels, frame-rate overlay), the waterfall screen and the Home screen. |
 | `tests/core/` | Unit tests, plus the parity checks against the Python implementations. |
-| `tests/ui/` | The waterfall screen's touch and display wiring, offscreen. |
+| `tests/ui/` | The waterfall and Home screens' touch and display wiring, offscreen. |
 | `tests/golden/` | Shared fixtures and the expectations captured from the Python modules. |
 | `tests/parity/` | The capture scripts that produce `tests/golden/*_expected.json`. |
 
@@ -375,6 +381,64 @@ and the `beforeRendering`→`afterRendering` render time. On this host it report
 period. That is the software backend at 1× scale on a Mac: it is a regression
 canary, **not** the CM5 frame budget, which still needs the device.
 
+## Home screen and drawers
+
+The Home screen is the live RF canvas on the left and the permanent 256 px rail on
+the right. The rail, the drawer boxes and the navigation rules live in
+`src/core/navigation.*` and `src/core/drawer_geometry.*`, ported from
+`UI/kiwi_gl_display.py` and verified against goldens captured from it by
+`qt/tests/parity/capture_navigation.py`.
+
+`src/ui/home_view.*` is the seam. It owns no layout: it hands QML the rail tiles,
+the Home instruments, the mode annunciators and the open drawer's controls, each
+already carrying its box, its enabled state and the reason it is disabled. One
+`touch(x, y)` entry point routes every gesture through the same core hit tests the
+renderer draws with, so a control that is drawn is always touchable and a control
+that is not drawn never is.
+
+```sh
+./qt/build/ituner-sdr-qt --desktop --home                 # the Home screen
+./qt/build/ituner-sdr-qt --desktop --home --menu-icons UI/assets/menu-icons
+./qt/build/ituner-sdr-qt --desktop --home --surface audio   # one drawer, open
+```
+
+Three properties are worth knowing because they are easy to lose:
+
+- Every drawer returns through **one** shared Back box. `lcdDrawerBackBox()` is
+  the single definition, and the Settings rail's last tile is that same box, so
+  Back never moves between faces.
+- Back is **parent-aware**: a leaf opened from Settings returns to Settings, one
+  opened from Home returns to Home, and an unknown parent falls back to Home
+  rather than stranding the operator.
+- A disabled control is **visible and explains itself**. The state comes from the
+  ported receiver contract, so a shared FM-DX tuner renders its frequency readout
+  disabled and reports the same message the Python app shows. Nothing is silently
+  ignored.
+
+The Audio and Display drawers are ports of the Python drawer functions, and the
+strings they show are decided in C++ (`src/core/audio_controls.*`,
+`src/core/drawer_bodies.*`) rather than assembled in QML. Their hit tests, their
+slider maps and the tiles the Python drawers draw are pinned by
+`drawer_bodies_expected.json`; the drawers' own tiles are then checked on the
+rendered frame. `--surface <name>` opens one drawer immediately so it can be
+rendered and checked headlessly, which is how the two render checks work.
+
+The rail draws labels only unless `--menu-icons <dir>` points at the installed
+artwork; installing it is Task 5, and the icons are not copied into the build.
+
+```sh
+# the wiring, through the same object QML uses
+QT_QPA_PLATFORM=offscreen ./qt/build/tests/ui/tst_home_view
+# the rendered frame: a painted rail, six tiles, readout, passband and volume
+QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software ./qt/build/ituner-sdr-qt \
+  --desktop --home --screenshot-path /tmp/home.png
+UI/.venv/bin/python3 qt/tests/parity/verify_home_screen.py /tmp/home.png
+# one drawer's own body, on the frame
+QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software ./qt/build/ituner-sdr-qt \
+  --desktop --home --surface audio --screenshot-path /tmp/audio.png
+UI/.venv/bin/python3 qt/tests/parity/verify_drawer_render.py /tmp/audio.png audio
+```
+
 ## Automated verification of the transform
 
 `--self-test` grabs the frame that actually rendered and checks it against the
@@ -403,6 +467,11 @@ Suite results on this macOS host with Qt 6.11.2:
 | `ctest` (`waterfall_frames`), parity vs Python | passed, 12 rows across 5 streams through the leveler, palette and queue |
 | `ctest` (`waterfall_view`) | passed, 12 methods: controls, zoom, tune/drag/inertia, passband handles, spectrum feed and one-upload-per-row |
 | `ctest` (`waterfall_render_row1` / `_row2`) | passed, 5/5 captured frames pixel-identical to the Python renderer |
+| `ctest` (`navigation`), parity vs Python | passed, 15 test methods: 3 rails, 13 tiles, the navigation matrix, icons, both frequency layouts, filter presets, drawer box tables, Apps boxes, the Modes matrix, the manual-entry parser and the Home instrument stack |
+| `ctest` (`drawer_bodies`), parity vs Python | passed, 10 test methods: the Audio and Display boxes and hit tests, the tiles the real Python drawers draw (4 audio and 3 display states), the volume/squelch/denoise and floor/ceiling slider maps, the preset tables and label rules |
+| `ctest` (`home_view`) | passed, 12 test methods: one shared Back target, drawers inside the rail, no Home control in the RF canvas, parent-aware Back, capability-disabled instruments, and both drawer bodies acting on their own state |
+| `ctest` (`home_render`) | passed, the rendered Home frame has a painted rail, six tiles, readout, passband and volume |
+| `ctest` (`audio_render` / `display_render`) | passed, the rendered Audio and Display drawers have every control box painted plus the shared Back control |
 | `python3 UI/test_receiver_catalog.py` (unchanged) | passed, 19 tests |
 
 For example, `flipped` maps the top-left marker's logical `(20,20)` to panel

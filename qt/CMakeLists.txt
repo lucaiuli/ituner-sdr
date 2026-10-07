@@ -69,6 +69,7 @@ qt_add_qml_module(ituner-sdr-qt
     VERSION 0.1
     QML_FILES
         qml/Main.qml
+        qml/HomeScreen.qml
         qml/WaterfallScreen.qml
         qml/OrientationCanvas.qml
         qml/TestPattern.qml

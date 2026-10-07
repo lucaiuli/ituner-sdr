@@ -352,16 +352,112 @@ and the sanitizers are still not run (both tools are absent on this host).
 
 ## Task 4: Home screen and the drawer system
 
-- [ ] Build the QML Home screen: frequency display and tuning step, mode selection with commit-before-options behavior, s-meter, waterfall controls, the left rail, and the `RECEIVERS / GLOBE` header treatment from the current branch.
+- [x] Build the QML Home screen: frequency display and tuning step, mode selection with commit-before-options behavior, s-meter, waterfall controls, the left rail, and the `RECEIVERS / GLOBE` header treatment from the current branch.
 - [ ] Port the icon layer: load the existing SVG sources and 64x64 PNG runtime assets from `UI/assets/menu-icons` and `UI/assets/menu-icons-svg`, preserving identifiers, the muted-audio icon switch, and the current fallback when optional artwork is missing.
-- [ ] Implement the shared drawer geometry helpers and the single bottom-positioned Back control, with drawing and hit-testing derived from one box definition per control, as the Python code does.
-- [ ] Implement parent-aware navigation: a leaf opened from Settings returns to Settings, a leaf opened from Home returns to Home, and an unknown parent falls back to Home.
+- [x] Implement the shared drawer geometry helpers and the single bottom-positioned Back control, with drawing and hit-testing derived from one box definition per control, as the Python code does.
+- [x] Implement parent-aware navigation: a leaf opened from Settings returns to Settings, a leaf opened from Home returns to Home, and an unknown parent falls back to Home.
 - [ ] Implement the drawers in scope for the slice: Settings, Modes, Audio, Display, Filter, Apps, and the receiver browser with its `LIST | MAP` selector and the five source segments in the fixed order.
-- [ ] Render capability-disabled controls as visible and disabled, and surface the exact rejection message when touched, so no input is silently ignored.
+- [x] Render capability-disabled controls as visible and disabled, and surface the exact rejection message when touched, so no input is silently ignored.
 - [ ] Port the operator-visible strings exactly (`MODES`, `BACK`, `PASSBAND`, `Apps`, the FM-DX shared-tuner explanations) so documentation and muscle memory stay valid.
-- [ ] Add QML-side geometry tests that assert the same relationships the Python navigation tests assert: one shared Back target, drawer bounds inside the rail, two-line sidebar buttons, and controls not overlapping Home instruments.
+- [x] Add QML-side geometry tests that assert the same relationships the Python navigation tests assert: one shared Back target, drawer bounds inside the rail, two-line sidebar buttons, and controls not overlapping Home instruments.
 
 **Exit gate:** the Home screen and the in-scope drawers are fully operable by touch on the CM5, with capability messaging correct, and the geometry assertions pass.
+
+### Task 4 progress
+
+The rail, the drawer geometry and the navigation rules are ported and golden-
+verified, and a Home screen renders them. Three bullets remain open and are named
+at the end of this section.
+
+**The ported geometry.** `src/core/navigation.*` owns the rail: the Home,
+Settings and DIGI item lists, the tile grid (`lcd_nav_box` / `lcd_nav_top`), the
+rail and content bottoms, the **single shared Back target**
+(`lcdDrawerBackBox`), the navigation rules (`navigation_parent`,
+`navigation_back_surface`, `navigation_previous_surface`,
+`stats_keeps_settings_sidebar`, `NAVIGATION_SURFACES`), and the Home instrument
+stack (mode annunciators, passband, volume with its separate speaker toggle and
+slider travel, S-meter, compact frequency readout). `src/core/drawer_geometry.*`
+owns the drawer boxes and hit tests: the manual keypad, the frequency drawer with
+its square tuning arrows and inline step choices, the passband drawer with its six
+width presets, the Info / fan-curve / font-review drawers, the Apps action boxes,
+the Modes drawer (`radio_mode_layout`, `radio_step_options`, `radio_wspr_box`,
+`radio_option_at`), the frequency formatting and step math, and the readout touch
+box. `src/core/menu_icons.*` owns the icon filename rule, including the
+muted-audio switch and the `<kind>.png` fallback.
+
+**The screen.** `src/ui/home_view.*` is a QObject that owns no layout of its own:
+it hands QML the rail tiles, the instruments, the mode buttons and the open
+drawer's controls, each already carrying its box, its enabled state and the
+reason it is disabled. `qml/HomeScreen.qml` places them over the live RF canvas
+and forwards touches to one `touch(x, y)` entry point, which routes through the
+same core hit tests the renderer uses. A control that is drawn is therefore
+always touchable and a control that is not drawn never is.
+
+**Capability, not invention.** An instrument resolves against the ported receiver
+contract, so on a shared FM-DX tuner the frequency readout renders disabled and
+reports `kFmdxSharedFrequencyMessage` when touched, while volume stays live.
+Nothing is silently ignored.
+
+**Verification.** `qt/tests/parity/capture_navigation.py` records the expectation
+from the real Python functions: the three rails, every tile box and hit test, the
+navigation matrix, the icon resolutions, both frequency layouts, the filter
+presets, the three-tile drawers, the Apps boxes, the Modes matrix and options,
+and the Home instrument stack in both presentations. `tst_navigation` (17
+methods) replays it; `tst_home_view` (8 test methods) then asserts the plan's own
+relationships *through the object the QML screen uses*: one shared Back target
+across every drawer, drawer bounds inside the rail, no Home control reaching into
+the RF canvas, no instrument covering another, parent-aware Back, and the
+disabled-and-explained contract. `verify_home_screen.py` closes the loop by
+rendering the screen offscreen and checking the frame for a painted rail, six
+tiles, the readout, the passband and the volume. `ctest` is green at 16/16.
+
+Seventeen of eighteen mutations of the ported rules were caught. The survivor is
+benign and worth recording: swapping the order of the passband `shift` and
+`width` hit tests cannot be observed, because the two boxes are disjoint by
+construction, so the precedence is unreachable. Two mutations that *were*
+gen genuinely revealed gaps and were closed by adding golden cases rather than by
+weakening the test: the detent epsilon needed frequencies whose grid quotient sits
+a hair off an integer, and the Apps boxes needed a direct box comparison, since a
+box shifted by one pixel still answers the same for its centre.
+
+Three defects were caught while wiring the screen: the QML offset the instrument
+stack by the rail origin twice, the Settings rail's APPS and INFO tiles were
+navigating to surfaces named `tests` and `system` instead of the `apps` and
+`info` surfaces the navigation rules name, and the `home_render` ctest case was
+silently *skipping* because its Python path was defined below its use -- a test
+that passes for the wrong reason, which is exactly what the driver's skip branch
+was written to make visible.
+
+**The Audio and Display drawer bodies landed next.** They are the two drawers
+whose contents are *strings*, so the port moved that decision into C++:
+`src/core/audio_controls.*` owns the audio state, the preset tables and the label
+rules, and `src/core/drawer_bodies.*` turns that state into the tiles of both
+drawers with their boxes. `capture_drawer_bodies.py` records what the real
+`draw_lcd_audio_drawer` and `draw_display_setup_panel` pass to their own tile
+primitives -- title, detail, active flag, box, `value`/`maximum` for a slider --
+for four audio and three display states, so the drawer's order is pinned as well
+as its text; `tst_drawer_bodies` (12 methods) replays it and `tst_home_view`
+drives the drawers through the object the QML screen uses. `--surface audio` and
+`--surface display` render one drawer offscreen, checked by
+`verify_drawer_render.py` as the `audio_render` and `display_render` ctest cases.
+
+Three real bugs came out of it: Python rounds an exact decimal half to the even
+digit (`f"{500.5:.0f}"` is `500`) where both `QString::number` and `snprintf`
+round away from zero; the manual frequency keypad multiplied every entry by 1000
+instead of applying `parse_frequency_entry_mhz` (MHz first, kHz tolerated, against
+the receiver's own ceiling); and the audio drawer's Denoise row is a detent
+slider that the Python option function deliberately does not name. Nine mutations
+were caught, one of them (the Denoise tie-break) only after the tie position was
+added to the golden.
+
+**Still open in this task.** The icon layer resolves filenames and renders them
+when `--menu-icons <dir>` is supplied, but installing the artwork is Task 5, so a
+plain build draws labels only. The receiver-browser body is not ported: its rail
+tile opens a surface that shows the shared Back control plus a clearly-marked
+development notice rather than a dead screen. The port renders the compact
+instrument presentation by default because the expanded one draws its frequency
+in the canvas instrument layer, which is not ported; and none of it is
+touch-verified on the CM5.
 
 ## Task 5: Configuration, persistence, deployment, and switching
 

@@ -18,11 +18,15 @@ Window {
     readonly property bool desktop: Runtime.desktop
     readonly property bool waterfallMode: Runtime.waterfallFramePath !== ""
                                           || Runtime.waterfallBenchSeconds > 0
+    // The Home screen supersedes the test pattern for a normal run; the pattern
+    // is still what `--self-test` and a plain `--desktop` preview use.
+    readonly property bool homeMode: Runtime.home && !waterfallMode
 
     visible: true
     color: "#0d0d0d"
-    title: waterfallMode ? "iTuner SDR — Qt runtime (waterfall)"
-                         : "iTuner SDR — Qt runtime (Task 0 test pattern)"
+    title: homeMode ? "iTuner SDR — Qt runtime (Home)"
+                    : waterfallMode ? "iTuner SDR — Qt runtime (waterfall)"
+                                    : "iTuner SDR — Qt runtime (Task 0 test pattern)"
 
     width: desktop ? Runtime.logicalWidth : Runtime.panelWidth
     height: desktop ? Runtime.logicalHeight : Runtime.panelHeight
@@ -39,15 +43,24 @@ Window {
             rowSetStream: Runtime.waterfallStream
         }
 
+        HomeScreen {
+            visible: root.homeMode
+            anchors.fill: parent
+        }
+
         TestPattern {
-            visible: !root.waterfallMode
+            visible: !root.waterfallMode && !root.homeMode
             anchors.fill: parent
         }
 
         // Inside the rotated canvas so the diagnostics read upright to the
-        // operator on the mounted panel.
+        // operator on the mounted panel. It belongs to the Task 0 test pattern
+        // and is what a frame-rate measurement is read from, so it is not drawn
+        // over a product screen: an operator does not want a diagnostic box on
+        // the Home screen, and it would sit on top of the rail.
         FpsOverlay {
             anchors.fill: parent
+            visible: !root.waterfallMode && !root.homeMode
             target: Runtime.fpsTarget
             runtimeSummary: Runtime.summary
             desktop: root.desktop

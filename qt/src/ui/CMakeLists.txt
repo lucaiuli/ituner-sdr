@@ -5,6 +5,8 @@
 # the core is what the goldens verify. Keeping that boundary is what lets the
 # display behaviour be checked without a device.
 add_library(ituner_ui STATIC
+    home_view.cpp
+    home_view.h
     overlay_item.cpp
     overlay_item.h
     waterfall_item.cpp

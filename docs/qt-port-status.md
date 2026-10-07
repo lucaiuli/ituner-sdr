@@ -13,11 +13,17 @@ a development desktop and on the CM5.
 > device backends are not built yet. Task 3 (waterfall and spectrum rendering) is
 > complete on the host: the surface renders offscreen **pixel for pixel** like the
 > Python renderer for a captured row set, and tuning, zoom, passband and control
-> gestures are wired and tested. Tasks 4–6 (Home screen and drawers,
-> configuration/deployment, handover) are **not started**. Nothing has been run on
-> the device: every frame-rate, touch and audio number in the plan is still "not
-> yet measured", including Task 3's own frame-budget bullet. The Python
-> application in `UI/` remains the only shipping runtime and is unmodified.
+> gestures are wired and tested. Task 4 (Home screen and drawers) is **in
+> progress**: the rail, the drawer geometry, the navigation rules and the icon
+> resolution are ported and golden-verified, a Home screen renders them over the
+> live RF canvas, and the Frequency, Passband, Modes, Info, Apps, **Audio and
+> Display** drawer bodies are ported, golden-verified and rendered. The
+> receiver-browser body and the installed icon artwork are not done. Task 5 and
+> Task 6 are **not started**.
+> Nothing has been run on the device: every frame-rate, touch and audio number in
+> the plan is still "not yet measured", including Task 3's own frame-budget
+> bullet. The Python application in `UI/` remains the only shipping runtime and is
+> unmodified.
 
 ---
 
@@ -44,10 +50,15 @@ below means the C++ QtTest suite replays that golden and passes.
 | 13 | Spectrum model & draw list | `UI/kiwi_gl_display.py` — `update_spectrum`, `zoomed_spectrum_values`, `draw_spectrum` | `qt/src/core/draw_list.*`, `qt/src/core/spectrum_model.*` | `tst_spectrum_model` (11) | `spectrum_model_expected.json` — 10 binning, 8 zoom, 13 state steps, 10 draw lists (bit-exact) |
 | 14 | Passband overlay & waterfall controls | `UI/kiwi_gl_display.py` — `set_filter`, `draw_filter_overlay`, `filter_x`, `filter_cut_at_x`, `filter_edit_limit`, the LCD control boxes | `qt/src/core/passband_overlay.*`, `qt/src/core/waterfall_controls.*` | `tst_spectrum_model` (11) | `passband_overlay_expected.json` — 19 overlay, 27 handle, 16 edit-limit rows, 96 touch samples, control geometry |
 | 15 | Waterfall ring accessors, screenshot parity | `UI/kiwi_gl_display.py` — `WaterfallTexture`, `waterfall_line` | `qt/src/core/waterfall_model.*`, `qt/src/ui/waterfall_item.*`, `qt/src/ui/overlay_item.*`, `qt/src/ui/waterfall_view.*` | `tst_waterfall_palette` (7+), `tst_waterfall_frames` (3), `tst_waterfall_view` (12) | `waterfall_frames_expected.json` (12 rows × 5 streams) + `verify_waterfall_render.py` — 5/5 offscreen frames pixel-identical |
+| 16 | Home rail, drawer geometry & navigation | `UI/kiwi_gl_display.py` — `lcd_nav_*`, `lcd_drawer_back_box`, `navigation_*`, `menu_icon_filename`, `frequency_*`, `lcd_filter_drawer_*`, `receiver_home_drawer_boxes`, `fan_curve_drawer_boxes`, `compact_font_review_*`, `tests_option_at`, `radio_*`, `lcd_home_*` | `qt/src/core/navigation.*`, `qt/src/core/drawer_geometry.*`, `qt/src/core/menu_icons.*` | `tst_navigation` (15) | `navigation_expected.json` — 3 rails, 13 tiles, 15 hit tests, the navigation matrix, 10 icon rules, 2 frequency layouts, 6 filter presets, 3 drawer box tables, 9 Apps boxes, 8 mode families, the options matrix, Home instruments in both presentations |
+| 17 | Home screen wiring | — (new) | `qt/src/ui/home_view.*`, `qt/qml/HomeScreen.qml` | `tst_home_view` (8), `home_render` | one shared Back target across every drawer, drawers inside the rail, parent-aware Back, capability-disabled instruments, rendered-frame check |
 
-**Totals:** 13 ctest tests (11 suites plus two end-to-end render checks), 88 test
-methods, 10 golden files, 10 capture scripts, ~5.5k lines of library code across
-`src/core`, `src/transport`, `src/audio` and `src/ui`.
+| 18 | Audio & Display drawer bodies | `UI/kiwi_gl_display.py` — `audio_option_at`, `audio_volume_at_x`, `audio_squelch_at_x`, `audio_denoise_level_at_x`, `squelch_maximum`, `main_volume_label`, `format_filter_width`, `display_option_at`, `draw_lcd_audio_drawer`, `draw_display_setup_panel` | `qt/src/core/audio_controls.*`, `qt/src/core/drawer_bodies.*`, `qt/src/core/drawer_geometry.*` | `tst_drawer_bodies` (12) | `drawer_bodies_expected.json` — 15 audio boxes, 8 display boxes, every hit test, the drawer tiles the real Python drawers draw (4 audio states × 13 tiles, 3 display states), the three slider maps, the speed/palette boxes, the preset tables and the label rules |
+| 19 | Audio & Display drawer wiring | — (new) | `qt/src/ui/home_view.*`, `qt/qml/HomeScreen.qml` | `tst_home_view` (14), `audio_render`, `display_render` | the drawer's own tiles on screen, the volume/squelch/denoise drags, the squelch scale following the mode, the layout toggle, the waterfall following the Display drawer |
+
+**Totals:** 19 ctest tests (14 unit suites plus five render checks), 160 declared
+test slots across the suites, 12 golden files, 12 capture scripts, ~8.6k lines of
+library code across `src/core`, `src/transport`, `src/audio` and `src/ui`.
 
 ### 1.1 Modules
 
@@ -69,7 +80,7 @@ methods, 10 golden files, 10 capture scripts, ~5.5k lines of library code across
 | **Task 1** — domain core | **Complete** | — |
 | **Task 2** — Kiwi transport, audio, first live signal | Partial | Live `QWebSocket` session (upgrade request, `read_http_header`, accept check, redirect follow); SND worker loop (512-frame quanta + 1 s keepalive); PipeWire and ALSA audio backends; spectrum/s-meter *extraction* from live PCM. |
 | **Task 3** — waterfall & spectrum rendering | Complete on host | Only the frame-budget bullet is open, and it needs the CM5. Everything else renders and is verified offscreen. |
-| **Task 4** — Home screen & drawers | Not started | Home layout, drawer system, capability messaging, touch-operable on device. |
+| **Task 4** — Home screen & drawers | In progress | Rail, drawer geometry, navigation and icons ported and verified; Home screen renders; Frequency, Passband, Modes, Info, Apps, Audio and Display drawer bodies ported and rendered. Open: the receiver-browser body (LIST/MAP plus the five source segments), the installed icon artwork, and touch on the device. |
 | **Task 5** — configuration, persistence, deployment | Not started | Install layout, `receiver_sources.json` path wiring, the documented Python⇄Qt switch, remembered-receiver continuity. |
 | **Task 6** — parity harness & handover | Not started | Whole-project parity run, switch/revert instructions, maintainer handover. |
 
@@ -82,20 +93,26 @@ Produced on this macOS host with Qt 6.11.2 (Homebrew), Apple clang 21, CMake
 
 ```
 $ ctest --test-dir qt/build
-     1/13 display_geometry ...... Passed
-     2/13 receiver_catalog ...... Passed
-     3/13 tuning_waterfall ...... Passed
-     4/13 waterfall_palette ..... Passed
-     5/13 state_store .......... Passed
-     6/13 swipe_gesture ........ Passed
-     7/13 spectrum_model ....... Passed
-     8/13 waterfall_frames ..... Passed
-     9/13 kiwi_transport ....... Passed
-    10/13 audio_math ........... Passed
-    11/13 waterfall_view ....... Passed
-    12/13 waterfall_render_row1  Passed
-    13/13 waterfall_render_row2  Passed
-100% tests passed, 0 tests failed out of 13
+     1/19 display_geometry ...... Passed
+     2/19 receiver_catalog ...... Passed
+     3/19 tuning_waterfall ...... Passed
+     4/19 waterfall_palette ..... Passed
+     5/19 state_store .......... Passed
+     6/19 swipe_gesture ........ Passed
+     7/19 spectrum_model ....... Passed
+     8/19 navigation ........... Passed
+     9/19 drawer_bodies ........ Passed
+    10/19 waterfall_frames ..... Passed
+    11/19 kiwi_transport ....... Passed
+    12/19 audio_math ........... Passed
+    13/19 waterfall_view ....... Passed
+    14/19 home_view ............ Passed
+    15/19 home_render .......... Passed
+    16/19 audio_render ......... Passed
+    17/19 display_render ....... Passed
+    18/19 waterfall_render_row1  Passed
+    19/19 waterfall_render_row2  Passed
+100% tests passed, 0 tests failed out of 19
 ```
 
 The two `waterfall_render_*` cases are the end-to-end check: the runtime renders
@@ -177,6 +194,96 @@ recording because each was invisible to the others:
 3. The overlays tinted the captured frame. Captured mode now passes `null`
    overlays, so the check compares the waterfall alone.
 
+### 3.2 Home screen and drawers (Task 4, in progress)
+
+The rail, the drawer geometry and the navigation rules are ports, verified against
+the real Python functions by `capture_navigation.py`. The three rules the plan
+names are asserted through the object the QML screen actually uses, not only
+through the core:
+
+- **One shared Back target.** `lcdDrawerBackBox()` is the single definition, and
+  every drawer's close control, the Settings rail's last tile and all three of
+  `lcdRadioDrawerCloseBox` / `lcdDisplayDrawerCloseBox` / `lcdAudioDrawerCloseBox`
+  are that box. `tst_home_view` walks every drawer the screen can open and checks
+  its `back` control against it.
+- **Drawer bounds inside the rail.** No drawer control leaves `x >= 1024` or
+  `0 <= y <= 800`, and no Home control reaches into the RF canvas.
+- **No Home instrument covers another.** The passband sits under the mode grid,
+  the volume under the passband and the S-meter under the volume; the speaker
+  toggle and the slider travel never share a pixel. The compact S-meter is
+  *allowed* to pass the tile grid because the Python `max()` does, and that
+  exception is asserted rather than hidden.
+
+Capability handling is the receiver contract's, not a UI invention: on a shared
+FM-DX tuner the frequency readout renders visible-and-disabled with
+`kFmdxSharedFrequencyMessage` and reports it when touched, while volume stays
+live. `verify_home_screen.py` renders the screen offscreen and checks the frame
+for a painted rail, six tiles, the readout, the passband and the volume, so a box
+that is right in the model and wrong on the screen is caught.
+
+Seventeen of eighteen mutations were caught. The survivor is benign: swapping the
+passband `shift`/`width` hit-test order cannot be observed because the two boxes
+are disjoint. Two mutations that did survive initially revealed genuine gaps and
+were closed with new golden cases, not by relaxing the test.
+
+### 3.3 Audio and Display drawer bodies
+
+The two drawers are ports of the Python drawer functions, and the strings an
+operator reads in them are decided in C++ rather than in QML:
+`src/core/audio_controls.*` owns the audio state, the preset tables and the
+label rules (`AUTO`/`HANG`/`MANUAL`, `BYPASS`, `ALSA DIRECT`, `75 uS`, `MUTE` …),
+`src/core/drawer_bodies.*` turns that state into the two drawers' tiles with
+their boxes.
+
+The verification is again a capture, not a hand-written expectation, and for the
+tiles it records what the *real* drawer passes to its own primitives:
+`capture_drawer_bodies.py` wraps `draw_lcd_audio_tile` and
+`draw_lcd_audio_slider_tile`, runs the unmodified `draw_lcd_audio_drawer` and
+`draw_display_setup_panel`, and records the title, the detail, the active flag,
+the box and — for a slider — the level and range its fill is drawn from. Four
+audio states and three display states are captured, so the drawer's *order* is
+pinned as well as its text.
+
+Three findings are worth recording, because each was a real bug and not a
+curiosity:
+
+1. `f"{500.5:.0f}"` is `500`, not `501`. Python rounds an exact decimal half to
+   the nearest **even** digit, and so does neither `QString::number` nor
+   `snprintf` — a filter width would have read one hertz high, and
+   `f"{1250/1000:.1f}"` one tenth high. `formatDecimals` now does the
+   fixed-precision rendering itself from the exact binary expansion, and the
+   golden keeps the boundary cases (`500.5`, `999.5`, `1250`, `2450`, `1000.5`).
+2. The manual frequency keypad multiplied every entry by 1000. The Python rule is
+   `parse_frequency_entry_mhz`: MHz first, a pasted kHz value tolerated, against
+   the *active receiver's* ceiling — so `29.9` reads as 29900 kHz on a 30 MHz
+   receiver and as 29.9 kHz on one that stops at 20 MHz. The old port turned a
+   typed `7075` into 7.075 GHz; the rule and its boundary values are now golden.
+3. The audio drawer's Denoise row is a *detent slider*, not a tap control: the
+   Python option function does not name it, so a tap on it is not a control
+   action. The port keeps that split and asserts it, rather than quietly making
+   the row clickable. The middle of its track (x = 1152) is an exact tie between
+   the 0.4 and 0.6 detents, which pins Python's first-of-a-tie `min`.
+
+The whole drawer is rendered and checked: `--surface audio` and `--surface
+display` open one drawer offscreen, and `verify_drawer_render.py` then checks the
+frame for that drawer's own control boxes (read from the same golden) and for
+the shared Back control. `audio_render` and `display_render` are ctest cases.
+
+Nine mutations of the new rules were caught: the squelch ceiling, the audio tile
+order, `formatDecimals`, the display half-width split, the entry parser, the
+Denoise active rule, the volume track, the Display layout toggle and the Denoise
+detent tie-break. That last one survived first time and was closed by capturing
+the tie position itself, not by relaxing the test. Two remaining
+honest gaps: the compact readout presentation is what the port renders by default
+(the Python preference defaults to `expanded`, whose frequency lives in the
+canvas instrument layer that is not ported), and the Audio drawer's HF-enhance
+levels are all OFF because their local model files are a Python sidecar the Qt
+runtime does not ship.
+
+**Not done in this task:** the receiver-browser drawer body (LIST/MAP plus the
+five source segments), the installed icon artwork (the rail draws labels unless
+`--menu-icons` points at a directory), and any on-device touch verification.
+
 **Device evidence: none yet.** The CM5, its panel, its touch controller and both
 software fallbacks are unmeasured. The host bench
 (`--waterfall-bench`) reports 23.2 rows/s sustained, a 0.23 ms mean render time
@@ -257,6 +364,7 @@ UI/.venv/bin/python3 qt/tests/parity/capture_audio_math.py
 UI/.venv/bin/python3 qt/tests/parity/capture_spectrum_model.py
 UI/.venv/bin/python3 qt/tests/parity/capture_passband_overlay.py
 UI/.venv/bin/python3 qt/tests/parity/capture_waterfall_frames.py
+UI/.venv/bin/python3 qt/tests/parity/capture_navigation.py
 
 # This one only needs kiwi_gl_display's headless path:
 python3 qt/tests/parity/capture_state_store.py
@@ -394,6 +502,7 @@ These are deliberate and are recorded on the relevant headers as well.
 | Item | State |
 | --- | --- |
 | Commit `26b0bcc` — "Add Qt Quick runtime core with Python parity tests" | Committed and pushed to `origin/qt-redesign` (`lucaiuli/ituner-sdr-private`). |
-| Task 2 transport + audio, all of Task 3 | **Uncommitted** working-tree changes. |
+| Commit `bc1a9ac` — "Add Qt waterfall and spectrum rendering, and the Kiwi transport core" | Committed and pushed to `origin/qt-redesign` (Tasks 2 and 3). |
+| Task 4 (Home screen and drawers) | **Uncommitted** working-tree changes. |
 | Python application (`UI/`) | Unmodified; still the shipping runtime. |
 | `qt/build/` | Ignored via `.gitignore` (`qt/build/`, `qt/build-*/`). |

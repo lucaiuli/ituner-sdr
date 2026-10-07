@@ -3,6 +3,9 @@
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QDebug>
+
+#include <navigation.h>
 
 namespace ituner::app {
 namespace {
@@ -77,11 +80,25 @@ CliOptions parseCommandLine(QCoreApplication &app) {
         QStringLiteral("wf-row-pixels"),
         QStringLiteral("Waterfall screen rows per received line."), QStringLiteral("rows"),
         QStringLiteral("1"));
+    const QCommandLineOption homeOption(
+        QStringLiteral("home"),
+        QStringLiteral("Show the Home screen: the rail, its instruments and the drawers."));
+    const QCommandLineOption menuIconsOption(
+        QStringLiteral("menu-icons"),
+        QStringLiteral("Directory holding the 64x64 rail icons. Without it the rail draws "
+                       "labels only."),
+        QStringLiteral("dir"));
+    const QCommandLineOption surfaceOption(
+        QStringLiteral("surface"),
+        QStringLiteral("Open this drawer immediately, so it can be rendered and checked "
+                       "offscreen."),
+        QStringLiteral("name"));
 
     parser.addOptions({serverOption,      frequencyOption, orientationOption, fpsOption,
                        desktopOption,     durationOption,  panelOption,       platformOption,
                        screenshotOption,  selfTestOption,  waterfallFrameOption,
-                       waterfallStreamOption, waterfallBenchOption, wfRowPixelsOption});
+                       waterfallStreamOption, waterfallBenchOption, wfRowPixelsOption,
+                       homeOption, menuIconsOption, surfaceOption});
     // process() performs the standard --help/--version handling and terminates
     // the process on an unknown or malformed option.
     parser.process(app);
@@ -126,6 +143,19 @@ CliOptions parseCommandLine(QCoreApplication &app) {
     const int rowPixels = parser.value(wfRowPixelsOption).toInt(&ok);
     if (ok && rowPixels > 0) {
         options.waterfallRowPixels = rowPixels;
+    }
+
+    options.home = parser.isSet(homeOption);
+    options.menuIconDir = parser.value(menuIconsOption);
+    options.surface = parser.value(surfaceOption);
+    if (!options.surface.isEmpty()
+        && !ituner::core::openableSurfaces().contains(options.surface)) {
+        // An unknown surface is a typo, not a request to show nothing. The
+        // accepted set is the navigation surfaces plus every destination the
+        // rails can open, so a drawer that exists in the rail is always
+        // addressable here.
+        qWarning().noquote() << "unknown --surface" << options.surface;
+        parser.showHelp(2);
     }
 
     const QString panel = parser.value(panelOption);

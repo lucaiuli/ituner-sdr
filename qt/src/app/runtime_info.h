@@ -37,6 +37,9 @@ class RuntimeInfo : public QObject {
     Q_PROPERTY(int waterfallRowPixels READ waterfallRowPixels CONSTANT)
     Q_PROPERTY(double waterfallBenchSeconds READ waterfallBenchSeconds CONSTANT)
     Q_PROPERTY(int rfCanvasWidth READ rfCanvasWidth CONSTANT)
+    Q_PROPERTY(bool home READ home CONSTANT)
+    Q_PROPERTY(QString menuIconDir READ menuIconDir CONSTANT)
+    Q_PROPERTY(QString startSurface READ startSurface CONSTANT)
 
 public:
     explicit RuntimeInfo(CliOptions options, QObject *parent = nullptr);
@@ -66,6 +69,12 @@ public:
     double waterfallBenchSeconds() const { return m_options.waterfallBenchSeconds; }
     /// Width of the live RF surface, excluding the permanent control rail.
     int rfCanvasWidth() const { return m_layout.logical.width() == 1280 ? 1024 : m_layout.logical.width(); }
+    /// True when `--home` selected the Home screen.
+    bool home() const { return m_options.home; }
+    /// The configured rail-icon directory, or empty when none was given.
+    QString menuIconDir() const { return m_options.menuIconDir; }
+    /// The drawer `--surface` asked to open, or empty for the Home screen.
+    QString startSurface() const { return m_options.surface; }
 
     double fpsTarget() const { return m_options.fpsTarget; }
     double durationSeconds() const { return m_options.durationSeconds; }

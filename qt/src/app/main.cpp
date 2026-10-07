@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QtGlobal>
 
+#include <home_view.h>
 #include <overlay_item.h>
 #include <waterfall_item.h>
 #include <waterfall_view.h>
@@ -32,6 +33,7 @@ void registerQuickTypes() {
     qmlRegisterType<ituner::ui::WaterfallItem>("ItunerSdr.Ui", 1, 0, "WaterfallItem");
     qmlRegisterType<ituner::ui::OverlayItem>("ItunerSdr.Ui", 1, 0, "OverlayItem");
     qmlRegisterType<ituner::ui::WaterfallView>("ItunerSdr.Ui", 1, 0, "WaterfallView");
+    qmlRegisterType<ituner::ui::HomeView>("ItunerSdr.Ui", 1, 0, "HomeView");
 }
 
 }  // namespace
